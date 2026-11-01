@@ -57,7 +57,7 @@ function template(p) {
       <p class="pdp__tag">${p.tagline}</p>
 
       <div class="stock pdp__edition">
-        <div class="stock__row t-mono"><span><i class="dot" style="display:inline-block;margin-right:8px"></i>${left ? `${left} of ${p.edition} left` : 'Sold out'}</span><span>${Math.round((sold / p.edition) * 100)}% claimed</span></div>
+        <div class="stock__row t-mono"><span>${left ? `${left} of ${p.edition} left` : 'Sold out'}</span><span>${Math.round((sold / p.edition) * 100)}% claimed</span></div>
         <div class="stock__bar"><span class="stock__fill" style="--p:${(sold / p.edition) * 100}%"></span></div>
       </div>
 

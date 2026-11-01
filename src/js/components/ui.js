@@ -128,7 +128,7 @@ function initCursor() {
   document.addEventListener('pointerover', (e) => {
     const t = e.target.closest('[data-cursor], a, button');
     dot.classList.toggle('is-hover', !!t);
-    const txt = t?.closest('[data-cursor]')?.dataset.cursor;
+    const txt = e.target.closest?.('[data-cursor]')?.dataset.cursor;
     label.textContent = txt || ''; label.classList.toggle('is-on', !!txt);
   });
 }
