@@ -30,12 +30,15 @@
   <div class="stage" data-stage aria-hidden="true">
     <div class="stage__glow" data-stage-glow></div>
     <div class="stage__frame" data-stage-frame>
-      <img class="stage__img is-on" src="./images/m1-editorial-hero.webp" alt="" data-stage-img fetchpriority="high">
-      <img class="stage__img" src="./images/m1-editorial-sleeve.webp" alt="" data-stage-img>
-      <img class="stage__img" src="./images/m1-editorial-back.webp" alt="" data-stage-img>
-      <span class="stage__sheen"></span>
-      <div class="stage__tag glass"><span class="t-mono">M1 / 78C</span><span class="t-mono"><b data-m1-left>21</b> left</span></div>
-      <div class="stage__chip glass t-mono" data-stage-chip>800 FP · −25 °C</div>
+      <div class="stage__clip">
+        <img class="stage__img is-on" src="./images/m1-editorial-hero.webp" alt="" data-stage-img fetchpriority="high">
+        <img class="stage__img" src="./images/m1-editorial-sleeve.webp" alt="" data-stage-img>
+        <img class="stage__img" src="./images/m1-editorial-back.webp" alt="" data-stage-img>
+        <span class="stage__shade"></span>
+        <span class="stage__sheen"></span>
+        <div class="stage__tag"><span>M1 / 78C</span><span><span data-m1-left>21</span> left</span></div>
+      </div>
+      <div class="stage__chip"><b>800 FP</b><span>−25 °C</span></div>
     </div>
   </div>
 
@@ -69,7 +72,7 @@
 
       <div class="wrap hero__bottom">
         <div class="hero__side">
-          <span class="pill pill--live">Drop 01 is live</span>
+          <span class="btn btn--acid btn--static">Drop 01 is live</span>
           <p>Seventy-eight hand-filled down cells, sealed in satin ripstop. Built for −25 °C city nights.</p>
         </div>
         <div class="hero__cta">
@@ -84,7 +87,7 @@
       <div class="wrap chapter__grid">
         <div class="chapter__text">
           <p class="index-num">Warmth</p>
-          <h2 class="t-h2" data-split>78 cells.<br>Zero cold <em>spots</em>.</h2>
+          <h2 class="t-h2" data-split>78 <span class="hl">cells.</span><br>Zero cold <em class="hl">spots</em>.</h2>
           <p class="t-lead" data-reveal>Every cell is filled by hand and sewn shut on its own, so the down can't migrate. You get even warmth from the collar to the hem — and that heavy, sculpted silhouette.</p>
           <dl class="specs" data-reveal-stagger>
             <div><dt class="t-mono">Fill power</dt><dd><span data-count="800">800</span><small>FP</small></dd></div>
@@ -104,16 +107,19 @@
       <div class="wrap chapter__grid">
         <div class="chapter__text">
           <p class="index-num">The drop</p>
-          <h2 class="t-h2" data-split>Numbered.<br>Never <em>restocked</em>.</h2>
+          <h2 class="t-h2" data-split>Numbered.<br><span class="hl">Never</span> <em>restocked</em>.</h2>
           <div class="drop-counter" data-reveal>
             <span class="drop-counter__big" data-m1-left-count>21</span>
             <span class="drop-counter__of t-mono">of 78 M1 Obsidian<br>pieces remain</span>
           </div>
           <div class="size-stock" data-size-stock aria-label="Stock by size"></div>
           <div class="drop-buy" data-reveal>
-            <p class="drop-buy__price">€890 <span class="t-mono t-muted">VAT incl. · duties paid</span></p>
-            <div class="drop-buy__sizes" role="group" aria-label="Quick add M1 Obsidian by size" data-drop-sizes></div>
-            <p class="t-mono t-muted">Pick a size to add instantly · max 2 per size · 30-day returns</p>
+            <div class="drop-buy__top">
+              <span class="drop-buy__price">€890</span>
+              <span class="info" tabindex="0" role="button" aria-label="Price information: VAT included, duties paid">i<span class="info__bubble" role="tooltip">VAT incl. · duties paid</span></span>
+            </div>
+            <div class="drop-buy__sizes" role="radiogroup" aria-label="Choose a size for M1 Obsidian" data-drop-sizes></div>
+            <button class="btn btn--dark btn--block drop-buy__add" type="button" data-drop-add disabled><span class="btn__label">Choose a size</span><svg class="btn__icon"><use href="#i-arrow"/></svg></button>
           </div>
         </div>
       </div>
@@ -129,7 +135,8 @@
         </div>
         <div class="wrap details__ui">
           <header class="details__head">
-            <h2 class="details__title" id="details-title">Closer.</h2>
+            <h2 class="details__title" id="details-title" aria-label="Closer.">CLOSER.</h2>
+            <p class="details__sub">Six details that make the M1. Scroll through, or pick one from the list.</p>
           </header>
           <ol class="details__index glass" data-detail-index>
             <li class="is-on"><button type="button" data-detail-go="0">The jacket</button></li>

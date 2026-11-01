@@ -8,19 +8,27 @@ const $$ = (s, r = document) => [...r.querySelectorAll(s)];
 /* ---------- split text: [data-split="lines|words|chars"] ---------- */
 export function split(el, mode = el.dataset.split || 'words') {
   if (el.dataset.splitDone) return el.querySelectorAll('.word, .char');
-  const text = el.innerHTML;
-  const tokens = text.split(/(<br\s*\/?>)/i);
-  el.innerHTML = tokens.map((tk) => {
-    if (/^<br/i.test(tk)) return '<br>';
-    return tk.split(/(\s+)/).map((w) => {
-      if (/^\s+$/.test(w) || !w) return w;
-      if (/<[^>]+>/.test(w)) return `<span class="line-mask"><span class="word">${w}</span></span>`;
-      const inner = mode === 'chars' ? [...w].map((c) => `<span class="char">${c}</span>`).join('') : w;
-      return `<span class="line-mask" style="display:inline-block"><span class="word">${inner}</span></span>`;
-    }).join('');
-  }).join('');
-  el.dataset.splitDone = '1';
   el.setAttribute('aria-label', el.textContent.replace(/\s+/g, ' ').trim());
+  // walk text nodes only, so inline elements (<em>, <span class="hl">, <br>) keep their tags and styles
+  const walk = (node) => {
+    [...node.childNodes].forEach((n) => {
+      if (n.nodeType === 1) { if (n.tagName !== 'BR') walk(n); return; }
+      if (n.nodeType !== 3 || !n.textContent.trim()) return;
+      const frag = document.createDocumentFragment();
+      n.textContent.split(/(\s+)/).forEach((w) => {
+        if (!w) return;
+        if (/^\s+$/.test(w)) { frag.appendChild(document.createTextNode(' ')); return; }
+        const mask = document.createElement('span'); mask.className = 'line-mask'; mask.style.display = 'inline-block';
+        const word = document.createElement('span'); word.className = 'word';
+        if (mode === 'chars') [...w].forEach((c) => { const ch = document.createElement('span'); ch.className = 'char'; ch.textContent = c; word.appendChild(ch); });
+        else word.textContent = w;
+        mask.appendChild(word); frag.appendChild(mask);
+      });
+      n.replaceWith(frag);
+    });
+  };
+  walk(el);
+  el.dataset.splitDone = '1';
   return el.querySelectorAll(mode === 'chars' ? '.char' : '.word');
 }
 

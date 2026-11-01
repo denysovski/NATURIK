@@ -12,10 +12,7 @@ export function productCard(p, { eager = false, index = 0 } = {}) {
       <img src="${p.images[0].src}" srcset="${p.images[0].sm} 480w, ${p.images[0].src} 1100w" sizes="${SIZES_ATTR}" alt="${p.images[0].alt}" ${eager ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async" width="800" height="1000">
       <img src="${(p.images[1] || p.images[0]).src}" srcset="${(p.images[1] || p.images[0]).sm} 480w, ${(p.images[1] || p.images[0]).src} 1100w" sizes="${SIZES_ATTR}" alt="" loading="lazy" decoding="async" width="800" height="1000" aria-hidden="true">
       <div class="p-card__badges"><span class="pill ${left <= 8 ? 'pill--live' : ''}">${status}</span><span class="p-card__swatch" style="background:${p.swatch}" title="${p.colorName}"></span></div>
-      <div class="p-card__quick" role="group" aria-label="Quick add ${p.fullName}">
-        <span class="p-card__quick-label t-mono">Quick add — size</span>
-        ${SIZES.map((s) => `<button class="size-chip size-chip--mini" type="button" data-quick-add="${p.slug}" data-size="${s}" ${p.stock[s] ? '' : 'disabled'} aria-label="Add size ${s}">${s}</button>`).join('')}
-      </div>
+      <span class="p-card__more btn btn--acid btn--s" aria-hidden="true"><span class="btn__label">Read more</span><svg class="btn__icon"><use href="#i-arrow"/></svg></span>
     </div>
     <a class="p-card__link" data-cursor="View" href="./shop.html?p=${p.slug}" data-open-product="${p.slug}"><span class="sr-only">View ${p.fullName}</span></a>
     <div class="p-card__info">

@@ -27,18 +27,25 @@ export function mount(root = document) {
     const n = m1.stock[s];
     return `<div class="size-stock__row"><span class="t-mono">${s}</span><span class="stock__bar"><span class="stock__fill" style="--p:${(n / 8) * 100}%"></span></span><span class="t-mono ${n <= 2 ? 'is-low' : ''}">${n ? `${n} left` : 'Sold out'}</span></div>`;
   }).join('');
-  const drop = $('[data-drop-sizes]');
-  drop.innerHTML = SIZES.map((s) => `<button type="button" class="size-chip" data-size="${s}" ${m1.stock[s] ? '' : 'disabled'} aria-label="Add M1 Obsidian size ${s} to bag">${s}</button>`).join('');
+  const drop = $('[data-drop-sizes]'), dropAdd = $('[data-drop-add]');
+  let dropSize = null;
+  drop.innerHTML = SIZES.map((s) => `<button type="button" class="size-chip" role="radio" aria-checked="false" data-size="${s}" ${m1.stock[s] ? '' : 'disabled'} aria-label="Size ${s}">${s}</button>`).join('');
   on(drop, 'click', (e) => {
-    const b = e.target.closest('[data-size]'); if (!b) return;
-    if (addToBag('m1-obsidian', b.dataset.size)) { b.setAttribute('aria-pressed', 'true'); setTimeout(() => b.setAttribute('aria-pressed', 'false'), 900); }
+    const b = e.target.closest('[data-size]'); if (!b || b.disabled) return;
+    dropSize = b.dataset.size;
+    drop.querySelectorAll('[data-size]').forEach((x) => { const on = x === b; x.setAttribute('aria-pressed', String(on)); x.setAttribute('aria-checked', String(on)); });
+    dropAdd.disabled = false; dropAdd.querySelector('.btn__label').textContent = `Add to cart — size ${dropSize}`;
+  });
+  on(dropAdd, 'click', () => {
+    if (!dropSize) return;
+    if (addToBag('m1-obsidian', dropSize)) { dropAdd.querySelector('.btn__label').textContent = 'Added to cart'; setTimeout(() => (dropAdd.querySelector('.btn__label').textContent = `Add to cart — size ${dropSize}`), 1400); }
   });
 
   /* =========================================================
      IMAGE STAGE — one glass-framed photo that travels with the story
      ========================================================= */
   const stage = $('[data-stage]'), frame = $('[data-stage-frame]'), glow = $('[data-stage-glow]');
-  const stageImgs = $$('[data-stage-img]'), chip = $('[data-stage-chip]'), sheen = root.querySelector('.stage__sheen');
+  const stageImgs = $$('[data-stage-img]'), sheen = root.querySelector('.stage__sheen');
   const S = { x: 0, y: vp.mobile ? 0.12 : 0.07, scale: vp.mobile ? 0.8 : 0.96, rotY: 0, rotZ: 0, img: 0, zoom: 1.06, pan: 0, opacity: 1 };
   let lastImg = -1, hidden = false, lastKey = '';
 
@@ -70,8 +77,6 @@ export function mount(root = document) {
     frame.classList.toggle('is-hover', e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom);
   }, { passive: true });
 
-  const chipText = ['800 FP · −25 °C', '78 cells · 420 g down', `${totalStock(m1)} of 78 left`];
-  const setChip = (i) => { if (chip.dataset.i == i) return; chip.dataset.i = i; gsap.to(chip, { opacity: 0, y: 6, duration: 0.2, onComplete: () => { chip.textContent = chipText[i]; gsap.to(chip, { opacity: 1, y: 0, duration: 0.4 }); } }); };
 
   /* =========================================================
      DETAILS — pinned full-bleed zoom with glass cards
@@ -179,8 +184,6 @@ export function mount(root = document) {
     gsap.timeline({ scrollTrigger: { trigger: '#manifesto', start: 'top bottom', end: 'top 25%', scrub: true } })
       .fromTo(media, { scale: 1, borderRadius: 0 }, { scale: 0.68, borderRadius: 28, ease: 'none', immediateRender: false }, 0)
       .to(root.querySelector('.details__ui'), { opacity: 0, y: -30, ease: 'none' }, 0);
-    ScrollTrigger.create({ trigger: '#spec', start: 'top 60%', onEnter: () => setChip(1), onLeaveBack: () => setChip(0) });
-    ScrollTrigger.create({ trigger: '#drop', start: 'top 60%', onEnter: () => setChip(2), onLeaveBack: () => setChip(1) });
     gsap.fromTo(media, { scale: 0.68, borderRadius: 28 }, { scale: 1, borderRadius: 0, ease: 'none', immediateRender: true, scrollTrigger: { trigger: '#details', start: 'top 85%', end: 'top top', scrub: true } });
 
 

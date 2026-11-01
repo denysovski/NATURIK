@@ -721,3 +721,65 @@ body.is-locked { overflow: visible; }
 .details__card-text { color: rgba(0,0,0,0.78); }
 .details__card-title { color: #000; }
 .hero__stock-label { margin: 0 0 4px; font-family: var(--f-display); font-weight: 500; font-size: 1.15rem; line-height: 1.12; letter-spacing: -0.03em; color: var(--c-bone); }
+
+/* =========================== round: stage, drop buy box, closer, card hover =========================== */
+/* stage: frame no longer clips (so the circle can sit on the edge); a clip layer holds the photo */
+.stage__frame { overflow: visible !important; contain: none !important; background: none !important; box-shadow: none !important; border: 0 !important; }
+.stage__clip { position: absolute; inset: 0; border-radius: 26px; overflow: hidden; background: #111; transform: translateZ(0); }
+.stage__shade { position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background: linear-gradient(180deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.18) 22%, rgba(0,0,0,0.22) 60%, rgba(0,0,0,0.42) 100%); }
+.stage__tag { position: absolute; z-index: 3; left: 18px; right: 18px; top: 16px; display: flex; justify-content: space-between; align-items: center;
+  padding: 0 !important; background: none !important; box-shadow: none !important; border: 0 !important; color: var(--c-acid) !important;
+  font-family: var(--f-display); font-weight: 700 !important; font-size: 1.05rem; letter-spacing: -0.02em !important; }
+.stage__chip { position: absolute; z-index: 4; left: 50%; bottom: 0; transform: translate(-50%, 50%); width: 118px; height: 118px; border-radius: 50%;
+  display: grid; place-content: center; justify-items: center; gap: 2px; padding: 0 !important; text-align: center;
+  background: var(--c-cobalt) !important; color: #fff !important; box-shadow: 0 14px 34px -10px rgba(0,0,0,0.6) !important;
+  font-family: var(--f-display); transition: background-color 0.45s var(--ease-out), color 0.45s var(--ease-out); }
+.stage__chip b { font-size: 1.55rem; font-weight: 600; letter-spacing: -0.04em; line-height: 1; }
+.stage__chip span { font-size: 0.95rem; font-weight: 500; letter-spacing: -0.01em; opacity: 0.9; }
+.stage__frame.is-hover .stage__chip { background: var(--c-acid) !important; color: #000 !important; }
+.stage__frame.is-hover .stage__tag { background: none !important; color: var(--c-acid) !important; }
+@media (max-width: 819px) { .stage__chip { width: 92px; height: 92px; } .stage__chip b { font-size: 1.2rem; } .stage__chip span { font-size: 0.8rem; } }
+
+/* hero: "Drop 01 is live" looks like the Shop button, but is static */
+.btn--static { pointer-events: none; cursor: default; }
+.btn--static::before { display: none; }
+.hero__side .btn--static { color: #000; }
+.ht--1 { left: calc(33vw - 120px); }
+@media (max-width: 819px) { .ht--1 { left: 6vw; } }
+
+/* blue accents in headlines + counter */
+.t-h2 .hl, .t-h2 em.hl, .chapter .hl, .hl .word { color: var(--c-cobalt); }
+.drop-counter__big { color: var(--c-cobalt); }
+
+/* stock per size: bigger regular numbers, blue bars, no dot */
+.size-stock__row { grid-template-columns: 40px 1fr 96px; }
+.size-stock__row span { font-size: 1.05rem !important; font-weight: 400 !important; }
+.size-stock__row .is-low { font-weight: 400 !important; color: var(--c-ink); }
+.size-stock__row .is-low::before { content: none; }
+.size-stock__row .stock__fill { background: var(--c-cobalt); }
+
+/* drop buy box */
+.drop-buy__top { display: flex; align-items: center; gap: 12px; }
+.drop-buy__price { display: inline-flex; align-items: center; height: 48px; padding: 0 20px; border-radius: 14px; background: var(--c-acid); color: #000; font-size: 1.6rem; font-weight: 600; letter-spacing: -0.04em; }
+.info { position: relative; display: inline-grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: #fff; border: 1px solid #000; color: #000;
+  font: 600 13px/1 var(--f-display); font-style: italic; cursor: help; }
+.info__bubble { position: absolute; left: 50%; bottom: calc(100% + 10px); transform: translate(-50%, 6px); white-space: nowrap; padding: 9px 12px; border-radius: 10px;
+  background: var(--c-ink); color: var(--c-bone); font: 500 0.85rem/1 var(--f-display); font-style: normal; opacity: 0; pointer-events: none; transition: opacity 0.25s, transform 0.35s var(--ease-out); }
+.info__bubble::after { content: ''; position: absolute; left: 50%; top: 100%; margin-left: -6px; border: 6px solid transparent; border-top-color: var(--c-ink); }
+.info:hover .info__bubble, .info:focus-visible .info__bubble { opacity: 1; transform: translate(-50%, 0); }
+.drop-buy__sizes .size-chip[aria-pressed='true'] { background: var(--c-ink); color: var(--c-bone); border-color: var(--c-ink); }
+.drop-buy__add { height: 54px; }
+.drop-buy__add[disabled] { opacity: 0.45; }
+
+/* Closer: darker index, full Dirtyline caps, subtitle */
+.details__index { background: rgba(10,10,12,0.92) !important; }
+.details__title { text-transform: none; }
+.details__head { flex-direction: column; align-items: flex-start; gap: 10px; }
+.details__sub { max-width: 34ch; font-size: 1.05rem; line-height: 1.35; color: rgba(255,255,255,0.85); text-shadow: 0 2px 14px rgba(0,0,0,0.6); }
+
+/* six pieces: hover shows a "Read more" button bottom-right */
+.p-card__more { position: absolute; right: 12px; bottom: 12px; z-index: 6; pointer-events: none; opacity: 0; transform: translateY(10px); transition: opacity 0.3s, transform 0.45s var(--ease-out); }
+.p-card__more::before { display: none; }
+.p-card:hover .p-card__more, .p-card:focus-within .p-card__more { opacity: 1; transform: none; }
+@media (hover: none) { .p-card__more { opacity: 1; transform: none; } }
