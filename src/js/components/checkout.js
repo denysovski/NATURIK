@@ -133,7 +133,7 @@ function render() {
         <header class="co-top">
           <p class="t-mono t-muted">NATURIK — secure checkout</p>
           <h2 class="co-title" id="checkout-title">Checkout</h2>
-          <ol class="co-steps" aria-label="Checkout progress">${STEPS.map((n, i) => `<li class="${i < s ? 'is-done' : i === s ? 'is-current' : ''}" ${i === s ? 'aria-current="step"' : ''}><span class="t-mono">0${i + 1}</span>${n}</li>`).join('')}</ol>
+          <ol class="co-steps" aria-label="Checkout progress">${STEPS.map((n, i) => `<li class="${i < s ? 'is-done' : i === s ? 'is-current' : ''}" ${i === s ? 'aria-current="step"' : ''}>${n}</li>`).join('')}</ol>
         </header>
         <div class="co-step" data-step>${stepView()}</div>
         <div class="co-nav">

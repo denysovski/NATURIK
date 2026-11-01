@@ -28,7 +28,7 @@
   <div class="loader" data-loader aria-hidden="true">
     <div class="loader__top t-mono"><span>NATURIK / Drop 01</span><span>FW26 — Prague</span></div>
     <div class="loader__brand"><span>N</span><span>a</span><span>t</span><span>u</span><span>r</span><span>i</span><span>k</span></div>
-    <div><div class="loader__count"><span data-loader-count>000</span> — filling 78 cells</div><div class="loader__bar"><i data-loader-bar></i></div></div>
+    <div><div class="loader__count t-mono">Loading Drop 01</div><div class="loader__bar"><i data-loader-bar></i></div></div>
   </div>
 
   <!-- Image stage: one glass-framed photo that follows the story down the page -->
@@ -49,10 +49,10 @@
       <div class="hero__bg" aria-hidden="true"></div>
       <div class="wrap hero__top">
         <div class="hero__thumbs" data-reveal-stagger>
-          <figure><img src="./images/m1-detail-print-sm.webp" alt="" width="72" height="90"></figure>
-          <figure><img src="./images/m1-detail-collar-sm.webp" alt="" width="72" height="90"></figure>
-          <figure><img src="./images/m1-detail-sleeve-sm.webp" alt="" width="72" height="90"></figure>
-          <p class="t-mono">M1 Puffer 78C<br>Limited edition<br>78 / 78</p>
+          <button type="button" class="hero__thumb hv" data-lb="hero" data-lb-src="./images/m1-editorial-hero.webp" data-lb-caption="M1 Puffer 78C — Obsidian" data-cursor="View" aria-label="View photo: M1 Puffer front"><img src="./images/m1-editorial-hero-sm.webp" alt="M1 Puffer 78C front, worn with goggles" width="72" height="90"></button>
+          <button type="button" class="hero__thumb hv" data-lb="hero" data-lb-src="./images/m1-editorial-sleeve.webp" data-lb-caption="Shoulder cell and M1 print" data-cursor="View" aria-label="View photo: shoulder and print"><img src="./images/m1-editorial-sleeve-sm.webp" alt="Shoulder cell and chest print" width="72" height="90"></button>
+          <button type="button" class="hero__thumb hv" data-lb="hero" data-lb-src="./images/m1-editorial-back.webp" data-lb-caption="Back collar" data-cursor="View" aria-label="View photo: back collar"><img src="./images/m1-editorial-back-sm.webp" alt="Back collar of the M1 Puffer" width="72" height="90"></button>
+          <p class="t-mono">M1 Puffer 78C<br>Limited edition<br>Tap to view</p>
         </div>
         <div class="hero__center">
           <div class="hero__pills"><span class="pill pill--dark" aria-hidden="true">●●</span><span class="pill">FW · 2026</span></div>
@@ -85,11 +85,11 @@
       </div>
     </section>
 
-    <!-- 01 SPEC — jacket left, text right -->
+    <!-- SPEC — photo left, text right -->
     <section class="chapter chapter--right" id="spec" data-chapter="spec" data-header-light>
       <div class="wrap chapter__grid">
         <div class="chapter__text">
-          <p class="index-num">01 — Warmth</p>
+          <p class="index-num">Warmth</p>
           <h2 class="t-h2" data-split>78 cells.<br>Zero cold spots.</h2>
           <p class="t-lead" data-reveal>Every cell is filled by hand and sewn shut on its own, so the down can't migrate. You get even warmth from the collar to the hem — and that heavy, sculpted silhouette.</p>
           <dl class="specs" data-reveal-stagger>
@@ -109,7 +109,7 @@
     <section class="chapter chapter--left" id="drop" data-chapter="drop" data-header-light>
       <div class="wrap chapter__grid">
         <div class="chapter__text">
-          <p class="index-num">02 — The drop</p>
+          <p class="index-num">The drop</p>
           <h2 class="t-h2" data-split>Numbered.<br>Never restocked.</h2>
           <div class="drop-counter" data-reveal>
             <span class="drop-counter__big" data-m1-left-count>21</span>
@@ -141,20 +141,19 @@
             <h2 class="details__title" id="details-title">Closer.</h2>
           </header>
           <ol class="details__index glass" data-detail-index>
-            <li class="is-on"><span class="t-mono">00</span>The jacket</li>
-            <li><span class="t-mono">01</span>Funnel collar</li>
-            <li><span class="t-mono">02</span>M1 print</li>
-            <li><span class="t-mono">03</span>Shoulder cell</li>
-            <li><span class="t-mono">04</span>Offset zip</li>
-            <li><span class="t-mono">05</span>Back collar</li>
+            <li class="is-on">The jacket</li>
+            <li>Funnel collar</li>
+            <li>M1 print</li>
+            <li>Shoulder cell</li>
+            <li>Offset zip</li>
+            <li>Back collar</li>
           </ol>
           <article class="details__card glass" data-detail-card aria-live="polite">
-            <p class="t-mono details__card-num" data-dc-num>00 / 05</p>
-            <h3 class="details__card-title" data-dc-title>M1 Puffer 78C</h3>
+                        <h3 class="details__card-title" data-dc-title>M1 Puffer 78C</h3>
             <p class="details__card-text" data-dc-text>Seventy-eight hand-filled cells, one funnel collar, a satin shell that throws light like wet asphalt.</p>
             <p class="t-mono details__card-spec" data-dc-spec>Obsidian · 78 pieces</p>
           </article>
-          <div class="details__progress t-mono"><span data-dc-count>00</span><span class="details__bar"><i data-dc-bar></i></span><span>05</span></div>
+          <div class="details__progress" aria-hidden="true"><span class="details__bar"><i data-dc-bar></i></span></div>
         </div>
       </div>
     </section>
@@ -162,7 +161,7 @@
     <!-- 04 ABOUT / MESSAGE -->
     <section class="manifesto theme-light" id="manifesto" data-header-light>
       <div class="wrap">
-        <p class="index-num">03 — Who we are</p>
+        <p class="index-num">Who we are</p>
         <p class="manifesto__text" data-scrub-text>We are a small studio in Prague that makes one jacket at a time, properly. No seasons, no sale rail, no landfill. A drop is finished when the last cell is sold — then we start drawing the next one.</p>
         <div class="manifesto__cols" data-reveal-stagger>
           <div><h3 class="t-mono">Our message</h3><p>Warmth should be engineered, not marketed. Every number on this page is a real spec.</p></div>
@@ -176,21 +175,21 @@
     <section class="who theme-dark" aria-labelledby="who-title">
       <div class="wrap">
         <div class="who__head">
-          <p class="index-num">04 — Who it's for</p>
+          <p class="index-num">Who it's for</p>
           <h2 class="t-h2" id="who-title" data-split>Made for the ones<br>out after dark.</h2>
         </div>
         <div class="who__grid">
           <article class="who-card" data-reveal>
-            <div class="who-card__media" data-clip><img src="./images/look-01.webp" alt="Figure in goggles and down jacket in near darkness" loading="lazy"></div>
-            <p class="t-mono">A — Night commute</p><h3 class="t-h3">−15 °C on a bike at 6 am.</h3><p class="t-muted">Collar up, cuffs sealed, nothing gets in.</p>
+            <div class="who-card__media hv" data-clip data-lb="who" data-cursor="View" role="button" tabindex="0" aria-label="View larger"><img src="./images/look-01.webp" alt="Figure in goggles and down jacket in near darkness" loading="lazy"></div>
+            <p class="t-mono">Night commute</p><h3 class="t-h3">−15 °C on a bike at 6 am.</h3><p class="t-muted">Collar up, cuffs sealed, nothing gets in.</p>
           </article>
           <article class="who-card" data-reveal data-delay="0.1">
-            <div class="who-card__media" data-clip><img src="./images/look-02.webp" alt="Masked figure in a glossy puffer under hard light" loading="lazy"></div>
-            <p class="t-mono">B — Creative shift</p><h3 class="t-h3">Studios, sets, rooftops.</h3><p class="t-muted">A silhouette people remember without a logo on it.</p>
+            <div class="who-card__media hv" data-clip data-lb="who" data-cursor="View" role="button" tabindex="0" aria-label="View larger"><img src="./images/look-02.webp" alt="Masked figure in a glossy puffer under hard light" loading="lazy"></div>
+            <p class="t-mono">Creative shift</p><h3 class="t-h3">Studios, sets, rooftops.</h3><p class="t-muted">A silhouette people remember without a logo on it.</p>
           </article>
           <article class="who-card" data-reveal data-delay="0.2">
-            <div class="who-card__media" data-clip><img src="./images/look-04.webp" alt="Figure from behind in black hoodie, beanie and leather gloves" loading="lazy"></div>
-            <p class="t-mono">C — The collector</p><h3 class="t-h3">Numbered, never restocked.</h3><p class="t-muted">Your piece number is stitched inside the collar.</p>
+            <div class="who-card__media hv" data-clip data-lb="who" data-cursor="View" role="button" tabindex="0" aria-label="View larger"><img src="./images/look-04.webp" alt="Figure from behind in black hoodie, beanie and leather gloves" loading="lazy"></div>
+            <p class="t-mono">The collector</p><h3 class="t-h3">Numbered, never restocked.</h3><p class="t-muted">Your piece number is stitched inside the collar.</p>
           </article>
         </div>
       </div>
@@ -199,16 +198,16 @@
     <!-- 06 LOOKBOOK — horizontal pinned gallery -->
     <section class="lookbook theme-dark" aria-labelledby="look-title">
       <div class="lookbook__pin" data-look-pin>
-        <div class="wrap lookbook__head"><h2 class="t-h2" id="look-title">Lookbook<sup class="t-mono">08</sup></h2><p class="t-mono t-muted">Drag or scroll →</p></div>
+        <div class="wrap lookbook__head"><h2 class="t-h2" id="look-title">Lookbook</h2><p class="t-mono t-muted">Drag or scroll →</p></div>
         <div class="lookbook__track" data-look-track>
-          <figure class="look"><img src="./images/m1-editorial-hero.webp" alt="M1 Puffer worn with green goggles and knit balaclava" loading="lazy"><figcaption class="t-mono">01 — M1 Obsidian / acid lens</figcaption></figure>
-          <figure class="look look--tall"><img src="./images/look-01.webp" alt="Figure in ski goggles lit from the side" loading="lazy"><figcaption class="t-mono">02 — Night shift</figcaption></figure>
-          <figure class="look"><img src="./images/m1-editorial-sleeve.webp" alt="Sleeve and chest print of the M1 Puffer" loading="lazy"><figcaption class="t-mono">03 — Shoulder cell</figcaption></figure>
-          <figure class="look look--wide"><img src="./images/look-02.webp" alt="Masked figure in a glossy puffer" loading="lazy"><figcaption class="t-mono">04 — Chrome mask</figcaption></figure>
-          <figure class="look"><img src="./images/look-07.webp" alt="Gloved hand with sculptural metal claws" loading="lazy"><figcaption class="t-mono">05 — Accessory study</figcaption></figure>
-          <figure class="look look--tall"><img src="./images/m1-editorial-back.webp" alt="Back of the M1 Puffer collar" loading="lazy"><figcaption class="t-mono">06 — Back collar</figcaption></figure>
-          <figure class="look"><img src="./images/look-06.webp" alt="Silhouette in black under a spotlight" loading="lazy"><figcaption class="t-mono">07 — Silhouette</figcaption></figure>
-          <figure class="look look--tall"><img src="./images/look-08.webp" alt="Black sculptural hand on white" loading="lazy"><figcaption class="t-mono">08 — Form</figcaption></figure>
+          <figure class="look hv" data-lb="look" data-lb-src="./images/m1-editorial-hero.webp" data-lb-caption="M1 Obsidian / acid lens" data-cursor="View" tabindex="0" role="button" aria-label="View: M1 Obsidian / acid lens"><img src="./images/m1-editorial-hero.webp" alt="M1 Puffer worn with green goggles and knit balaclava" loading="lazy"><figcaption class="t-mono">M1 Obsidian / acid lens</figcaption></figure>
+          <figure class="look look--tall hv" data-lb="look" data-lb-src="./images/look-01.webp" data-lb-caption="Night shift" data-cursor="View" tabindex="0" role="button" aria-label="View: Night shift"><img src="./images/look-01.webp" alt="Figure in ski goggles lit from the side" loading="lazy"><figcaption class="t-mono">Night shift</figcaption></figure>
+          <figure class="look hv" data-lb="look" data-lb-src="./images/m1-editorial-sleeve.webp" data-lb-caption="Shoulder cell" data-cursor="View" tabindex="0" role="button" aria-label="View: Shoulder cell"><img src="./images/m1-editorial-sleeve.webp" alt="Sleeve and chest print of the M1 Puffer" loading="lazy"><figcaption class="t-mono">Shoulder cell</figcaption></figure>
+          <figure class="look look--wide hv" data-lb="look" data-lb-src="./images/look-02.webp" data-lb-caption="Chrome mask" data-cursor="View" tabindex="0" role="button" aria-label="View: Chrome mask"><img src="./images/look-02.webp" alt="Masked figure in a glossy puffer" loading="lazy"><figcaption class="t-mono">Chrome mask</figcaption></figure>
+          <figure class="look hv" data-lb="look" data-lb-src="./images/look-07.webp" data-lb-caption="Accessory study" data-cursor="View" tabindex="0" role="button" aria-label="View: Accessory study"><img src="./images/look-07.webp" alt="Gloved hand with sculptural metal claws" loading="lazy"><figcaption class="t-mono">Accessory study</figcaption></figure>
+          <figure class="look look--tall hv" data-lb="look" data-lb-src="./images/m1-editorial-back.webp" data-lb-caption="Back collar" data-cursor="View" tabindex="0" role="button" aria-label="View: Back collar"><img src="./images/m1-editorial-back.webp" alt="Back of the M1 Puffer collar" loading="lazy"><figcaption class="t-mono">Back collar</figcaption></figure>
+          <figure class="look hv" data-lb="look" data-lb-src="./images/look-06.webp" data-lb-caption="Silhouette" data-cursor="View" tabindex="0" role="button" aria-label="View: Silhouette"><img src="./images/look-06.webp" alt="Silhouette in black under a spotlight" loading="lazy"><figcaption class="t-mono">Silhouette</figcaption></figure>
+          <figure class="look look--tall hv" data-lb="look" data-lb-src="./images/look-08.webp" data-lb-caption="Form" data-cursor="View" tabindex="0" role="button" aria-label="View: Form"><img src="./images/look-08.webp" alt="Black sculptural hand on white" loading="lazy"><figcaption class="t-mono">Form</figcaption></figure>
         </div>
       </div>
     </section>

@@ -39,12 +39,12 @@ function template(p) {
   </div>
   <div class="pdp__grid">
     <section class="pdp__gallery" aria-label="Gallery">
-      <span class="pdp__tabs glass t-mono">${p.images.length} photos · tap to zoom</span>
+      <span class="pdp__tabs glass t-mono">Tap to zoom</span>
       <div class="pdp__stage" data-stage>
         <div class="pdp__slides" data-slides tabindex="0" aria-label="Product images, use arrow keys">
-          ${p.images.map((im, i) => `<figure class="pdp__slide" data-cursor="Zoom"><img src="${im.src}" alt="${im.alt}" ${i ? 'loading="lazy"' : ''} decoding="async"></figure>`).join('')}
+          ${p.images.map((im, i) => `<figure class="pdp__slide hv" data-cursor="Zoom"><img src="${im.src}" alt="${im.alt}" ${i ? 'loading="lazy"' : ''} decoding="async"></figure>`).join('')}
         </div>
-        <div class="pdp__nav"><button class="icon-btn icon-btn--dark" type="button" data-prev aria-label="Previous image"><svg style="transform:scaleX(-1)"><use href="#i-arrow"/></svg></button><span class="t-mono" data-counter>01 / ${String(p.images.length).padStart(2, '0')}</span><button class="icon-btn icon-btn--dark" type="button" data-next aria-label="Next image"><svg><use href="#i-arrow"/></svg></button></div>
+        <div class="pdp__nav"><button class="icon-btn icon-btn--dark" type="button" data-prev aria-label="Previous image"><svg style="transform:scaleX(-1)"><use href="#i-arrow"/></svg></button><span class="pdp__dots" data-counter aria-hidden="true">${p.images.map((_, i) => `<i class="${i ? '' : 'is-on'}"></i>`).join('')}</span><button class="icon-btn icon-btn--dark" type="button" data-next aria-label="Next image"><svg><use href="#i-arrow"/></svg></button></div>
         <div class="pdp__zoom" data-zoom hidden><img alt=""></div>
       </div>
       <div class="pdp__thumbs" data-thumbs>${p.images.map((im, i) => `<button type="button" class="${i ? '' : 'is-active'}" data-thumb="${i}" aria-label="Show image ${i + 1}"><img src="${im.sm}" alt="" loading="lazy"></button>`).join('')}</div>
@@ -210,7 +210,7 @@ function bind(p) {
   let idx = 0;
   slides.addEventListener('scroll', () => {
     const i = Math.round(slides.scrollLeft / slides.clientWidth);
-    if (i !== idx) { idx = i; counter.textContent = `${String(i + 1).padStart(2, '0')} / ${String(count).padStart(2, '0')}`; thumbs.forEach((t, k) => t.classList.toggle('is-active', k === i)); thumbs[i]?.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'smooth' }); }
+    if (i !== idx) { idx = i; [...counter.children].forEach((d, k) => d.classList.toggle('is-on', k === i)); thumbs.forEach((t, k) => t.classList.toggle('is-active', k === i)); thumbs[i]?.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'smooth' }); }
   }, { passive: true });
   $('[data-prev]').onclick = () => go(idx - 1);
   $('[data-next]').onclick = () => go(idx + 1);

@@ -37,14 +37,16 @@ function syncNav(page) {
 
 const bars = () => [...document.querySelectorAll('[data-curtain] i')];
 function cover() {
-  if (reduceMotion) return Promise.resolve();
-  return new Promise((r) => gsap.timeline({ onComplete: r })
+  if (reduceMotion || document.hidden) return Promise.resolve();
+  // never let a paused animation (background tab) block navigation
+  return new Promise((r) => { setTimeout(r, 900); gsap.timeline({ onComplete: r })
     .set(bars(), { transformOrigin: 'bottom' })
     .to(bars(), { scaleY: 1, duration: 0.5, ease: 'expo.inOut', stagger: 0.04 })
-    .to('main', { opacity: 0.4, y: -30, duration: 0.5, ease: 'expo.inOut' }, 0));
+    .to('main', { opacity: 0.4, y: -30, duration: 0.5, ease: 'expo.inOut' }, 0); });
 }
 function reveal() {
-  if (reduceMotion) return;
+  if (reduceMotion) { gsap.set('main', { clearProps: 'all' }); return; }
+  gsap.set('main', { opacity: 1 });
   gsap.timeline()
     .set(bars(), { transformOrigin: 'top' })
     .fromTo('main', { y: 40, opacity: 1 }, { y: 0, duration: 0.9, ease: 'expo.out', clearProps: 'transform' }, 0.05)

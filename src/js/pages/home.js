@@ -38,7 +38,7 @@ export function mount(root = document) {
      IMAGE STAGE — one glass-framed photo that travels with the story
      ========================================================= */
   const stage = $('[data-stage]'), frame = $('[data-stage-frame]'), glow = $('[data-stage-glow]');
-  const stageImgs = $$('[data-stage-img]'), chip = $('[data-stage-chip]');
+  const stageImgs = $$('[data-stage-img]'), chip = $('[data-stage-chip]'), sheen = root.querySelector('.stage__sheen');
   const S = { x: 0, y: vp.mobile ? 0.12 : 0.07, scale: vp.mobile ? 0.8 : 0.96, rotY: -7, rotZ: 0, img: 0, zoom: 1.06, pan: 0, opacity: 1 };
   const mouse = { x: 0, y: 0, sx: 0, sy: 0 };
   let lastImg = -1, hidden = false;
@@ -51,7 +51,7 @@ export function mount(root = document) {
     const tx = S.x * vp.w, ty = S.y * vp.h;
     const ry = S.rotY + mouse.sx * 9, rx = -mouse.sy * 6;
     frame.style.transform = `translate3d(calc(-50% + ${tx.toFixed(1)}px), calc(-50% + ${ty.toFixed(1)}px), 0) perspective(1400px) rotateY(${ry.toFixed(2)}deg) rotateX(${rx.toFixed(2)}deg) rotateZ(${S.rotZ.toFixed(2)}deg) scale(${S.scale.toFixed(4)})`;
-    frame.style.setProperty('--sheen', `${(50 + ry * 3).toFixed(1)}%`);
+    sheen.style.transform = `translate3d(${(ry * 2.4).toFixed(1)}%, 0, 0)`;
     glow.style.transform = `translate3d(calc(-50% + ${(tx * 0.85).toFixed(1)}px), calc(-50% + ${ty.toFixed(1)}px), 0)`;
     stageImgs.forEach((im, i) => {
       // quick, decisive swap around the mid-point instead of a long ghosting double-exposure
@@ -120,10 +120,8 @@ export function mount(root = document) {
   function showCard(i) {
     const st = STEPS[i], card = $('[data-detail-card]');
     $$('[data-detail-index] li').forEach((li, k) => li.classList.toggle('is-on', k === i));
-    $('[data-dc-count]').textContent = String(i).padStart(2, '0');
     $('[data-dc-bar]').style.transform = `scaleX(${i / (STEPS.length - 1)})`;
     gsap.to(card, { opacity: 0, y: 12, duration: 0.16, overwrite: true, onComplete: () => {
-      $('[data-dc-num]').textContent = `${String(i).padStart(2, '0')} / 05`;
       $('[data-dc-title]').textContent = st.title;
       $('[data-dc-text]').textContent = st.text;
       $('[data-dc-spec]').textContent = st.spec;
@@ -146,12 +144,12 @@ export function mount(root = document) {
     try { sessionStorage.setItem('naturik.seen', '1'); } catch {}
     if (reduceMotion) { loader?.remove(); return; }
     if (seen || !loader) { loader?.remove(); heroReveal(gsap.timeline({ delay: viaRouter ? 0.35 : 0.1 })); return; }
-    const out = $('[data-loader-count]'), bar = $('[data-loader-bar]');
+    const bar = $('[data-loader-bar]');
     const shown = { v: 0 }, target = { v: 0.12 };
     const img = stageImgs[0];
     const tasks = [document.fonts?.ready ?? Promise.resolve(), img.complete ? Promise.resolve() : new Promise((r) => { img.onload = r; img.onerror = r; })];
     tasks.forEach((t) => t.then(() => (target.v = Math.min(1, target.v + 0.44))));
-    const lt = () => { shown.v += (target.v - shown.v) * 0.14; out.textContent = String(Math.round(shown.v * 100)).padStart(3, '0'); bar.style.transform = `scaleX(${shown.v})`; };
+    const lt = () => { shown.v += (target.v - shown.v) * 0.14; bar.style.transform = `scaleX(${shown.v})`; };
     gsap.ticker.add(lt);
     gsap.to(loader.querySelectorAll('.loader__brand span'), { yPercent: -105, stagger: 0.04, duration: 0.8, ease: 'expo.out' });
     Promise.all([Promise.race([Promise.all(tasks), new Promise((r) => setTimeout(r, 2200))]), new Promise((r) => setTimeout(r, 800))]).then(() => {

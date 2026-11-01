@@ -11,6 +11,7 @@ import { initLegal } from '../components/legal.js';
 import { bag } from '../components/store.js';
 import { bySlug } from '../data/products.js';
 import { toast } from '../components/toast.js';
+import { initLightbox } from '../components/lightbox.js';
 
 export function initApp() {
   initScroll();
@@ -18,6 +19,7 @@ export function initApp() {
   initLegal();
   initCart();
   initUI();
+  initLightbox();
   // quick-add buttons on any product card
   document.addEventListener('click', (e) => {
     const b = e.target.closest('[data-quick-add]'); if (!b) return;
