@@ -1,0 +1,54 @@
+/* NATURIK design tokens — black / chrome grey / cobalt, with an acid-lens signal colour */
+:root {
+  --c-void: #000000;
+  --c-ink: #050506;
+  --c-graphite: #121214;
+  --c-carbon: #1d1d20;
+  --c-steel: #8b8b8f;
+  --c-fog: #cfcfcf;
+  --c-paper: #e2e2e0;
+  --c-bone: #f3f3f1;
+  --c-cobalt: #1638ff;
+  --c-cobalt-deep: #06104d;
+  --c-cobalt-mist: #7d8fe8;
+  --c-acid: #b6ff2e;
+  --c-danger: #ff4d3d;
+
+  --grad-hero: linear-gradient(180deg, #000 0%, #000 34%, #06104d 50%, #1638ff 64%, #7d8fe8 80%, #cfcfcf 100%);
+  --grad-chrome: linear-gradient(115deg, #f4f4f2 0%, #9a9a9e 28%, #fdfdfd 46%, #6d6d72 66%, #e7e7e5 100%);
+
+  --f-display: 'Inter Tight', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --f-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --fs-micro: 0.6875rem;   /* 11 */
+  --fs-small: 0.8125rem;   /* 13 */
+  --fs-body: 1rem;
+  --fs-lead: clamp(1.125rem, 0.9rem + 0.7vw, 1.5rem);
+  --fs-h3: clamp(1.5rem, 1.1rem + 1.4vw, 2.5rem);
+  --fs-h2: clamp(2.5rem, 1.4rem + 4.4vw, 6rem);
+  --fs-h1: clamp(3.5rem, 1.6rem + 9vw, 13rem);
+  --fs-mega: clamp(5rem, 2rem + 17vw, 26rem);
+
+  --track-tight: -0.055em;
+  --track-mono: 0.06em;
+
+  --gutter: clamp(16px, 2.4vw, 40px);
+  --radius-s: 6px;
+  --radius-m: 14px;
+  --radius-l: 28px;
+  --radius-pill: 999px;
+  --header-h: 72px;
+  --max: 1680px;
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.76, 0, 0.24, 1);
+  --dur: 0.6s;
+
+  --z-stage: 1;
+  --z-content: 2;
+  --z-header: 50;
+  --z-drawer: 80;
+  --z-modal: 90;
+  --z-toast: 95;
+  --z-loader: 100;
+}

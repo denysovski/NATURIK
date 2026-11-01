@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- @include head -->
+  <title>Contact &amp; Client Care — Sizing, Orders, Returns | NATURIK</title>
+  <meta name="description" content="Talk to NATURIK client care about sizing, orders, returns, repairs, press or wholesale. Reply within one working day. Showroom visits in Prague by appointment.">
+  <link rel="canonical" href="https://denysovski.github.io/NATURIK/contact.html">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Contact — NATURIK">
+  <meta property="og:description" content="Sizing help, orders, returns and showroom visits in Prague.">
+  <meta property="og:url" content="https://denysovski.github.io/NATURIK/contact.html">
+  <meta name="twitter:title" content="Contact — NATURIK">
+  <meta name="twitter:description" content="Sizing help, orders, returns and showroom visits in Prague.">
+  <script type="application/ld+json" id="ld-faq"></script>
+  <script type="module" src="./src/js/pages/contact.js"></script>
+</head>
+<body class="page-contact">
+  <!-- @include header {"page":"contact"} -->
+  <main id="main">
+    <section class="contact-hero">
+      <div class="contact-hero__bg" aria-hidden="true"></div>
+      <div class="wrap">
+        <p class="t-mono contact-hero__meta"><span class="pill pill--line"><i class="dot" aria-hidden="true"></i><span data-open-status>Client care</span></span></p>
+        <h1 class="contact-hero__title"><span data-split="chars">Talk</span><br><span data-split="chars">to</span> <span class="t-chrome">us.</span></h1>
+        <div class="contact-hero__row">
+          <p class="t-lead" data-reveal>Real people in Prague. Sizing questions answered within one working day — usually within the hour.</p>
+          <dl class="contact-hero__facts" data-reveal-stagger>
+            <div><dt class="t-mono">Avg. reply</dt><dd>47 min</dd></div>
+            <div><dt class="t-mono">Hours</dt><dd>Mon–Fri · 09–18 CET</dd></div>
+          </dl>
+        </div>
+      </div>
+    </section>
+
+    <section class="contact theme-light" data-header-light aria-label="Contact options">
+      <div class="wrap contact__grid">
+        <form class="contact-form" data-contact novalidate aria-labelledby="form-title">
+          <h2 class="t-h3" id="form-title">Send a message</h2>
+          <fieldset class="topic-pick"><legend class="field__label">What is it about?</legend>
+            <label class="chip"><input type="radio" name="topic" value="sizing" checked><span>Sizing</span></label>
+            <label class="chip"><input type="radio" name="topic" value="order"><span>My order</span></label>
+            <label class="chip"><input type="radio" name="topic" value="returns"><span>Returns</span></label>
+            <label class="chip"><input type="radio" name="topic" value="repair"><span>Repair</span></label>
+            <label class="chip"><input type="radio" name="topic" value="press"><span>Press</span></label>
+            <label class="chip"><input type="radio" name="topic" value="wholesale"><span>Wholesale</span></label>
+          </fieldset>
+          <div class="fields fields--2">
+            <div class="field"><label class="field__label" for="c-name">Name</label><input class="field__input" id="c-name" name="name" autocomplete="name" required><span class="field__error"></span></div>
+            <div class="field"><label class="field__label" for="c-email">Email</label><input class="field__input" id="c-email" name="email" type="email" autocomplete="email" required><span class="field__error"></span></div>
+          </div>
+          <div class="field" data-when="order returns repair" hidden><label class="field__label" for="c-order">Order number</label><input class="field__input" id="c-order" name="order" placeholder="NTK-26xxxxx"><span class="field__hint">On your confirmation email.</span></div>
+          <div class="fields fields--2" data-when="sizing">
+            <div class="field"><label class="field__label" for="c-height">Height (cm) <span class="t-muted">optional</span></label><input class="field__input" id="c-height" name="height" type="number" inputmode="numeric"></div>
+            <div class="field"><label class="field__label" for="c-usual">Usual jacket size <span class="t-muted">optional</span></label><select class="field__input" id="c-usual" name="usual"><option value="">—</option><option>XS</option><option>S</option><option>M</option><option>L</option><option>XL</option><option>XXL</option></select></div>
+          </div>
+          <div class="field"><label class="field__label" for="c-msg">Message</label><textarea class="field__input" id="c-msg" name="message" required minlength="10" placeholder="Tell us what you need…"></textarea><span class="field__error"></span></div>
+          <label class="check"><input type="checkbox" name="consent" required><span>I agree that NATURIK may use these details to answer me (<button type="button" class="link-btn" data-legal="privacy">privacy</button>).</span></label>
+          <span class="field__error" data-consent-err></span>
+          <button class="btn btn--dark" type="submit" data-magnetic><span class="btn__label">Send message</span><svg class="btn__icon"><use href="#i-arrow"/></svg></button>
+          <div class="contact-form__done" data-contact-done hidden>
+            <div class="co-done__mark"><svg><use href="#i-check"/></svg></div>
+            <h3 class="t-h3">Message received.</h3>
+            <p>Ticket <b data-ticket></b> — we'll reply to <b data-reply-to></b> within one working day.</p>
+            <button class="btn btn--ghost" type="button" data-contact-reset><span class="btn__label">Send another</span></button>
+          </div>
+        </form>
+
+        <aside class="contact-cards" data-reveal-stagger>
+          <a class="c-card" href="mailto:care@naturik.studio"><svg><use href="#i-mail"/></svg><span class="t-mono">Client care</span><b>care@naturik.studio</b><span class="t-muted">Orders, sizing, returns</span></a>
+          <a class="c-card" href="mailto:press@naturik.studio"><svg><use href="#i-plus"/></svg><span class="t-mono">Press &amp; collabs</span><b>press@naturik.studio</b><span class="t-muted">Lookbook &amp; samples</span></a>
+          <div class="c-card c-card--dark" id="showroom"><svg><use href="#i-cube"/></svg><span class="t-mono">Showroom</span><b>Prague, Czech Republic</b><span>Try every piece and size before the drop sells out. Private 30-min slots, by appointment.</span><button class="btn btn--acid btn--s" type="button" data-book><span class="btn__label">Request a slot</span></button></div>
+          <div class="c-card"><svg><use href="#i-instagram"/></svg><span class="t-mono">Social</span><div class="socials socials--ink">
+            <a href="https://instagram.com" target="_blank" rel="noopener" aria-label="Instagram"><svg><use href="#i-instagram"/></svg></a>
+            <a href="https://tiktok.com" target="_blank" rel="noopener" aria-label="TikTok"><svg><use href="#i-tiktok"/></svg></a>
+            <a href="https://x.com" target="_blank" rel="noopener" aria-label="X"><svg><use href="#i-x"/></svg></a>
+            <a href="https://youtube.com" target="_blank" rel="noopener" aria-label="YouTube"><svg><use href="#i-youtube"/></svg></a>
+          </div><span class="t-muted">DMs answered on weekdays</span></div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="faq theme-dark" id="faq" aria-labelledby="faq-title">
+      <div class="wrap faq__grid">
+        <div><p class="index-num">FAQ</p><h2 class="t-h2" id="faq-title" data-split>Before<br>you ask.</h2></div>
+        <div data-faq></div>
+      </div>
+    </section>
+
+    <section class="contact-marquee theme-dark" aria-hidden="true">
+      <div class="marquee" style="--speed:26s"><div class="marquee__track"><span>care@naturik.studio</span><span>✦</span><span>Prague — EU</span><span>✦</span><span>Drop 02 — soon</span><span>✦</span></div><div class="marquee__track"><span>care@naturik.studio</span><span>✦</span><span>Prague — EU</span><span>✦</span><span>Drop 02 — soon</span><span>✦</span></div></div>
+    </section>
+  </main>
+  <!-- @include footer {"page":"contact"} -->
+</body>
+</html>
