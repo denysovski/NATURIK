@@ -30,24 +30,35 @@
 
     <section class="shop theme-light" data-header-light aria-label="Products">
       <div class="wrap">
-        <div class="shop-bar" data-shop-bar>
-          <div class="shop-filters" role="group" aria-label="Filter products">
-            <button type="button" class="chip" aria-pressed="true" data-filter="all">All <sup data-n="all"></sup></button>
-            <button type="button" class="chip" aria-pressed="false" data-filter="black"><i class="chip__sw" style="background:#060607"></i>Obsidian <sup data-n="black"></sup></button>
-            <button type="button" class="chip" aria-pressed="false" data-filter="white"><i class="chip__sw" style="background:#e2e2df"></i>Arctic <sup data-n="white"></sup></button>
-            <span class="shop-filters__sep" aria-hidden="true"></span>
-            <button type="button" class="chip" aria-pressed="false" data-filter="m1">Hip</button>
-            <button type="button" class="chip" aria-pressed="false" data-filter="c3">Cropped</button>
-            <button type="button" class="chip" aria-pressed="false" data-filter="l7">Long</button>
-          </div>
-          <div class="shop-tools">
-            <div class="shop-sort" data-sort></div>
-            <div class="seg" role="group" aria-label="Grid density"><button type="button" aria-pressed="false" data-cols="2">2</button><button type="button" aria-pressed="true" data-cols="3">3</button></div>
+        <div class="shop-layout">
+          <aside class="shop-side" aria-label="Filter and sort">
+            <div class="shop-side__group" role="group" aria-label="Colour">
+              <p class="shop-side__label">Colour</p>
+              <button type="button" class="chip" aria-pressed="true" data-filter="all">All <sup data-n="all"></sup></button>
+              <button type="button" class="chip" aria-pressed="false" data-filter="black"><i class="chip__sw" style="background:#060607"></i>Obsidian <sup data-n="black"></sup></button>
+              <button type="button" class="chip" aria-pressed="false" data-filter="white"><i class="chip__sw" style="background:#e2e2df"></i>Arctic <sup data-n="white"></sup></button>
+            </div>
+            <div class="shop-side__group" role="group" aria-label="Length">
+              <p class="shop-side__label">Length</p>
+              <button type="button" class="chip" aria-pressed="false" data-filter="m1">Hip</button>
+              <button type="button" class="chip" aria-pressed="false" data-filter="c3">Cropped</button>
+              <button type="button" class="chip" aria-pressed="false" data-filter="l7">Long</button>
+            </div>
+            <div class="shop-side__group">
+              <p class="shop-side__label">Sort</p>
+              <div class="shop-sort" data-sort></div>
+            </div>
+            <div class="shop-side__group shop-side__view">
+              <p class="shop-side__label">View</p>
+              <div class="seg" role="group" aria-label="Grid density"><button type="button" aria-pressed="false" data-cols="2">2 columns</button><button type="button" aria-pressed="true" data-cols="3">3 columns</button></div>
+            </div>
+            <p class="shop-side__count" aria-live="polite" data-shop-count></p>
+          </aside>
+          <div class="shop-main">
+            <div class="product-grid" data-grid data-cols="3"><!-- @render products --></div>
+            <div class="shop-empty" data-empty hidden><p class="t-h3">Nothing matches that combination.</p><button class="btn btn--dark" type="button" data-filter="all"><span class="btn__label">Show all pieces</span></button></div>
           </div>
         </div>
-        <p class="t-mono t-muted shop-count" aria-live="polite" data-shop-count></p>
-        <div class="product-grid" data-grid data-cols="3"><!-- @render products --></div>
-        <div class="shop-empty" data-empty hidden><p class="t-h3">Nothing matches that combination.</p><button class="btn btn--dark" type="button" data-filter="all"><span class="btn__label">Show all pieces</span></button></div>
       </div>
     </section>
 
