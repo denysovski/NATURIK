@@ -77,25 +77,26 @@ export function mount(root = document) {
      DETAILS — pinned full-bleed zoom with glass cards
      ========================================================= */
   const STEPS = [
-    { img: 'hero', fx: 0.5, fy: 0.45, s: 1, title: 'M1 Puffer 78C', text: 'Seventy-eight hand-filled cells, one funnel collar and a satin shell that throws light like wet asphalt.', spec: 'Obsidian · 78 numbered pieces' },
-    { img: 'hero', fx: 0.53, fy: 0.21, s: 2.3, title: 'Funnel collar', text: 'Two stacked cells rise to the bridge of your nose. A brushed chin guard sits inside, so the zip never touches skin.', spec: 'Height 27 cm · two cells' },
-    { img: 'hero', fx: 0.58, fy: 0.42, s: 2.5, title: 'M1 print', text: 'Matte grey by day, bright under headlights. Printed across one full chest cell so it moves with the down.', spec: 'Reflective · wash-fast' },
-    { img: 'sleeve', fx: 0.38, fy: 0.48, s: 1.55, title: 'Shoulder cell', text: 'One continuous cell over a dropped shoulder — no seam where a bag strap sits. The wordmark rides on the cap.', spec: 'Single-cell yoke' },
-    { img: 'hero', fx: 0.71, fy: 0.74, s: 2.4, title: 'Offset two-way zip', text: 'Moved off-centre so the chest panel stays clean. Opens from the hem so you can sit down without unzipping.', spec: 'YKK® Aquaguard® · two-way' },
+    { img: 'hero', fx: 0.5, fy: 0.5, s: 1, title: 'M1 Puffer 78C', text: 'Seventy-eight hand-filled cells, one funnel collar and a satin shell that throws light like wet asphalt.', spec: 'Obsidian · 78 numbered pieces' },
+    { img: 'hero', fx: 0.5, fy: 0.3, s: 2.2, title: 'Funnel collar', text: 'Two stacked cells rise to the bridge of your nose. A brushed chin guard sits inside, so the zip never touches skin.', spec: 'Height 27 cm · two cells' },
+    { img: 'hero', fx: 0.41, fy: 0.62, s: 2.6, title: 'M1 print', text: 'Matte grey by day, bright under headlights. Printed across one full chest cell so it moves with the down.', spec: 'Reflective · wash-fast' },
+    { img: 'sleeve', fx: 0.36, fy: 0.55, s: 1.5, title: 'Shoulder cell', text: 'One continuous cell over a dropped shoulder — no seam where a bag strap sits. The wordmark rides on the cap.', spec: 'Single-cell yoke' },
+    { img: 'hero', fx: 0.505, fy: 0.78, s: 2.5, title: 'Offset two-way zip', text: 'Moved off-centre so the chest panel stays clean. Opens from the hem so you can sit down without unzipping.', spec: 'YKK® Aquaguard® · two-way' },
     { img: 'back', fx: 0.5, fy: 0.3, s: 1.75, title: 'Back collar', text: 'Three vertical seams shape the collar so it stands on its own, even fully unzipped.', spec: 'Self-supporting · 3 panels' },
-    { img: 'hero', fx: 0.5, fy: 0.45, s: 1, title: 'Every detail, one jacket', text: 'Seventy-eight cells, one collar, one zip that sits where it should. Numbered and never restocked.', spec: 'M1 Puffer 78C · €890', end: true },
+    { img: 'hero', fx: 0.5, fy: 0.5, s: 1, title: 'Every detail, one jacket', text: 'Seventy-eight cells, one collar, one zip that sits where it should. Numbered and never restocked.', spec: 'M1 Puffer 78C · €890', end: true },
   ];
   const media = $('[data-zoom-media]');
   const zImgs = Object.fromEntries($$('[data-zoom-img]').map((im) => [im.dataset.zoomImg, im]));
   const ring = $('[data-focus-ring]');
   const Z = { step: 0, active: false, dirty: true, W: 0, H: 0, base: 1 };
-  const NAT = { w: 1111, h: 1415 };
+  // natural size per photo (they differ: landscape front/sleeve, portrait back)
+  const NATS = Object.fromEntries(Object.entries(zImgs).map(([k, im]) => [k, { w: +im.dataset.w || 1111, h: +im.dataset.h || 1415 }]));
   let shownStep = -1, lastStep = -1;
 
   function sizeZoom() {
     Z.W = media.clientWidth; Z.H = media.clientHeight;
-    Z.base = Math.max(Z.W / NAT.w, Z.H / NAT.h);
-    Object.values(zImgs).forEach((im) => { im.style.width = `${NAT.w * Z.base}px`; im.style.height = `${NAT.h * Z.base}px`; });
+    Z.bases = {};
+    Object.entries(zImgs).forEach(([k, im]) => { const n = NATS[k], b = Math.max(Z.W / n.w, Z.H / n.h); Z.bases[k] = b; im.style.width = `${n.w * b}px`; im.style.height = `${n.h * b}px`; });
     Z.dirty = true;
   }
   tick(() => {
@@ -107,18 +108,25 @@ export function mount(root = document) {
     const k = Math.min(1, Math.max(0, (f - i0 - 0.18) / 0.64));
     const e = k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
     const a = STEPS[i0], b = STEPS[i1], same = a.img === b.img, lerp = (p, q) => p + (q - p) * e;
-    const s = same ? lerp(a.s, b.s) : (e < 0.5 ? a.s * (1 + e * 0.5) : b.s * (1 + (1 - e) * 0.5));
+    let s = same ? lerp(a.s, b.s) : (e < 0.5 ? a.s * (1 + e * 0.5) : b.s * (1 + (1 - e) * 0.5));
     const fx = same ? lerp(a.fx, b.fx) : (e < 0.5 ? a.fx : b.fx);
     const fy = same ? lerp(a.fy, b.fy) : (e < 0.5 ? a.fy : b.fy);
-    const dw = NAT.w * Z.base * s, dh = NAT.h * Z.base * s;
     const cx = Z.W * (vp.mobile ? 0.5 : 0.42), cy = Z.H * (vp.mobile ? 0.36 : 0.5);
-    const left = Math.min(0, Math.max(Z.W - dw, cx - fx * dw)), top = Math.min(0, Math.max(Z.H - dh, cy - fy * dh));
+    // tall screens already magnify wide photos just to fill them: zoom less on top of that
+    if (Z.H > Z.W) s = 1 + (s - 1) * 0.3;
+    const place = (name) => {
+      const n = NATS[name], dw = n.w * Z.bases[name] * s, dh = n.h * Z.bases[name] * s;
+      return { dw, dh, left: Math.min(0, Math.max(Z.W - dw, cx - fx * dw)), top: Math.min(0, Math.max(Z.H - dh, cy - fy * dh)) };
+    };
+    let ringAt = null;
     for (const [name, im] of Object.entries(zImgs)) {
       const op = same ? (name === a.img ? 1 : 0) : (name === a.img ? 1 - e : name === b.img ? e : 0);
       im.style.opacity = op;
       im.style.visibility = op > 0 ? 'visible' : 'hidden';
-      if (op > 0) im.style.transform = `translate3d(${left.toFixed(1)}px, ${top.toFixed(1)}px, 0) scale(${s.toFixed(4)})`;
+      if (op > 0) { const g = place(name); im.style.transform = `translate3d(${g.left.toFixed(1)}px, ${g.top.toFixed(1)}px, 0) scale(${s.toFixed(4)})`; if (op >= 0.5) ringAt = g; }
     }
+    const g = ringAt || place(a.img);
+    const left = g.left, top = g.top, dw = g.dw, dh = g.dh;
     const holding = k === 0 || k === 1;
     ring.style.transform = `translate3d(${(left + fx * dw).toFixed(1)}px, ${(top + fy * dh).toFixed(1)}px, 0) translate(-50%, -50%) scale(${holding ? 1 : 0.6})`;
     ring.style.opacity = Math.round(f) === 0 || STEPS[Math.round(f)].end || !holding ? 0 : 1;
