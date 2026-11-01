@@ -63,6 +63,13 @@ export function mount(root = document) {
     stage.style.opacity = S.opacity.toFixed(3);
   });
 
+  // hover over the travelling photo (it sits behind the content, so hit-test it ourselves)
+  on(window, 'pointermove', (e) => {
+    if (hidden) return;
+    const r = frame.getBoundingClientRect();
+    frame.classList.toggle('is-hover', e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom);
+  }, { passive: true });
+
   const chipText = ['800 FP · −25 °C', '78 cells · 420 g down', `${totalStock(m1)} of 78 left`];
   const setChip = (i) => { if (chip.dataset.i == i) return; chip.dataset.i = i; gsap.to(chip, { opacity: 0, y: 6, duration: 0.2, onComplete: () => { chip.textContent = chipText[i]; gsap.to(chip, { opacity: 1, y: 0, duration: 0.4 }); } }); };
 
