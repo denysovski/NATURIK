@@ -783,3 +783,33 @@ body.is-locked { overflow: visible; }
 .p-card__more::before { display: none; }
 .p-card:hover .p-card__more, .p-card:focus-within .p-card__more { opacity: 1; transform: none; }
 @media (hover: none) { .p-card__more { opacity: 1; transform: none; } }
+
+/* stage tags: regular weight, one baseline */
+.stage__tag { font-weight: 500 !important; font-size: 1rem; line-height: 1; align-items: baseline; }
+.stage__tag > span { display: inline-flex; align-items: baseline; gap: 0.3em; font-variant-numeric: lining-nums tabular-nums; }
+/* crisp clipped edges while the card moves */
+.stage__clip { -webkit-mask-image: -webkit-radial-gradient(white, black); backface-visibility: hidden; outline: 1px solid transparent; }
+.stage__frame { backface-visibility: hidden; }
+/* buy box price: plain */
+.drop-buy__price { background: none !important; padding: 0 !important; height: auto !important; border-radius: 0 !important; font-size: 2rem; color: var(--c-ink) !important; }
+
+/* marquees: large, continuous, never pause */
+.marquee__track { will-change: transform; animation-timing-function: linear !important; }
+.marquee:hover .marquee__track { animation-play-state: running; }
+.confidence__marquee { font-family: var(--f-display); font-size: clamp(3rem, 9vw, 8rem); font-weight: 500; letter-spacing: -0.05em; line-height: 1.05; color: var(--c-cobalt);
+  border: 0 !important; padding: 20px 0 30px; margin-bottom: 70px; text-transform: none; }
+.confidence__marquee .marquee__track { gap: 0.5em; padding-right: 0.5em; }
+
+/* footer: back to top */
+.to-top { width: 54px; height: 54px; border-radius: 50%; display: inline-grid; place-items: center; background: var(--c-acid); color: #000; transition: transform 0.4s var(--ease-out), box-shadow 0.3s; }
+.to-top svg { width: 20px; height: 20px; }
+.to-top:hover { transform: translateY(-4px); box-shadow: 0 10px 24px -8px rgba(182,255,46,0.6); }
+.footer-col a.to-top::after, .footer-bottom a.to-top::after { display: none; }
+.footer-bottom { align-items: center; }
+
+/* toasts bottom-right, page sans */
+.toasts { left: auto; right: 20px; transform: none; width: min(380px, calc(100vw - 24px)); }
+.toast__body { font-family: var(--f-display); font-size: 0.95rem; font-weight: 500; letter-spacing: -0.01em; }
+@media (max-width: 640px) { .toasts { right: 12px; left: 12px; width: auto; } }
+.cookie { opacity: 0; transition: transform 0.7s var(--ease-out), opacity 0.45s ease; }
+.cookie.is-open { opacity: 1; }

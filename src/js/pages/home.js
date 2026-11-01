@@ -57,7 +57,7 @@ export function mount(root = document) {
     if (key === lastKey) return;
     lastKey = key;
     const tx = S.x * vp.w, ty = S.y * vp.h;
-    frame.style.transform = `translate3d(calc(-50% + ${tx.toFixed(1)}px), calc(-50% + ${ty.toFixed(1)}px), 0) perspective(1400px) rotateY(${S.rotY.toFixed(2)}deg) rotateZ(${S.rotZ.toFixed(2)}deg) scale(${S.scale.toFixed(4)})`;
+    frame.style.transform = `translate3d(calc(-50% + ${tx.toFixed(1)}px), calc(-50% + ${ty.toFixed(1)}px), 0) scale(${S.scale.toFixed(4)})`;
     sheen.style.transform = `translate3d(${(S.x * 60).toFixed(1)}%, 0, 0)`;
     glow.style.transform = `translate3d(calc(-50% + ${(tx * 0.9).toFixed(1)}px), calc(-50% + ${ty.toFixed(1)}px), 0) scale(${S.scale.toFixed(3)})`;
     stageImgs.forEach((im, i) => {
@@ -151,6 +151,16 @@ export function mount(root = document) {
 
   /* ---------- intro: photo and UI are simply there; only the headline letters rise ---------- */
   function intro() {
+    // photo card: wait until the hero image is decoded, then scale it up from small
+    if (!reduceMotion) {
+      gsap.set(frame, { opacity: 0 });
+      const img = stageImgs[0];
+      const ready = img.decode ? img.decode().catch(() => {}) : Promise.resolve();
+      Promise.race([ready, new Promise((r) => setTimeout(r, 1500))]).then(() => {
+        gsap.to(frame, { opacity: 1, duration: 0.6, ease: 'power2.out' });
+        gsap.from(S, { scale: S.scale * 0.6, zoom: 1.25, duration: 1.4, ease: 'expo.out' });
+      });
+    }
     $$('[data-hero-word]').forEach((w) => split(w, 'chars'));
     try { sessionStorage.setItem('naturik.seen', '1'); } catch {}
     if (reduceMotion) return;
@@ -174,8 +184,8 @@ export function mount(root = document) {
     mm.add({ desk: '(min-width: 820px)', mob: '(max-width: 819px)' }, (c) => {
       const d = c.conditions.desk;
       const step = (trigger, to, st = {}) => gsap.to(S, { ...to, ease: 'none', immediateRender: false, scrollTrigger: { trigger, start: 'top bottom', end: 'top top', scrub: true, ...st } });
-      step('#spec', { x: d ? -0.22 : 0, y: d ? 0 : -0.17, scale: d ? 0.92 : 0.64, rotY: 0, rotZ: -1.5, img: 1, zoom: 1.12, pan: 0 });
-      step('#drop', { x: d ? 0.22 : 0, y: d ? 0 : -0.19, scale: d ? 0.92 : 0.6, rotY: 0, rotZ: 1.5, img: 2, zoom: 1.08, pan: 0 });
+      step('#spec', { x: d ? -0.22 : 0, y: d ? 0 : -0.17, scale: d ? 0.92 : 0.64, rotY: 0, rotZ: 0, img: 1, zoom: 1.12, pan: 0 });
+      step('#drop', { x: d ? 0.22 : 0, y: d ? 0 : -0.19, scale: d ? 0.92 : 0.6, rotY: 0, rotZ: 0, img: 2, zoom: 1.08, pan: 0 });
       step('#details', { x: 0, y: 0, scale: 1.5, rotY: 0, rotZ: 0, img: 0, zoom: 1, pan: 0, opacity: 0 }, { end: 'top 15%' });
       detailsST = gsap.to(Z, { step: STEPS.length - 1, ease: 'none', scrollTrigger: { trigger: '#details', start: 'top top', end: d ? '+=460%' : '+=340%', pin: '[data-details-pin]', scrub: true } }).scrollTrigger;
     });
