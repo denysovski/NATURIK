@@ -686,3 +686,7 @@ body.is-locked { overflow: visible; }
 .stage__tag, .stage__chip { background: var(--c-cobalt); color: #fff; border: 0; box-shadow: 0 8px 22px -8px rgba(0,0,0,0.55);
   transition: background-color 0.45s var(--ease-out), color 0.45s var(--ease-out); }
 .stage__frame.is-hover .stage__tag, .stage__frame.is-hover .stage__chip { background: var(--c-acid); color: #000; }
+/* hero thumbnails: images in a row, caption below in the headline sans */
+.hero__thumbs { flex-wrap: wrap; max-width: 190px; row-gap: 12px; }
+.hero__thumbs-text { flex-basis: 100%; margin: 0; font-family: var(--f-display); font-weight: 500; font-size: 1.15rem; line-height: 1.12; letter-spacing: -0.03em; color: var(--c-bone); text-transform: none; }
+.hero__thumbs p.hero__thumbs-text { margin: 0; }
