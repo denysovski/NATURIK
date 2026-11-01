@@ -616,3 +616,7 @@ body.is-locked { overflow: visible; }
 .btn--acid:hover { color: var(--c-bone); }
 /* header band: softer */
 .site-header::before { background: linear-gradient(180deg, rgba(243,243,241,0.62) 0%, rgba(243,243,241,0.4) 55%, rgba(243,243,241,0) 100%); }
+/* header band: soft dark scrim, light header content */
+.site-header::before { background: linear-gradient(180deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.32) 55%, rgba(0,0,0,0) 100%); }
+.site-header, .site-header.on-light { color: var(--c-bone); }
+.site-header .icon-btn:not(.icon-btn--dark) { background: var(--c-bone); color: var(--c-ink); }
