@@ -690,3 +690,34 @@ body.is-locked { overflow: visible; }
 .hero__thumbs { flex-wrap: wrap; max-width: 190px; row-gap: 12px; }
 .hero__thumbs-text { flex-basis: 100%; margin: 0; font-family: var(--f-display); font-weight: 500; font-size: 1.15rem; line-height: 1.12; letter-spacing: -0.03em; color: var(--c-bone); text-transform: none; }
 .hero__thumbs p.hero__thumbs-text { margin: 0; }
+
+/* =========================== one label style: same as "M1 Puffer 78C" =========================== */
+/* the small ALL-CAPS tracked label treatment is gone everywhere — sentence case Neue Montreal medium */
+.t-mono, .pill, .field__label, .seg button, .line-item__remove, .toast__action, .cursor__label, .size-table tbody th, .size-table thead th,
+.compare::before, .manifesto__cols h3, .shop-side__label, .select__label, .drop-status, .eyebrow, .index-num, .who-card__tag,
+.stage__tag, .stage__chip, .co-steps li, .totals, .pay-icons span, .footer-bottom, .footer-col h3, .footer-mid dt, .loader__count, .hero__statement {
+  font-family: var(--f-display) !important; text-transform: none !important; letter-spacing: -0.01em !important; font-weight: 500;
+}
+.t-mono { font-size: 0.85rem; }
+.pill { font-size: 0.85rem; }
+.drop-status { font-size: 0.9rem; }
+.field__label, .shop-side__label, .select__label, .footer-col h3, .footer-mid dt { font-size: 0.85rem; }
+.manifesto__cols h3 { font-size: 1rem; }
+.line-item__remove, .toast__action { font-size: 0.8rem; }
+.pay-icons span { font-size: 0.72rem; }
+/* hero: statement and "Remaining" match the M1 caption exactly */
+.hero__statement { font-size: 1.15rem !important; line-height: 1.12; letter-spacing: -0.03em !important; color: var(--c-bone); max-width: 30ch; }
+.hero__stock .t-mono, .hero__stock .t-muted:first-child { font-size: 1.15rem; letter-spacing: -0.03em !important; color: var(--c-bone); }
+.drop-status { letter-spacing: -0.02em !important; }
+
+/* lookbook hover frame: fades out toward the bottom-left so it never runs over the green caption */
+.look.hv::after, .look.hv::before {
+  -webkit-mask-image: linear-gradient(to top right, transparent 0%, transparent 26%, #000 52%);
+  mask-image: linear-gradient(to top right, transparent 0%, transparent 26%, #000 52%);
+}
+
+/* Closer cards: green, slightly see-through */
+.details__card { background: rgba(182,255,46,0.8); color: #000; border: 0; box-shadow: 0 24px 60px -24px rgba(0,0,0,0.7); }
+.details__card-text { color: rgba(0,0,0,0.78); }
+.details__card-title { color: #000; }
+.hero__stock-label { margin: 0 0 4px; font-family: var(--f-display); font-weight: 500; font-size: 1.15rem; line-height: 1.12; letter-spacing: -0.03em; color: var(--c-bone); }
