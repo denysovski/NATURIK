@@ -831,3 +831,11 @@ body.is-locked { overflow: visible; }
   .look.hv:hover .look__info::before { opacity: 0; }
 }
 @media (max-width: 819px) { .look__i { font-size: 0.8rem; } .look__i--tl { font-size: 0.92rem; } }
+
+/* hero words: m1 + PUFFER lower, 78C higher (desktop) */
+@media (min-width: 820px) {
+  .ht--1, .ht--3 { margin-top: 80px; }
+  .ht--5 { margin-top: -60px; }
+}
+/* stage photos: deeper shade on top of the darker baked images */
+.stage__shade { background: linear-gradient(180deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.28) 22%, rgba(0,0,0,0.3) 60%, rgba(0,0,0,0.5) 100%) !important; }
