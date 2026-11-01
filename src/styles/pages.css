@@ -627,3 +627,8 @@ body.is-locked { overflow: visible; }
 .site-header::before { transition: background 0.4s; }
 /* lookbook captions in the Canobis accent face (same as "pieces") */
 .look figcaption { font-family: var(--f-accent); font-weight: 400; font-size: 1.35rem; letter-spacing: 0; line-height: 1.1; padding: 12px 16px 14px; }
+/* specs: no box, no dividers */
+.specs { border: 0; background: none; gap: 26px 32px; border-radius: 0; overflow: visible; }
+.specs > div { background: none; padding: 0; }
+/* header never hides */
+.site-header.is-hidden { transform: none; }

@@ -130,34 +130,13 @@ export function mount(root = document) {
     } });
   }
 
-  /* ---------- intro ---------- */
-  function heroReveal(tl) {
-    return tl
-      .from(S, { scale: 0.7, rotZ: -3, zoom: 1.3, duration: 1.6, ease: 'expo.out' }, 0)
-      .from(frame, { clipPath: 'inset(50% 50% 50% 50% round 24px)', duration: 1.3, ease: 'expo.inOut', clearProps: 'clipPath' }, 0)
-      .from($$('.hero__title .char'), { yPercent: 110, rotate: 6, stagger: 0.025, duration: 1.1, ease: 'expo.out', onComplete: () => root.querySelector('.hero__title')?.classList.add('is-revealed') }, 0.15)
-      .from($$('.hero__top > *, .hero__bottom > *'), { y: 24, opacity: 0, stagger: 0.05, duration: 0.9, ease: 'expo.out' }, 0.3);
-  }
-  function intro(viaRouter) {
-    const loader = $('[data-loader]');
+  /* ---------- intro: photo and UI are simply there; only the headline letters rise ---------- */
+  function intro() {
     $$('[data-hero-word]').forEach((w) => split(w, 'chars'));
-    const seen = viaRouter || document.documentElement.classList.contains('seen');
     try { sessionStorage.setItem('naturik.seen', '1'); } catch {}
-    if (reduceMotion) { loader?.remove(); return; }
-    if (seen || !loader) { loader?.remove(); heroReveal(gsap.timeline({ delay: viaRouter ? 0.35 : 0.1 })); return; }
-    const bar = $('[data-loader-bar]');
-    const shown = { v: 0 }, target = { v: 0.12 };
-    const img = stageImgs[0];
-    const tasks = [document.fonts?.ready ?? Promise.resolve(), img.complete ? Promise.resolve() : new Promise((r) => { img.onload = r; img.onerror = r; })];
-    tasks.forEach((t) => t.then(() => (target.v = Math.min(1, target.v + 0.44))));
-    const lt = () => { shown.v += (target.v - shown.v) * 0.14; bar.style.transform = `scaleX(${shown.v})`; };
-    gsap.ticker.add(lt);
-    gsap.to(loader.querySelectorAll('.loader__brand span'), { yPercent: -105, stagger: 0.04, duration: 0.8, ease: 'expo.out' });
-    Promise.all([Promise.race([Promise.all(tasks), new Promise((r) => setTimeout(r, 2200))]), new Promise((r) => setTimeout(r, 800))]).then(() => {
-      target.v = 1;
-      gsap.to(loader, { clipPath: 'inset(0 0 100% 0)', duration: 0.85, ease: 'expo.inOut', delay: 0.2, onComplete: () => { gsap.ticker.remove(lt); loader.remove(); } });
-      heroReveal(gsap.timeline({ delay: 0.55 }));
-    });
+    if (reduceMotion) return;
+    gsap.from($$('.hero__title .char'), { yPercent: 110, stagger: 0.02, duration: 0.9, ease: 'expo.out', delay: 0.05,
+      onComplete: () => root.querySelector('.hero__title')?.classList.add('is-revealed') });
   }
 
   /* ---------- scroll choreography (Lenis already smooths, so scrub is direct) ---------- */
@@ -181,28 +160,21 @@ export function mount(root = document) {
     ScrollTrigger.create({ trigger: '#drop', start: 'top 60%', onEnter: () => setChip(2), onLeaveBack: () => setChip(1) });
     gsap.fromTo(media, { scale: 0.68, borderRadius: 28 }, { scale: 1, borderRadius: 0, ease: 'none', immediateRender: true, scrollTrigger: { trigger: '#details', start: 'top 85%', end: 'top top', scrub: true } });
 
-    const drift = (sel, x) => gsap.to(sel, { xPercent: x, ease: 'none', scrollTrigger: { trigger: '[data-hero]', start: 'top top', end: 'bottom top', scrub: true } });
-    drift('.ht--1', -25); drift('.ht--2', 18); drift('.ht--3', 22); drift('.ht--5', 26);
 
     const scrub = $('[data-scrub-text]');
     gsap.fromTo(split(scrub, 'words'), { opacity: 0.14 }, { opacity: 1, stagger: 0.05, ease: 'none', scrollTrigger: { trigger: scrub, start: 'top 80%', end: 'bottom 45%', scrub: true } });
 
     const track = $('[data-look-track]');
     const dist = () => Math.max(0, track.scrollWidth - innerWidth + 40);
-    const skew = gsap.quickTo(track, 'skewX', { duration: 0.5, ease: 'power3' });
-    gsap.to(track, { x: () => -dist(), ease: 'none', scrollTrigger: { trigger: '[data-look-pin]', start: 'top top', end: () => `+=${dist()}`, pin: true, scrub: true, invalidateOnRefresh: true,
-      onUpdate: (s) => skew(Math.max(-5, Math.min(5, s.getVelocity() / -450))) } });
+    gsap.to(track, { x: () => -dist(), ease: 'none', scrollTrigger: { trigger: '[data-look-pin]', start: 'top top', end: () => `+=${dist()}`, pin: true, scrub: true, invalidateOnRefresh: true } });
 
-    gsap.from('[data-home-products] .p-card', { y: 100, opacity: 0, stagger: 0.07, duration: 1.1, ease: 'expo.out', scrollTrigger: { trigger: '[data-home-products]', start: 'top 88%', once: true } });
 
     initReveals(root);
-    initCounters(root);
   }, root === document ? undefined : root);
 
   measure();
   on(window, 'resize', measure);
-  intro(mount.visited);
-  mount.visited = true;
+  intro();
   requestAnimationFrame(() => ScrollTrigger.refresh());
 
   return () => { ctx.revert(); cleanups.forEach((f) => f()); };

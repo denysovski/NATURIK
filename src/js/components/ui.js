@@ -36,17 +36,10 @@ export function initReveals(scope = document) {
     gsap.fromTo(el, { yPercent: 60, opacity: 0, clipPath: 'inset(0 0 100% 0)' }, { yPercent: 0, opacity: 1, clipPath: 'inset(-20% -10% -20% -10%)', duration: 1.2, ease: 'expo.out', delay: 0.15 + i * 0.12 });
   });
   $$('[data-reveal]', scope).forEach((el) => {
-    gsap.from(el, { y: 50, opacity: 0, duration: 1.1, ease: 'expo.out', delay: +el.dataset.delay || 0, scrollTrigger: { trigger: el, start: 'top 90%', once: true } });
+    gsap.from(el, { opacity: 0, duration: 0.6, ease: 'power1.out', scrollTrigger: { trigger: el, start: 'top 92%', once: true } });
   });
   $$('[data-reveal-stagger]', scope).forEach((el) => {
-    gsap.from(el.children, { y: 60, opacity: 0, duration: 1, ease: 'expo.out', stagger: 0.08, scrollTrigger: { trigger: el, start: 'top 85%', once: true } });
-  });
-  $$('[data-clip]', scope).forEach((el) => {
-    gsap.fromTo(el, { clipPath: 'inset(100% 0 0 0)' }, { clipPath: 'inset(0% 0 0 0)', duration: 1.4, ease: 'expo.out', scrollTrigger: { trigger: el, start: 'top 88%', once: true } });
-    const img = el.querySelector('img'); if (img) gsap.fromTo(img, { scale: 1.25 }, { scale: 1, duration: 1.8, ease: 'expo.out', scrollTrigger: { trigger: el, start: 'top 88%', once: true } });
-  });
-  $$('[data-parallax]', scope).forEach((el) => {
-    gsap.fromTo(el, { yPercent: -(+el.dataset.parallax || 10) }, { yPercent: +el.dataset.parallax || 10, ease: 'none', scrollTrigger: { trigger: el.parentElement, scrub: true } });
+    gsap.from(el.children, { opacity: 0, duration: 0.6, ease: 'power1.out', stagger: 0.06, scrollTrigger: { trigger: el, start: 'top 92%', once: true } });
   });
 }
 
@@ -97,7 +90,6 @@ function initHeader() {
   let last = 0;
   const update = (y) => {
     const menuOpen = document.querySelector('[data-mobile-menu].is-open');
-    h.classList.toggle('is-hidden', !menuOpen && y > last && y > 240);
     last = y;
     const probe = 36;
     h.classList.toggle('on-light', !menuOpen && $$('[data-header-light]').some((s) => { const r = s.getBoundingClientRect(); return r.top <= probe && r.bottom >= probe; }));
