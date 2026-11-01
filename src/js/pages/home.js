@@ -125,7 +125,6 @@ export function mount(root = document) {
     gsap.to(card, { opacity: 0, y: 12, duration: 0.16, overwrite: true, onComplete: () => {
       $('[data-dc-title]').textContent = st.title;
       $('[data-dc-text]').textContent = st.text;
-      $('[data-dc-spec]').textContent = st.spec;
       gsap.to(card, { opacity: 1, y: 0, duration: 0.45, ease: 'expo.out' });
     } });
   }
@@ -140,6 +139,15 @@ export function mount(root = document) {
   }
 
   /* ---------- scroll choreography (Lenis already smooths, so scrub is direct) ---------- */
+  // index links: jump the scroll to the exact point where that detail is in focus
+  let detailsST = null;
+  on(root, 'click', (e) => {
+    const b = e.target.closest('[data-detail-go]'); if (!b || !detailsST) return;
+    const i = +b.dataset.detailGo;
+    const y = detailsST.start + (detailsST.end - detailsST.start) * (i / (STEPS.length - 1));
+    window.naturikScrollTo ? window.naturikScrollTo(y, 0) : window.scrollTo({ top: y, behavior: 'smooth' });
+  });
+
   const ctx = gsap.context(() => {
     if (reduceMotion) { S.opacity = 0; return; }
     const mm = gsap.matchMedia();
@@ -149,7 +157,7 @@ export function mount(root = document) {
       step('#spec', { x: d ? -0.22 : 0, y: d ? 0 : -0.17, scale: d ? 0.92 : 0.64, rotY: 0, rotZ: -1.5, img: 1, zoom: 1.12, pan: 0 });
       step('#drop', { x: d ? 0.22 : 0, y: d ? 0 : -0.19, scale: d ? 0.92 : 0.6, rotY: 0, rotZ: 1.5, img: 2, zoom: 1.08, pan: 0 });
       step('#details', { x: 0, y: 0, scale: 1.5, rotY: 0, rotZ: 0, img: 0, zoom: 1, pan: 0, opacity: 0 }, { end: 'top 15%' });
-      gsap.to(Z, { step: STEPS.length - 1, ease: 'none', scrollTrigger: { trigger: '#details', start: 'top top', end: d ? '+=460%' : '+=340%', pin: '[data-details-pin]', scrub: true } });
+      detailsST = gsap.to(Z, { step: STEPS.length - 1, ease: 'none', scrollTrigger: { trigger: '#details', start: 'top top', end: d ? '+=460%' : '+=340%', pin: '[data-details-pin]', scrub: true } }).scrollTrigger;
     });
     ScrollTrigger.create({ trigger: '#details', start: 'top bottom', end: 'bottom top', onToggle: (s) => { Z.active = s.isActive; Z.dirty = true; media.style.visibility = s.isActive ? 'visible' : 'hidden'; } });
     // release: the full-bleed photo folds back into a card as the next section arrives (mirror of the entry)

@@ -58,6 +58,9 @@ async function go(href, { push = true } = {}) {
   if (busy) return;
   busy = true;
   const htmlP = fetchPage(url.href);
+  lenis?.stop();                                 // freeze scrolling while the page swaps
+  const swallow = (e) => e.preventDefault();
+  window.addEventListener('wheel', swallow, { passive: false }); window.addEventListener('touchmove', swallow, { passive: false });
   window.naturikMenuClose?.();
   window.naturikCart?.close();
   try {
@@ -73,20 +76,28 @@ async function go(href, { push = true } = {}) {
     syncHead(doc);
     syncNav(next);
     if (push) history.pushState({ page: next }, '', url.pathname + url.search + url.hash);
-    lenis?.scrollTo(0, { immediate: true, force: true }); window.scrollTo(0, 0);
+    // hard reset to the top: kill any running smooth-scroll momentum first
+    const toTop = () => { lenis?.scrollTo(0, { immediate: true, force: true }); document.documentElement.scrollTop = 0; document.body.scrollTop = 0; window.scrollTo(0, 0); };
+    lenis?.stop(); toTop();
     current = mounts[next]?.(fresh) || null;
     document.dispatchEvent(new CustomEvent('naturik:page', { detail: { page: next } }));
     ScrollTrigger.refresh();
+    if (!url.hash) toTop();
+    lenis?.start();
+    if (!url.hash) requestAnimationFrame(() => { toTop(); requestAnimationFrame(toTop); });
     if (url.hash) setTimeout(() => { const t = document.querySelector(url.hash); if (t) lenis?.scrollTo(t, { offset: -20 }); }, 300);
     reveal();
   } catch {
     location.href = url.href;                      // graceful fallback: real navigation
   } finally {
+    window.removeEventListener('wheel', swallow); window.removeEventListener('touchmove', swallow);
+    lenis?.start();
     busy = false;
   }
 }
 
 export function initRouter(pageMounts) {
+  if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
   mounts = pageMounts;
   const page = document.body.dataset.page;
   current = mounts[page]?.(document) || null;
