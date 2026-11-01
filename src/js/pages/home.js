@@ -80,9 +80,9 @@ export function mount(root = document) {
     { img: 'hero', fx: 0.5, fy: 0.5, s: 1, title: 'M1 Puffer 78C', text: 'Seventy-eight hand-filled cells, one funnel collar and a satin shell that throws light like wet asphalt.', spec: 'Obsidian · 78 numbered pieces' },
     { img: 'hero', fx: 0.5, fy: 0.3, s: 2.2, title: 'Funnel collar', text: 'Two stacked cells rise to the bridge of your nose. A brushed chin guard sits inside, so the zip never touches skin.', spec: 'Height 27 cm · two cells' },
     { img: 'hero', fx: 0.41, fy: 0.62, s: 2.6, title: 'M1 print', text: 'Matte grey by day, bright under headlights. Printed across one full chest cell so it moves with the down.', spec: 'Reflective · wash-fast' },
-    { img: 'sleeve', fx: 0.36, fy: 0.55, s: 1.5, title: 'Shoulder cell', text: 'One continuous cell over a dropped shoulder — no seam where a bag strap sits. The wordmark rides on the cap.', spec: 'Single-cell yoke' },
+    { img: 'hero', fx: 0.25, fy: 0.66, s: 2.3, title: 'Shoulder cell', text: 'One continuous cell over a dropped shoulder — no seam where a bag strap sits. The wordmark rides on the cap.', spec: 'Single-cell yoke' },
     { img: 'hero', fx: 0.505, fy: 0.78, s: 2.5, title: 'Offset two-way zip', text: 'Moved off-centre so the chest panel stays clean. Opens from the hem so you can sit down without unzipping.', spec: 'YKK® Aquaguard® · two-way' },
-    { img: 'back', fx: 0.5, fy: 0.3, s: 1.75, title: 'Back collar', text: 'Three vertical seams shape the collar so it stands on its own, even fully unzipped.', spec: 'Self-supporting · 3 panels' },
+    { img: 'hero', fx: 0.5, fy: 0.34, s: 1.7, title: 'Stand-up collar', text: 'Three vertical seams shape the collar so it stands on its own, even fully unzipped.', spec: 'Self-supporting · 3 panels' },
     { img: 'hero', fx: 0.5, fy: 0.5, s: 1, title: 'Every detail, one jacket', text: 'Seventy-eight cells, one collar, one zip that sits where it should. Numbered and never restocked.', spec: 'M1 Puffer 78C · €890', end: true },
   ];
   const media = $('[data-zoom-media]');
