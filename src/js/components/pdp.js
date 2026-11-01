@@ -256,7 +256,7 @@ function bind(p) {
       e.preventDefault();
       const v = e.target.querySelector('input').value.trim(), err = waitlist.querySelector('.field__error');
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v)) { err.textContent = 'Enter a valid email address'; return; }
-      waitlist.innerHTML = `<p><b style="color:var(--c-cobalt)">You're on the ${s} waitlist.</b> We'll write to ${v.replace(/[<>&"]/g, '')} if one becomes available.</p>`;
+      waitlist.innerHTML = `<p><b>You're on the ${s} waitlist.</b> We'll write to ${v.replace(/[<>&"]/g, '')} if one becomes available.</p>`;
     };
   };
   $$('.size-chip[data-size]').forEach((c) => (c.onclick = () => { if (p.stock[c.dataset.size]) { waitlist.hidden = true; select(c.dataset.size); } else openWaitlist(c.dataset.size); }));

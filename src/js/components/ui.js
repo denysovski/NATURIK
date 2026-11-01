@@ -30,7 +30,7 @@ export function initReveals(scope = document) {
   $$('[data-split]', scope).forEach((el) => {
     const parts = split(el);
     gsap.from(parts, { yPercent: 110, rotate: 4, duration: 1.1, ease: 'expo.out', stagger: el.dataset.split === 'chars' ? 0.025 : 0.06,
-      scrollTrigger: { trigger: el, start: 'top 88%', once: true } });
+      scrollTrigger: { trigger: el, start: 'top 88%', once: true }, onComplete: () => el.classList.add('is-revealed') });
   });
   $$('[data-rise] .fit-line', scope).forEach((el, i) => {
     gsap.fromTo(el, { yPercent: 60, opacity: 0, clipPath: 'inset(0 0 100% 0)' }, { yPercent: 0, opacity: 1, clipPath: 'inset(-20% -10% -20% -10%)', duration: 1.2, ease: 'expo.out', delay: 0.15 + i * 0.12 });
@@ -203,13 +203,14 @@ function initFooter() {
 
 /* ---------- image fade-in over shimmer skeletons ---------- */
 function initImageLoading() {
-  const mark = (img) => { if (img.complete && img.naturalWidth) img.classList.add('is-loaded'); };
+  const mark = (img) => { if (img.complete && img.naturalWidth) { img.classList.add('is-loaded'); img.parentElement?.classList.add('media-loaded'); } };
+  document.querySelectorAll('img').forEach(mark);
   const prep = (root = document) => root.querySelectorAll('img:not(.fade-in)').forEach((img) => {
     if (img.closest('.loader, .stage, .details__media, .toast, .p-card__media')) return;
     img.classList.add('fade-in'); mark(img);
   });
   prep();
-  document.addEventListener('load', (e) => { if (e.target.tagName === 'IMG') e.target.classList.add('is-loaded'); }, true);
+  document.addEventListener('load', (e) => { if (e.target.tagName === 'IMG') { e.target.classList.add('is-loaded'); e.target.parentElement?.classList.add('media-loaded'); } }, true);
   document.addEventListener('error', (e) => { if (e.target.tagName === 'IMG') e.target.classList.add('is-loaded'); }, true);
   new MutationObserver((ms) => ms.forEach((m) => m.addedNodes.forEach((n) => n.nodeType === 1 && prep(n.tagName === 'IMG' ? n.parentElement : n)))).observe(document.body, { childList: true, subtree: true });
 }

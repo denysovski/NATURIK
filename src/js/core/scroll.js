@@ -3,6 +3,8 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 gsap.registerPlugin(ScrollTrigger);
+gsap.config({ force3D: 'auto' });
+gsap.defaults({ overwrite: 'auto' });
 
 export const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 export let lenis = null;

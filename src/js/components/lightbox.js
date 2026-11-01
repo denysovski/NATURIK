@@ -1,6 +1,6 @@
 // Lightbox: any element with data-lb="group" (+ data-lb-src, data-lb-caption) opens a full-size viewer.
 // The photo flies from the thumbnail into place, arrows / swipe / keys move through the group.
-import { gsap, lockScroll, unlockScroll } from '../core/scroll.js';
+import { gsap } from '../core/scroll.js';
 
 let el, items = [], idx = 0, origin = null, lastFocus = null;
 
@@ -45,7 +45,7 @@ export function openLightbox(group, start, fromEl) {
   el.querySelector('.lb__dots').innerHTML = items.length > 1 ? items.map(() => '<i></i>').join('') : '';
   el.querySelectorAll('.lb__btn--prev, .lb__btn--next').forEach((b) => (b.hidden = items.length < 2));
   show(start);
-  el.classList.add('is-open'); lockScroll();
+  el.classList.add('is-open');
   const img = el.querySelector('.lb__img');
   gsap.fromTo(el.querySelector('.lb__backdrop'), { opacity: 0 }, { opacity: 1, duration: 0.4 });
   gsap.fromTo(el.querySelectorAll('.lb__btn, .lb__dots, .lb__cap'), { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.5, delay: 0.25, stagger: 0.04 });
@@ -63,7 +63,6 @@ export function openLightbox(group, start, fromEl) {
 function close() {
   if (!el?.classList.contains('is-open')) return;
   gsap.to(el, { opacity: 0, duration: 0.3, onComplete: () => { el.classList.remove('is-open'); gsap.set(el, { clearProps: 'opacity' }); } });
-  if (!document.querySelector('.modal.is-open, .pdp.is-open, [data-cart].is-open')) unlockScroll();
   lastFocus?.focus?.({ preventScroll: true });
 }
 

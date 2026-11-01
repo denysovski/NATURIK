@@ -39,28 +39,27 @@ export function mount(root = document) {
      ========================================================= */
   const stage = $('[data-stage]'), frame = $('[data-stage-frame]'), glow = $('[data-stage-glow]');
   const stageImgs = $$('[data-stage-img]'), chip = $('[data-stage-chip]'), sheen = root.querySelector('.stage__sheen');
-  const S = { x: 0, y: vp.mobile ? 0.12 : 0.07, scale: vp.mobile ? 0.8 : 0.96, rotY: -7, rotZ: 0, img: 0, zoom: 1.06, pan: 0, opacity: 1 };
-  const mouse = { x: 0, y: 0, sx: 0, sy: 0 };
-  let lastImg = -1, hidden = false;
-  on(window, 'pointermove', (e) => { mouse.x = e.clientX / vp.w - 0.5; mouse.y = e.clientY / vp.h - 0.5; }, { passive: true });
+  const S = { x: 0, y: vp.mobile ? 0.12 : 0.07, scale: vp.mobile ? 0.8 : 0.96, rotY: 0, rotZ: 0, img: 0, zoom: 1.06, pan: 0, opacity: 1 };
+  let lastImg = -1, hidden = false, lastKey = '';
 
+  // Writes only when the scroll-driven state actually changed: zero work while idle.
   tick(() => {
     if (S.opacity < 0.01) { if (!hidden) { stage.style.visibility = 'hidden'; hidden = true; } return; }
     if (hidden) { stage.style.visibility = 'visible'; hidden = false; }
-    mouse.sx += (mouse.x - mouse.sx) * 0.08; mouse.sy += (mouse.y - mouse.sy) * 0.08;
+    const key = `${S.x.toFixed(4)}|${S.y.toFixed(4)}|${S.scale.toFixed(4)}|${S.rotY.toFixed(2)}|${S.rotZ.toFixed(2)}|${S.img.toFixed(3)}|${S.zoom.toFixed(4)}|${S.pan.toFixed(4)}|${S.opacity.toFixed(3)}|${vp.w}|${vp.h}`;
+    if (key === lastKey) return;
+    lastKey = key;
     const tx = S.x * vp.w, ty = S.y * vp.h;
-    const ry = S.rotY + mouse.sx * 9, rx = -mouse.sy * 6;
-    frame.style.transform = `translate3d(calc(-50% + ${tx.toFixed(1)}px), calc(-50% + ${ty.toFixed(1)}px), 0) perspective(1400px) rotateY(${ry.toFixed(2)}deg) rotateX(${rx.toFixed(2)}deg) rotateZ(${S.rotZ.toFixed(2)}deg) scale(${S.scale.toFixed(4)})`;
-    sheen.style.transform = `translate3d(${(ry * 2.4).toFixed(1)}%, 0, 0)`;
-    glow.style.transform = `translate3d(calc(-50% + ${(tx * 0.85).toFixed(1)}px), calc(-50% + ${ty.toFixed(1)}px), 0)`;
+    frame.style.transform = `translate3d(calc(-50% + ${tx.toFixed(1)}px), calc(-50% + ${ty.toFixed(1)}px), 0) perspective(1400px) rotateY(${S.rotY.toFixed(2)}deg) rotateZ(${S.rotZ.toFixed(2)}deg) scale(${S.scale.toFixed(4)})`;
+    sheen.style.transform = `translate3d(${(S.x * 60).toFixed(1)}%, 0, 0)`;
+    glow.style.transform = `translate3d(calc(-50% + ${(tx * 0.9).toFixed(1)}px), calc(-50% + ${ty.toFixed(1)}px), 0) scale(${S.scale.toFixed(3)})`;
     stageImgs.forEach((im, i) => {
-      // quick, decisive swap around the mid-point instead of a long ghosting double-exposure
       const o = Math.min(1, Math.max(0, (0.5 - Math.abs(i - S.img)) * 4 + 0.5));
       im.style.opacity = o.toFixed(3);
-      if (o > 0) im.style.transform = `translate3d(${(mouse.sx * -12).toFixed(1)}px, ${(S.pan * 100 + mouse.sy * -10).toFixed(1)}px, 0) scale(${S.zoom.toFixed(4)})`;
+      im.style.visibility = o > 0 ? 'visible' : 'hidden';
+      if (o > 0) im.style.transform = `translate3d(0, ${(S.pan * 100).toFixed(1)}px, 0) scale(${S.zoom.toFixed(4)})`;
     });
     const cur = Math.round(S.img);
-    if (cur !== lastImg) { lastImg = cur; glow.style.backgroundImage = `url(${stageImgs[cur].getAttribute('src')})`; }
     stage.style.opacity = S.opacity.toFixed(3);
   });
 
@@ -77,6 +76,7 @@ export function mount(root = document) {
     { img: 'sleeve', fx: 0.38, fy: 0.48, s: 1.55, title: 'Shoulder cell', text: 'One continuous cell over a dropped shoulder — no seam where a bag strap sits. The wordmark rides on the cap.', spec: 'Single-cell yoke' },
     { img: 'hero', fx: 0.71, fy: 0.74, s: 2.4, title: 'Offset two-way zip', text: 'Moved off-centre so the chest panel stays clean. Opens from the hem so you can sit down without unzipping.', spec: 'YKK® Aquaguard® · two-way' },
     { img: 'back', fx: 0.5, fy: 0.3, s: 1.75, title: 'Back collar', text: 'Three vertical seams shape the collar so it stands on its own, even fully unzipped.', spec: 'Self-supporting · 3 panels' },
+    { img: 'hero', fx: 0.5, fy: 0.45, s: 1, title: 'Every detail, one jacket', text: 'Seventy-eight cells, one collar, one zip that sits where it should. Numbered and never restocked.', spec: 'M1 Puffer 78C · €890', end: true },
   ];
   const media = $('[data-zoom-media]');
   const zImgs = Object.fromEntries($$('[data-zoom-img]').map((im) => [im.dataset.zoomImg, im]));
@@ -109,17 +109,18 @@ export function mount(root = document) {
     for (const [name, im] of Object.entries(zImgs)) {
       const op = same ? (name === a.img ? 1 : 0) : (name === a.img ? 1 - e : name === b.img ? e : 0);
       im.style.opacity = op;
+      im.style.visibility = op > 0 ? 'visible' : 'hidden';
       if (op > 0) im.style.transform = `translate3d(${left.toFixed(1)}px, ${top.toFixed(1)}px, 0) scale(${s.toFixed(4)})`;
     }
     const holding = k === 0 || k === 1;
     ring.style.transform = `translate3d(${(left + fx * dw).toFixed(1)}px, ${(top + fy * dh).toFixed(1)}px, 0) translate(-50%, -50%) scale(${holding ? 1 : 0.6})`;
-    ring.style.opacity = Math.round(f) === 0 || !holding ? 0 : 1;
+    ring.style.opacity = Math.round(f) === 0 || STEPS[Math.round(f)].end || !holding ? 0 : 1;
     const cur = Math.round(f);
     if (cur !== shownStep) { shownStep = cur; showCard(cur); }
   });
   function showCard(i) {
     const st = STEPS[i], card = $('[data-detail-card]');
-    $$('[data-detail-index] li').forEach((li, k) => li.classList.toggle('is-on', k === i));
+    $$('[data-detail-index] li').forEach((li, k) => li.classList.toggle('is-on', st.end ? k === 0 : k === i));
     $('[data-dc-bar]').style.transform = `scaleX(${i / (STEPS.length - 1)})`;
     gsap.to(card, { opacity: 0, y: 12, duration: 0.16, overwrite: true, onComplete: () => {
       $('[data-dc-title]').textContent = st.title;
@@ -132,9 +133,9 @@ export function mount(root = document) {
   /* ---------- intro ---------- */
   function heroReveal(tl) {
     return tl
-      .from(S, { scale: 0.55, rotY: -40, rotZ: -6, zoom: 1.6, duration: 1.6, ease: 'expo.out' }, 0)
+      .from(S, { scale: 0.7, rotZ: -3, zoom: 1.3, duration: 1.6, ease: 'expo.out' }, 0)
       .from(frame, { clipPath: 'inset(50% 50% 50% 50% round 24px)', duration: 1.3, ease: 'expo.inOut', clearProps: 'clipPath' }, 0)
-      .from($$('.hero__title .char'), { yPercent: 110, rotate: 6, stagger: 0.025, duration: 1.1, ease: 'expo.out' }, 0.15)
+      .from($$('.hero__title .char'), { yPercent: 110, rotate: 6, stagger: 0.025, duration: 1.1, ease: 'expo.out', onComplete: () => root.querySelector('.hero__title')?.classList.add('is-revealed') }, 0.15)
       .from($$('.hero__top > *, .hero__bottom > *'), { y: 24, opacity: 0, stagger: 0.05, duration: 0.9, ease: 'expo.out' }, 0.3);
   }
   function intro(viaRouter) {
@@ -166,15 +167,19 @@ export function mount(root = document) {
     mm.add({ desk: '(min-width: 820px)', mob: '(max-width: 819px)' }, (c) => {
       const d = c.conditions.desk;
       const step = (trigger, to, st = {}) => gsap.to(S, { ...to, ease: 'none', immediateRender: false, scrollTrigger: { trigger, start: 'top bottom', end: 'top top', scrub: true, ...st } });
-      step('#spec', { x: d ? -0.22 : 0, y: d ? 0 : -0.17, scale: d ? 0.92 : 0.64, rotY: d ? 12 : 0, rotZ: -2, img: 1, zoom: 1.22, pan: -0.04 });
-      step('#drop', { x: d ? 0.22 : 0, y: d ? 0 : -0.19, scale: d ? 0.92 : 0.6, rotY: d ? -12 : 0, rotZ: 2, img: 2, zoom: 1.12, pan: 0.03 });
+      step('#spec', { x: d ? -0.22 : 0, y: d ? 0 : -0.17, scale: d ? 0.92 : 0.64, rotY: 0, rotZ: -1.5, img: 1, zoom: 1.12, pan: 0 });
+      step('#drop', { x: d ? 0.22 : 0, y: d ? 0 : -0.19, scale: d ? 0.92 : 0.6, rotY: 0, rotZ: 1.5, img: 2, zoom: 1.08, pan: 0 });
       step('#details', { x: 0, y: 0, scale: 1.5, rotY: 0, rotZ: 0, img: 0, zoom: 1, pan: 0, opacity: 0 }, { end: 'top 15%' });
-      gsap.to(Z, { step: STEPS.length - 1, ease: 'none', scrollTrigger: { trigger: '#details', start: 'top top', end: d ? '+=400%' : '+=300%', pin: '[data-details-pin]', scrub: true } });
+      gsap.to(Z, { step: STEPS.length - 1, ease: 'none', scrollTrigger: { trigger: '#details', start: 'top top', end: d ? '+=460%' : '+=340%', pin: '[data-details-pin]', scrub: true } });
     });
-    ScrollTrigger.create({ trigger: '#details', start: 'top bottom', end: 'bottom top', onToggle: (s) => { Z.active = s.isActive; Z.dirty = true; } });
+    ScrollTrigger.create({ trigger: '#details', start: 'top bottom', end: 'bottom top', onToggle: (s) => { Z.active = s.isActive; Z.dirty = true; media.style.visibility = s.isActive ? 'visible' : 'hidden'; } });
+    // release: the full-bleed photo folds back into a card as the next section arrives (mirror of the entry)
+    gsap.timeline({ scrollTrigger: { trigger: '#manifesto', start: 'top bottom', end: 'top 25%', scrub: true } })
+      .fromTo(media, { scale: 1, borderRadius: 0 }, { scale: 0.68, borderRadius: 28, ease: 'none', immediateRender: false }, 0)
+      .to(root.querySelector('.details__ui'), { opacity: 0, y: -30, ease: 'none' }, 0);
     ScrollTrigger.create({ trigger: '#spec', start: 'top 60%', onEnter: () => setChip(1), onLeaveBack: () => setChip(0) });
     ScrollTrigger.create({ trigger: '#drop', start: 'top 60%', onEnter: () => setChip(2), onLeaveBack: () => setChip(1) });
-    gsap.fromTo(media, { clipPath: 'inset(10% 16% 10% 16% round 28px)' }, { clipPath: 'inset(0% 0% 0% 0% round 0px)', ease: 'none', scrollTrigger: { trigger: '#details', start: 'top 85%', end: 'top top', scrub: true } });
+    gsap.fromTo(media, { scale: 0.68, borderRadius: 28 }, { scale: 1, borderRadius: 0, ease: 'none', immediateRender: true, scrollTrigger: { trigger: '#details', start: 'top 85%', end: 'top top', scrub: true } });
 
     const drift = (sel, x) => gsap.to(sel, { xPercent: x, ease: 'none', scrollTrigger: { trigger: '[data-hero]', start: 'top top', end: 'bottom top', scrub: true } });
     drift('.ht--1', -25); drift('.ht--2', 18); drift('.ht--3', 22); drift('.ht--5', 26);
