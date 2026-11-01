@@ -621,3 +621,7 @@ body.is-locked { overflow: visible; }
 .site-header, .site-header.on-light { color: var(--c-bone); }
 .site-header .icon-btn:not(.icon-btn--dark) { background: var(--c-bone); color: var(--c-ink); }
 .site-header::before { background: linear-gradient(180deg, rgba(0,0,0,0.32) 0%, rgba(0,0,0,0.16) 55%, rgba(0,0,0,0) 100%); }
+.site-header.on-light { color: var(--c-ink); }
+.site-header.on-light .icon-btn:not(.icon-btn--dark) { background: var(--c-ink); color: var(--c-bone); }
+.site-header.on-light::before { background: linear-gradient(180deg, rgba(0,0,0,0.12) 0%, rgba(0,0,0,0.05) 55%, rgba(0,0,0,0) 100%); }
+.site-header::before { transition: background 0.4s; }
