@@ -839,3 +839,7 @@ body.is-locked { overflow: visible; }
 }
 /* stage photos: deeper shade on top of the darker baked images */
 .stage__shade { background: linear-gradient(180deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.28) 22%, rgba(0,0,0,0.3) 60%, rgba(0,0,0,0.5) 100%) !important; }
+
+/* more air around the shipping marquee */
+.confidence { padding-top: clamp(80px, 10vw, 150px) !important; }
+.confidence__marquee { margin-bottom: clamp(80px, 10vw, 150px) !important; }
