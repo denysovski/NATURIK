@@ -183,8 +183,9 @@ export function openProduct(slug, { from, push = true } = {}) {
   setTimeout(() => panel.querySelector('[data-pdp-close].icon-btn')?.focus({ preventScroll: true }), 600);
 }
 
-export function closeProduct({ push = true } = {}) {
+export function closeProduct({ push = true, instant = false } = {}) {
   if (!panel?.classList.contains('is-open')) return;
+  if (instant) { panel.classList.remove('is-open'); panel.innerHTML = ''; document.getElementById('ld-product')?.remove(); resetMeta(); unlockScroll(); return; }
   gsap.to(panel, { opacity: 0, y: 30, duration: 0.45, ease: 'power3.in', onComplete: () => { panel.classList.remove('is-open'); gsap.set(panel, { clearProps: 'all' }); panel.innerHTML = ''; } });
   unlockScroll();
   document.title = window.__baseTitle || document.title;
@@ -298,16 +299,20 @@ function bind(p) {
   io.observe(add);
 }
 
+let routed = false;
 export function initPdpRouting() {
+  const first = !routed; routed = true;
   window.__baseTitle = document.title;
   window.naturikOpenProduct = (slug) => openProduct(slug);
-  document.addEventListener('click', (e) => {
+  if (first) document.addEventListener('click', (e) => {
+    if (document.body.dataset.page !== 'shop') return;
     const a = e.target.closest('[data-open-product]');
     if (!a || a.closest('.pdp')) return;
     e.preventDefault();
     openProduct(a.dataset.openProduct, { from: a.closest('.p-card') });
   });
-  window.addEventListener('popstate', () => {
+  if (first) window.addEventListener('popstate', () => {
+    if (document.body.dataset.page !== 'shop') return;
     const slug = new URLSearchParams(location.search).get('p');
     if (slug) openProduct(slug, { push: false }); else closeProduct({ push: false });
   });

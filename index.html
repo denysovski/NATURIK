@@ -19,11 +19,12 @@
     {"@type":"Product","name":"M1 Puffer 78C — Obsidian","brand":{"@type":"Brand","name":"NATURIK"},"sku":"M1-OBSIDIAN","image":["https://denysovski.github.io/NATURIK/images/m1-editorial-hero.webp","https://denysovski.github.io/NATURIK/images/m1-front.webp"],"description":"Limited down jacket with 78 hand-filled cells of 800-fill down, satin ripstop shell and two-cell funnel collar.","offers":{"@type":"Offer","price":"890","priceCurrency":"EUR","availability":"https://schema.org/LimitedAvailability","url":"https://denysovski.github.io/NATURIK/shop.html?p=m1-obsidian"}}
   ]}
   </script>
-  <script type="module" src="./src/js/pages/home.js"></script>
+  <script type="module" src="./src/js/main.js"></script>
 </head>
-<body class="page-home">
+<body class="page-home" data-page="home">
   <!-- @include header {"page":"home"} -->
 
+  <main id="main">
   <div class="loader" data-loader aria-hidden="true">
     <div class="loader__top t-mono"><span>NATURIK / Drop 01</span><span>FW26 — Prague</span></div>
     <div class="loader__brand"><span>N</span><span>a</span><span>t</span><span>u</span><span>r</span><span>i</span><span>k</span></div>
@@ -43,7 +44,6 @@
     </div>
   </div>
 
-  <main id="main">
     <!-- 00 HERO -->
     <section class="hero" data-hero aria-labelledby="hero-title">
       <div class="hero__bg" aria-hidden="true"></div>
@@ -138,7 +138,7 @@
         <div class="wrap details__ui">
           <header class="details__head">
             <span class="pill pill--dark glass">Every detail</span>
-            <h2 class="details__title" id="details-title" aria-label="Closer.">Closer.</h2>
+            <h2 class="details__title" id="details-title">Closer.</h2>
           </header>
           <ol class="details__index glass" data-detail-index>
             <li class="is-on"><span class="t-mono">00</span>The jacket</li>

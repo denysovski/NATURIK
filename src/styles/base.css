@@ -55,3 +55,7 @@ ul, ol { padding: 0; list-style: none; }
   *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
   .grain { display: none; }
 }
+[hidden] { display: none !important; }
+/* grain: static, no blend mode — zero per-frame compositing cost */
+.grain { inset: 0; animation: none; mix-blend-mode: normal; opacity: 0.045; }
+@media (hover: none), (max-width: 819px) { .grain { display: none; } }

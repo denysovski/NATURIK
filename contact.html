@@ -11,17 +11,17 @@
   <meta property="og:url" content="https://denysovski.github.io/NATURIK/contact.html">
   <meta name="twitter:title" content="Contact — NATURIK">
   <meta name="twitter:description" content="Sizing help, orders, returns and showroom visits in Prague.">
-  <script type="application/ld+json" id="ld-faq"></script>
-  <script type="module" src="./src/js/pages/contact.js"></script>
+  <!-- @render ld-faq -->
+  <script type="module" src="./src/js/main.js"></script>
 </head>
-<body class="page-contact">
+<body class="page-contact" data-page="contact">
   <!-- @include header {"page":"contact"} -->
   <main id="main">
     <section class="contact-hero">
       <div class="contact-hero__bg" aria-hidden="true"></div>
       <div class="wrap">
         <p class="t-mono contact-hero__meta"><span class="pill pill--line"><i class="dot" aria-hidden="true"></i><span data-open-status>Client care</span></span></p>
-        <h1 class="contact-hero__title" aria-label="Talk to us."><span data-split="chars" aria-hidden="true">Talk</span><br><span data-split="chars" aria-hidden="true">to</span> <span class="t-chrome" aria-hidden="true">us.</span></h1>
+        <h1 class="contact-hero__title" data-fit data-rise aria-label="Talk to us."><span class="fit-line" aria-hidden="true">Talk</span><br><span class="fit-line" aria-hidden="true">to <span class="t-chrome">us.</span></span></h1>
         <div class="contact-hero__row">
           <p class="t-lead" data-reveal>Real people in Prague. Sizing questions answered within one working day — usually within the hour.</p>
           <dl class="contact-hero__facts" data-reveal-stagger>
@@ -51,7 +51,7 @@
           <div class="field" data-when="order returns repair" hidden><label class="field__label" for="c-order">Order number</label><input class="field__input" id="c-order" name="order" placeholder="NTK-26xxxxx"><span class="field__hint">On your confirmation email.</span></div>
           <div class="fields fields--2" data-when="sizing">
             <div class="field"><label class="field__label" for="c-height">Height (cm) <span class="t-muted">optional</span></label><input class="field__input" id="c-height" name="height" type="number" inputmode="numeric"></div>
-            <div class="field"><label class="field__label" for="c-usual">Usual jacket size <span class="t-muted">optional</span></label><select class="field__input" id="c-usual" name="usual"><option value="">—</option><option>XS</option><option>S</option><option>M</option><option>L</option><option>XL</option><option>XXL</option></select></div>
+            <div class="field"><span class="field__label">Usual jacket size <span class="t-muted">optional</span></span><div data-usual-size class="select--field"></div></div>
           </div>
           <div class="field"><label class="field__label" for="c-msg">Message</label><textarea class="field__input" id="c-msg" name="message" required minlength="10" placeholder="Tell us what you need…"></textarea><span class="field__error"></span></div>
           <label class="check"><input type="checkbox" name="consent" required><span>I agree that NATURIK may use these details to answer me (<button type="button" class="link-btn" data-legal="privacy">privacy</button>).</span></label>
@@ -82,7 +82,7 @@
     <section class="faq theme-dark" id="faq" aria-labelledby="faq-title">
       <div class="wrap faq__grid">
         <div><p class="index-num">FAQ</p><h2 class="t-h2" id="faq-title" data-split>Before<br>you ask.</h2></div>
-        <div data-faq></div>
+        <div data-faq><!-- @render faq --></div>
       </div>
     </section>
 

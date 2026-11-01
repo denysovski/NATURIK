@@ -14,16 +14,16 @@
   <script type="application/ld+json" id="ld-list"></script>
   <!-- @render ld-products -->
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://denysovski.github.io/NATURIK/"},{"@type":"ListItem","position":2,"name":"Shop","item":"https://denysovski.github.io/NATURIK/shop.html"}]}</script>
-  <script type="module" src="./src/js/pages/shop.js"></script>
+  <script type="module" src="./src/js/main.js"></script>
 </head>
-<body class="page-shop">
+<body class="page-shop" data-page="shop">
   <!-- @include header {"page":"shop"} -->
   <main id="main">
     <section class="shop-hero">
       <div class="shop-hero__bg" aria-hidden="true"></div>
       <div class="wrap">
         <div class="shop-hero__meta t-mono"><span>Drop 01 / FW26</span><span><span data-shop-total>—</span> pieces left across the drop</span></div>
-        <h1 class="shop-hero__title" aria-label="The Drop"><span data-split="chars" aria-hidden="true">The</span> <span class="t-chrome" aria-hidden="true">drop</span></h1>
+        <h1 class="shop-hero__title" data-fit data-rise aria-label="The Drop"><span class="fit-line" aria-hidden="true">The <span class="t-chrome">drop</span></span></h1>
         <p class="t-lead shop-hero__lead" data-reveal>Six down jackets. Two colours. Numbered, never restocked — when a size is gone, it's gone.</p>
       </div>
     </section>
@@ -41,10 +41,7 @@
             <button type="button" class="chip" aria-pressed="false" data-filter="l7">Long</button>
           </div>
           <div class="shop-tools">
-            <label class="sr-only" for="sort">Sort</label>
-            <select class="field__input shop-sort" id="sort" data-sort>
-              <option value="featured">Featured</option><option value="low">Price — low to high</option><option value="high">Price — high to low</option><option value="scarce">Fewest left</option>
-            </select>
+            <div class="shop-sort" data-sort></div>
             <div class="seg" role="group" aria-label="Grid density"><button type="button" aria-pressed="false" data-cols="2">2</button><button type="button" aria-pressed="true" data-cols="3">3</button></div>
           </div>
         </div>
