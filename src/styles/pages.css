@@ -841,3 +841,40 @@ body.is-locked { overflow: visible; }
 /* more air around the shipping marquee */
 .confidence { padding-top: clamp(80px, 10vw, 150px) !important; }
 .confidence__marquee { margin-bottom: clamp(80px, 10vw, 150px) !important; }
+
+/* =========================== round: stage overlay, who stars, lookbook rhythm =========================== */
+/* stage: no full-photo overlay; only a soft fade at the top behind "M1 / 78C" and "21 left" */
+.stage__sheen { display: none !important; }
+.stage__shade { background: linear-gradient(180deg, rgba(0,0,0,0.38) 0%, rgba(0,0,0,0.12) 9%, transparent 16%) !important; }
+/* loading veil: dark card with a soft moving highlight until the photo is decoded */
+.stage__veil { position: absolute; inset: 0; z-index: 1; pointer-events: none; background: #141416; transition: opacity 0.7s var(--ease-out); overflow: hidden; }
+.stage__veil::after { content: ""; position: absolute; inset: 0; background: linear-gradient(105deg, transparent 35%, rgba(255,255,255,0.06) 50%, transparent 65%); transform: translateX(-100%); animation: veil-sweep 1.3s ease-in-out infinite; }
+.stage__veil.is-gone { opacity: 0; }
+.stage__veil.is-gone::after { animation: none; }
+@keyframes veil-sweep { to { transform: translateX(100%); } }
+
+/* who: scattered sparkle stars, tilted, some behind the cards, some over them */
+.who__grid { position: relative; }
+.who-star { position: absolute; pointer-events: none; fill: var(--c-acid); }
+.who-star--1 { width: 74px; left: 27%; top: -38px; transform: rotate(14deg); z-index: 2; }
+.who-star--2 { width: 150px; left: 58%; top: 34%; transform: rotate(-11deg); z-index: 0; fill: rgba(182,255,46,0.22); }
+.who-star--3 { width: 40px; left: 4%; top: 58%; transform: rotate(27deg); z-index: 2; fill: var(--c-bone); }
+.who-star--4 { width: 96px; right: -2%; top: 14%; transform: rotate(-24deg); z-index: 2; }
+.who-card { position: relative; z-index: 1; }
+@media (max-width: 820px) {
+  .who-star--1 { width: 54px; left: 70%; top: -30px; } .who-star--2 { width: 110px; left: 50%; top: 40%; }
+  .who-star--3 { width: 32px; left: 2%; top: 30%; } .who-star--4 { width: 66px; right: 2%; top: 72%; }
+}
+
+/* lookbook: varied sizes and ratios, staggered vertically, one hero frame */
+.lookbook__track { height: min(74vh, 720px); align-items: center; gap: clamp(16px, 2vw, 28px); }
+.lookbook__track .look { height: auto; flex: none; }
+.lookbook__track .look:nth-child(1) { width: auto; height: 60%; aspect-ratio: 4/5; align-self: flex-start; }
+.lookbook__track .look:nth-child(2) { width: auto; height: 100%; aspect-ratio: 3/4; }
+.lookbook__track .look:nth-child(3) { width: auto; height: 46%; aspect-ratio: 1/1; align-self: flex-end; }
+.lookbook__track .look:nth-child(4) { width: auto; height: 72%; aspect-ratio: 16/10; align-self: flex-start; }
+.lookbook__track .look:nth-child(5) { width: auto; height: 52%; aspect-ratio: 2/3; align-self: flex-end; }
+.lookbook__track .look:nth-child(6) { width: auto; height: 86%; aspect-ratio: 4/5; }
+.lookbook__track .look:nth-child(7) { width: auto; height: 50%; aspect-ratio: 5/4; align-self: flex-start; }
+.lookbook__track .look:nth-child(8) { width: auto; height: 78%; aspect-ratio: 3/5; align-self: flex-end; }
+@media (max-width: 819px) { .lookbook__track { height: 62vh; } }

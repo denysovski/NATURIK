@@ -42,14 +42,14 @@ function cover() {
   return new Promise((r) => { setTimeout(r, 900); gsap.timeline({ onComplete: r })
     .set(bars(), { transformOrigin: 'bottom' })
     .to(bars(), { scaleY: 1, duration: 0.5, ease: 'expo.inOut', stagger: 0.04 })
-    .to('main', { opacity: 0.4, y: -30, duration: 0.5, ease: 'expo.inOut' }, 0); });
+    .to('main', { opacity: 0.4, duration: 0.5, ease: 'expo.inOut' }, 0); });
 }
 function reveal() {
   if (reduceMotion) { gsap.set('main', { clearProps: 'all' }); return; }
   gsap.set('main', { opacity: 1 });
   gsap.timeline()
     .set(bars(), { transformOrigin: 'top' })
-    .fromTo('main', { y: 40, opacity: 1 }, { y: 0, duration: 0.9, ease: 'expo.out', clearProps: 'transform' }, 0.05)
+    .fromTo('main', { opacity: 0.4 }, { opacity: 1, duration: 0.6, ease: 'power2.out', clearProps: 'opacity' }, 0.05)
     .to(bars(), { scaleY: 0, duration: 0.65, ease: 'expo.inOut', stagger: 0.04 }, 0);
 }
 
@@ -123,7 +123,7 @@ export function initRouter(pageMounts) {
   document.addEventListener('touchstart', warm, { passive: true });
   document.addEventListener('focusin', warm);
   // idle prefetch of the other two pages
-  (window.requestIdleCallback || ((f) => setTimeout(f, 1500)))(() => document.querySelectorAll('.nav a').forEach((a) => fetchPage(a.href).catch(() => {})));
+  (window.requestIdleCallback || ((f) => setTimeout(f, 1500)))(() => { document.querySelectorAll('.nav a').forEach((a) => fetchPage(a.href).catch(() => {})); const im = new Image(); im.decoding = 'async'; im.src = new URL('./images/m1-editorial-hero-stage.webp', location.href).href; });
 
   window.addEventListener('popstate', () => {
     const want = new URL(location.href);
