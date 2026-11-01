@@ -614,3 +614,5 @@ body.is-locked { overflow: visible; }
 .brand { font-size: 1.25rem; letter-spacing: -0.035em; }
 .btn--acid::before { background: var(--c-ink); }
 .btn--acid:hover { color: var(--c-bone); }
+/* header band: softer */
+.site-header::before { background: linear-gradient(180deg, rgba(243,243,241,0.62) 0%, rgba(243,243,241,0.4) 55%, rgba(243,243,241,0) 100%); }
