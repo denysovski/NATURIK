@@ -12,7 +12,7 @@ const isMobile = () => innerWidth < 820;
 
 /* ---------- live data into the page ---------- */
 $$('[data-m1-left], [data-m1-left-count]').forEach((n) => (n.textContent = totalStock(m1)));
-$('[data-home-products]').innerHTML = PRODUCTS.map((p, i) => productCard(p, { index: i })).join('');
+if (!$('[data-home-products]').children.length) $('[data-home-products]').innerHTML = PRODUCTS.map((p, i) => productCard(p, { index: i })).join('');
 $('[data-size-stock]').innerHTML = SIZES.map((s) => {
   const n = m1.stock[s], max = 8;
   return `<div class="size-stock__row"><span class="t-mono">${s}</span><span class="stock__bar"><span class="stock__fill" style="--p:${(n / max) * 100}%"></span></span><span class="t-mono ${n <= 2 ? 'is-low' : ''}">${n ? `${n} left` : 'Sold out'}</span></div>`;
@@ -28,7 +28,7 @@ $('[data-drop-sizes]').addEventListener('click', (e) => {
    ========================================================= */
 const stage = $('[data-stage]'), frame = $('[data-stage-frame]'), glow = $('[data-stage-glow]');
 const stageImgs = $$('[data-stage-img]'), chip = $('[data-stage-chip]');
-const S = { x: 0, y: 0.08, scale: 0.96, rotY: -7, rotZ: 0, img: 0, zoom: 1.06, pan: 0, opacity: 1 };
+const S = { x: 0, y: isMobile() ? 0.12 : 0.08, scale: isMobile() ? 0.82 : 0.96, rotY: -7, rotZ: 0, img: 0, zoom: 1.06, pan: 0, opacity: 1 };
 const mouse = { x: 0, y: 0, sx: 0, sy: 0 };
 let lastImg = -1;
 window.addEventListener('pointermove', (e) => { mouse.x = e.clientX / innerWidth - 0.5; mouse.y = e.clientY / innerHeight - 0.5; });
@@ -119,21 +119,43 @@ function showCard(i) {
 }
 gsap.ticker.add(renderZoom);
 
-/* ---------- loader → hero intro ---------- */
+/* ---------- loader → hero intro ----------
+   First visit of the session: a short loader driven by real progress (fonts + hero photo).
+   Repeat visits skip straight to the hero reveal. */
+function whenReady() {
+  const imgs = [$('[data-stage-img]')];
+  const tasks = [document.fonts?.ready ?? Promise.resolve(), ...imgs.map((im) => im.complete ? Promise.resolve() : new Promise((r) => { im.addEventListener('load', r, { once: true }); im.addEventListener('error', r, { once: true }); }))];
+  let done = 0; const listeners = [];
+  tasks.forEach((t) => t.then(() => { done++; listeners.forEach((f) => f(done / tasks.length)); }));
+  return { onProgress: (f) => listeners.push(f), all: Promise.race([Promise.all(tasks), new Promise((r) => setTimeout(r, 2500))]) };
+}
+function heroReveal(tl) {
+  return tl
+    .from(S, { scale: 0.55, rotY: -40, rotZ: -6, zoom: 1.6, duration: 1.8, ease: 'expo.out' }, 0)
+    .from(frame, { clipPath: 'inset(50% 50% 50% 50% round 24px)', duration: 1.4, ease: 'expo.inOut' }, 0)
+    .from('.hero__title .char', { yPercent: 110, rotate: 6, stagger: 0.025, duration: 1.1, ease: 'expo.out' }, 0.2)
+    .from('.hero__top > *, .hero__bottom > *', { y: 30, opacity: 0, stagger: 0.05, duration: 0.9, ease: 'expo.out' }, 0.4);
+}
 function intro() {
   const loader = $('[data-loader]');
   $$('[data-hero-word]').forEach((w) => split(w, 'chars'));
+  const seen = document.documentElement.classList.contains('seen');
+  try { sessionStorage.setItem('naturik.seen', '1'); } catch {}
   if (reduceMotion) { loader.remove(); return; }
-  const count = { v: 0 }, out = $('[data-loader-count]'), bar = $('[data-loader-bar]');
-  gsap.timeline()
-    .to('.loader__brand span', { yPercent: -105, stagger: 0.05, duration: 0.9, ease: 'expo.out' }, 0)
-    .to(count, { v: 100, duration: 1.6, ease: 'power2.inOut', onUpdate: () => { out.textContent = String(Math.round(count.v)).padStart(3, '0'); bar.style.transform = `scaleX(${count.v / 100})`; } }, 0)
-    .to(loader, { clipPath: 'inset(0 0 100% 0)', duration: 1.1, ease: 'expo.inOut' }, '+=0.1')
-    .from(S, { scale: 0.55, rotY: -40, rotZ: -6, zoom: 1.6, duration: 2, ease: 'expo.out' }, '-=0.7')
-    .from(frame, { clipPath: 'inset(50% 50% 50% 50% round 24px)', duration: 1.6, ease: 'expo.inOut' }, '<')
-    .from('.hero__title .char', { yPercent: 110, rotate: 6, stagger: 0.025, duration: 1.2, ease: 'expo.out' }, '-=1.4')
-    .from('.hero__top > *, .hero__bottom > *', { y: 30, opacity: 0, stagger: 0.06, duration: 1, ease: 'expo.out' }, '-=1')
-    .add(() => loader.remove());
+  if (seen) { loader.remove(); heroReveal(gsap.timeline({ delay: 0.15 })); return; }
+  const out = $('[data-loader-count]'), bar = $('[data-loader-bar]');
+  const shown = { v: 0 }, target = { v: 0.15 };
+  const ready = whenReady();
+  ready.onProgress((p) => (target.v = Math.max(target.v, p)));
+  const tick = () => { shown.v += (target.v - shown.v) * 0.12; out.textContent = String(Math.round(shown.v * 100)).padStart(3, '0'); bar.style.transform = `scaleX(${shown.v})`; };
+  gsap.ticker.add(tick);
+  gsap.to('.loader__brand span', { yPercent: -105, stagger: 0.04, duration: 0.8, ease: 'expo.out' });
+  Promise.all([ready.all, new Promise((r) => setTimeout(r, 900))]).then(() => {
+    target.v = 1;
+    const tl = gsap.timeline({ delay: 0.25, onComplete: () => { gsap.ticker.remove(tick); loader.remove(); } });
+    tl.to(loader, { clipPath: 'inset(0 0 100% 0)', duration: 0.9, ease: 'expo.inOut' });
+    heroReveal(gsap.timeline({ delay: 0.9 }));
+  });
 }
 
 /* ---------- scroll choreography ---------- */

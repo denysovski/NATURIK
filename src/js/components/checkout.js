@@ -219,6 +219,14 @@ function place() {
   const order = `NTK-${new Date().getFullYear().toString().slice(2)}${String(Math.floor(Math.random() * 1e5)).padStart(5, '0')}`;
   const m = SHIPPING[d.ship];
   const eta = fmtDate(addBusinessDays(new Date(), m.days[1]));
+  // staged processing overlay — tells the buyer exactly what is happening
+  const ov = document.createElement('div');
+  ov.className = 'co-processing'; ov.setAttribute('role', 'status'); ov.setAttribute('aria-live', 'polite');
+  ov.innerHTML = `<span class="co-ring" aria-hidden="true"></span><ol class="t-mono"><li>Reserving your pieces</li><li>Authorising payment</li><li>Confirming order</li></ol>`;
+  root.appendChild(ov);
+  gsap.from(ov, { opacity: 0, duration: 0.3 });
+  const lis = ov.querySelectorAll('li');
+  lis.forEach((li, i) => { setTimeout(() => { lis.forEach((x, k) => { x.classList.toggle('is-active', k === i); x.classList.toggle('is-done', k < i); }); }, i * 650); });
   setTimeout(() => {
     clearInterval(timer);
     root.innerHTML = `
@@ -226,17 +234,18 @@ function place() {
       <div class="co-done">
         <div class="co-done__mark"><svg><use href="#i-check"/></svg></div>
         <p class="t-mono t-muted">Order ${order}</p>
-        <h2 class="co-done__title">It's yours.</h2>
+        <h2 class="co-done__title" aria-label="It's yours.">It's yours.</h2>
         <p class="t-lead">Thank you, ${esc(d.first)}. A confirmation is on its way to ${esc(d.email)}. Your piece${items.length > 1 ? 's leave' : ' leaves'} the Prague studio within 24 hours and should arrive by <b>${eta}</b>.</p>
         <ul class="co-done__items">${items.map((i) => `<li><img src="${i.product.images[0].sm}" alt=""><span>${esc(i.product.fullName)}<br><span class="t-muted t-mono">Size ${i.size} · ×${i.qty}</span></span></li>`).join('')}</ul>
         <p class="t-mono">Paid ${formatPrice(t.total)} · ${m.label}</p>
         <p class="co-note t-mono">This is a demo store. No order was placed and no payment was taken.</p>
         <div class="co-done__actions"><a class="btn btn--dark" href="./shop.html"><span class="btn__label">Keep browsing</span></a><button class="btn btn--ghost" type="button" data-modal-close><span class="btn__label">Close</span></button></div>
       </div>`;
+    root.scrollTop = 0;
     gsap.from(root.querySelectorAll('.co-done > *'), { y: 30, opacity: 0, stagger: 0.07, duration: 0.8, ease: 'expo.out' });
     gsap.from(root.querySelector('.co-done__mark'), { scale: 0, rotate: -90, duration: 1, ease: 'elastic.out(1, 0.5)' });
     bag.clear();
-  }, 1600);
+  }, 2100);
 }
 
 export { closeModal as closeCheckout };

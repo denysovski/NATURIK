@@ -197,7 +197,45 @@ function initFooter() {
   $$('[data-year]').forEach((n) => (n.textContent = new Date().getFullYear()));
 }
 
+/* ---------- image fade-in over shimmer skeletons ---------- */
+function initImageLoading() {
+  const mark = (img) => { if (img.complete && img.naturalWidth) img.classList.add('is-loaded'); };
+  const prep = (root = document) => root.querySelectorAll('img:not(.fade-in)').forEach((img) => {
+    if (img.closest('.loader, .stage, .details__media, .toast, .p-card__media')) return;
+    img.classList.add('fade-in'); mark(img);
+  });
+  prep();
+  document.addEventListener('load', (e) => { if (e.target.tagName === 'IMG') e.target.classList.add('is-loaded'); }, true);
+  document.addEventListener('error', (e) => { if (e.target.tagName === 'IMG') e.target.classList.add('is-loaded'); }, true);
+  new MutationObserver((ms) => ms.forEach((m) => m.addedNodes.forEach((n) => n.nodeType === 1 && prep(n.tagName === 'IMG' ? n.parentElement : n)))).observe(document.body, { childList: true, subtree: true });
+}
+
+/* ---------- scroll progress line ---------- */
+function initScrollProgress() {
+  const bar = document.querySelector('[data-scroll-progress]'); if (!bar) return;
+  const set = () => { const max = document.documentElement.scrollHeight - innerHeight; bar.style.transform = `scaleX(${max > 0 ? Math.min(1, scrollY / max) : 0})`; };
+  if (lenis) lenis.on('scroll', set); else addEventListener('scroll', set, { passive: true });
+  set();
+}
+
+/* ---------- keyboard focus stays inside the open layer (modal, bag, product panel) ---------- */
+function initFocusTrap() {
+  const SEL = 'a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select, textarea, [tabindex]:not([tabindex="-1"])';
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Tab') return;
+    const layer = document.querySelector('.modal.is-open .modal__panel') || document.querySelector('[data-cart].is-open') || document.querySelector('.pdp.is-open');
+    if (!layer) return;
+    const items = [...layer.querySelectorAll(SEL)].filter((el) => el.offsetParent !== null || el === document.activeElement);
+    if (!items.length) return;
+    const first = items[0], last = items[items.length - 1];
+    if (!layer.contains(document.activeElement)) { e.preventDefault(); first.focus(); return; }
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  });
+}
+
 export function initUI() {
+  initImageLoading(); initScrollProgress(); initFocusTrap();
   initHeader(); initMenu(); initCursor(); initMagnetic(); initNewsletter(); initCookies(); initTransitions(); initFooter();
   initAccordions(document);
 }

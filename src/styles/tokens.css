@@ -1,3 +1,15 @@
+@font-face { font-family: 'Neue Montreal'; src: url('/fonts/neuemontreal-light.woff2') format('woff2'); font-weight: 300; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Neue Montreal'; src: url('/fonts/neuemontreal-lightitalic.woff2') format('woff2'); font-weight: 300; font-style: italic; font-display: swap; }
+@font-face { font-family: 'Neue Montreal'; src: url('/fonts/neuemontreal-regular.woff2') format('woff2'); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Neue Montreal'; src: url('/fonts/neuemontreal-italic.woff2') format('woff2'); font-weight: 400; font-style: italic; font-display: swap; }
+@font-face { font-family: 'Neue Montreal'; src: url('/fonts/neuemontreal-medium.woff2') format('woff2'); font-weight: 500; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Neue Montreal'; src: url('/fonts/neuemontreal-mediumitalic.woff2') format('woff2'); font-weight: 500; font-style: italic; font-display: swap; }
+@font-face { font-family: 'Neue Montreal'; src: url('/fonts/neuemontreal-bold.woff2') format('woff2'); font-weight: 700; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Neue Montreal'; src: url('/fonts/neuemontreal-bolditalic.woff2') format('woff2'); font-weight: 700; font-style: italic; font-display: swap; }
+@font-face { font-family: 'JetBrains Mono'; src: url('/fonts/jetbrainsmono-400.woff2') format('woff2'); font-weight: 400; font-display: swap; }
+@font-face { font-family: 'JetBrains Mono'; src: url('/fonts/jetbrainsmono-500.woff2') format('woff2'); font-weight: 500; font-display: swap; }
+@font-face { font-family: 'Dirtyline'; src: url('/fonts/dirtyline.woff2') format('woff2'); font-weight: 400; font-style: normal; font-display: swap; }
+
 /* NATURIK design tokens — black / chrome grey / cobalt, with an acid-lens signal colour */
 :root {
   --c-void: #000000;
@@ -17,7 +29,8 @@
   --grad-hero: linear-gradient(180deg, #000 0%, #000 34%, #06104d 50%, #1638ff 64%, #7d8fe8 80%, #cfcfcf 100%);
   --grad-chrome: linear-gradient(115deg, #f4f4f2 0%, #9a9a9e 28%, #fdfdfd 46%, #6d6d72 66%, #e7e7e5 100%);
 
-  --f-display: 'Inter Tight', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --f-display: 'Neue Montreal', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --f-art: 'Dirtyline', 'Neue Montreal', sans-serif;
   --f-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
 
   --fs-micro: 0.6875rem;   /* 11 */

@@ -378,3 +378,19 @@ a.c-card:hover { transform: translateY(-4px); background: #fff; }
 .t-chrome[data-split-done] { background: none; color: transparent; }
 .shop-bar { transition: top 0.6s var(--ease-out); }
 body:has(.site-header:not(.is-hidden)) .shop-bar { top: calc(var(--header-h) + 4px); }
+
+/* ---------- type pairing: Dirtyline (display) × Neue Montreal (everything else) ---------- */
+.art, .ht, .loader__brand, .footer-word, .details__title, .shop-hero__title, .contact-hero__title, .drop-counter__big, .hero__stock-num, .co-done__title {
+  font-family: var(--f-art); font-weight: 400; letter-spacing: -0.01em; text-transform: none; font-feature-settings: normal;
+}
+.ht { line-height: 0.82; }
+.ht--1 { font-size: clamp(5rem, 1rem + 15vw, 18rem); }
+.shop-hero__title, .contact-hero__title { letter-spacing: -0.015em; line-height: 0.84; }
+.details__title { letter-spacing: 0; }
+.drop-counter__big { letter-spacing: -0.02em; line-height: 0.8; }
+.hero__stock-num .t-muted { font-family: var(--f-display); font-size: 0.5em; letter-spacing: -0.02em; }
+.footer-word { letter-spacing: -0.02em; line-height: 0.8; }
+.co-done__title { letter-spacing: 0; }
+.t-h2, .t-h3, .pdp__title, .co-title, .manifesto__text, .details__card-title { letter-spacing: -0.035em; }
+
+.pdp__tabs { padding: 7px 12px; border-radius: var(--radius-pill); background: rgba(10,10,12,0.45); }

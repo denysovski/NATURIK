@@ -14,7 +14,7 @@ const grid = $('[data-grid]');
 const params = new URLSearchParams(location.search);
 let filter = ['black', 'white', 'm1', 'c3', 'l7'].includes(params.get('c')) ? params.get('c') : 'all', sort = 'featured';
 
-grid.innerHTML = PRODUCTS.map((p, i) => productCard(p, { eager: i < 3, index: i })).join('');
+if (!grid.children.length) grid.innerHTML = PRODUCTS.map((p, i) => productCard(p, { eager: i < 3, index: i })).join('');
 $('[data-shop-total]').textContent = PRODUCTS.reduce((a, p) => a + totalStock(p), 0);
 $('[data-n="all"]').textContent = PRODUCTS.length;
 $('[data-n="black"]').textContent = PRODUCTS.filter((p) => p.color === 'black').length;

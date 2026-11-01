@@ -72,9 +72,10 @@ function template(p) {
       <div class="pdp__block">
         <div class="pdp__label"><span class="t-mono" data-size-label>Size — select</span><button type="button" class="link-btn t-mono" data-size-guide>Size guide</button></div>
         <div class="size-grid" role="radiogroup" aria-label="Size">
-          ${SIZES.map((s) => `<button type="button" class="size-chip ${p.stock[s] && p.stock[s] <= 2 ? 'is-low' : ''}" data-size="${s}" aria-pressed="false" ${p.stock[s] ? '' : 'disabled'} aria-label="${s}${p.stock[s] ? (p.stock[s] <= 2 ? `, only ${p.stock[s]} left` : '') : ', sold out'}">${s}</button>`).join('')}
+          ${SIZES.map((s) => `<button type="button" class="size-chip ${p.stock[s] && p.stock[s] <= 2 ? 'is-low' : ''}" ${p.stock[s] ? '' : 'is-soldout'}" data-size="${s}" aria-pressed="false" aria-label="${s}${p.stock[s] ? (p.stock[s] <= 2 ? `, only ${p.stock[s]} left` : '') : ', sold out — join the waitlist'}">${s}</button>`).join('')}
         </div>
-        <p class="t-mono t-muted pdp__stock-note" data-stock-note aria-live="polite">Green dot = 2 or fewer left in that size.</p>
+        <p class="t-mono t-muted pdp__stock-note" data-stock-note aria-live="polite">Dot = 2 or fewer left. Sold out? Tap the size to join the waitlist.</p>
+        <div class="waitlist" data-waitlist hidden></div>
       </div>
 
       <details class="pdp__finder" data-finder>
@@ -122,6 +123,20 @@ function template(p) {
   <div class="pdp__sticky" data-sticky><span><b>${p.name}</b><br><span class="t-mono t-muted" data-sticky-size>Select a size</span></span><button class="btn btn--acid" type="button" data-sticky-add><span class="btn__label">${formatPrice(p.price)} — Add</span></button></div>`;
 }
 
+const BASE_META = {};
+function setMeta(p) {
+  const pairs = [
+    ['link[rel="canonical"]', 'href', `${SITE_URL}shop.html?p=${p.slug}`],
+    ['meta[name="description"]', 'content', `${p.fullName} — ${p.tagline} ${formatPrice(p.price)}, limited to ${p.edition} pieces. Free EU shipping over €300, 30-day returns.`],
+    ['meta[property="og:title"]', 'content', `${p.fullName} | NATURIK`],
+    ['meta[property="og:url"]', 'content', `${SITE_URL}shop.html?p=${p.slug}`],
+    ['meta[property="og:image"]', 'content', new URL(p.images[0].src, SITE_URL).href],
+  ];
+  pairs.forEach(([sel, attr, val]) => { const el = document.head.querySelector(sel); if (!el) return; if (!(sel in BASE_META)) BASE_META[sel] = el.getAttribute(attr); el.setAttribute(attr, val); });
+}
+function resetMeta() {
+  Object.entries(BASE_META).forEach(([sel, val]) => { const el = document.head.querySelector(sel); if (!el) return; el.setAttribute(sel.startsWith('link') ? 'href' : 'content', val); });
+}
 function setJsonLd(p) {
   let s = document.getElementById('ld-product');
   if (!s) { s = document.createElement('script'); s.type = 'application/ld+json'; s.id = 'ld-product'; document.head.appendChild(s); }
@@ -142,6 +157,7 @@ export function openProduct(slug, { from, push = true } = {}) {
   bind(p);
   document.title = `${p.fullName} — ${formatPrice(p.price)} | NATURIK`;
   setJsonLd(p);
+  setMeta(p);
   if (push) history.pushState({ p: slug }, '', `?p=${slug}`);
   if (!wasOpen) {
     panel.classList.add('is-open'); lockScroll();
@@ -172,6 +188,7 @@ export function closeProduct({ push = true } = {}) {
   gsap.to(panel, { opacity: 0, y: 30, duration: 0.45, ease: 'power3.in', onComplete: () => { panel.classList.remove('is-open'); gsap.set(panel, { clearProps: 'all' }); panel.innerHTML = ''; } });
   unlockScroll();
   document.title = window.__baseTitle || document.title;
+  resetMeta();
   document.getElementById('ld-product')?.remove();
   if (push) history.pushState({}, '', location.pathname);
   document.querySelector(`[data-product="${current?.slug}"] .p-card__link`)?.focus({ preventScroll: true });
@@ -225,7 +242,23 @@ function bind(p) {
     add.disabled = false; add.querySelector('.btn__label').textContent = `Add to bag — ${formatPrice(p.price)}`;
     $('[data-sticky-size]').textContent = `Size ${s}`;
   };
-  $$('.size-chip[data-size]').forEach((c) => (c.onclick = () => select(c.dataset.size)));
+  const waitlist = $('[data-waitlist]');
+  const openWaitlist = (s) => {
+    $$('.size-chip[data-size]').forEach((c) => c.setAttribute('aria-pressed', 'false'));
+    selected = null; add.disabled = true; add.querySelector('.btn__label').textContent = 'Select a size';
+    waitlist.hidden = false;
+    waitlist.innerHTML = `<p><b>${s} is sold out.</b> Returns and cancellations happen — we'll email you the moment one comes back, before anyone else.</p>
+      <form novalidate><label class="sr-only" for="wl-email">Email for the ${s} waitlist</label><input class="field__input" id="wl-email" type="email" autocomplete="email" placeholder="you@domain.com" required><button class="btn btn--dark" type="submit"><span class="btn__label">Notify me</span></button></form><p class="field__error" aria-live="polite"></p>`;
+    gsap.from(waitlist, { height: 0, opacity: 0, duration: 0.5, ease: 'expo.out', clearProps: 'height' });
+    waitlist.querySelector('input').focus({ preventScroll: true });
+    waitlist.querySelector('form').onsubmit = (e) => {
+      e.preventDefault();
+      const v = e.target.querySelector('input').value.trim(), err = waitlist.querySelector('.field__error');
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v)) { err.textContent = 'Enter a valid email address'; return; }
+      waitlist.innerHTML = `<p><b style="color:var(--c-cobalt)">You're on the ${s} waitlist.</b> We'll write to ${v.replace(/[<>&"]/g, '')} if one becomes available.</p>`;
+    };
+  };
+  $$('.size-chip[data-size]').forEach((c) => (c.onclick = () => { if (p.stock[c.dataset.size]) { waitlist.hidden = true; select(c.dataset.size); } else openWaitlist(c.dataset.size); }));
   const doAdd = () => {
     if (!selected) {
       panel.querySelector('.size-grid').scrollIntoView({ behavior: 'smooth', block: 'center' });

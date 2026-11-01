@@ -12,6 +12,7 @@
   <meta name="twitter:title" content="Shop Drop 01 — NATURIK">
   <meta name="twitter:description" content="Six limited down jackets in black and white.">
   <script type="application/ld+json" id="ld-list"></script>
+  <!-- @render ld-products -->
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://denysovski.github.io/NATURIK/"},{"@type":"ListItem","position":2,"name":"Shop","item":"https://denysovski.github.io/NATURIK/shop.html"}]}</script>
   <script type="module" src="./src/js/pages/shop.js"></script>
 </head>
@@ -22,7 +23,7 @@
       <div class="shop-hero__bg" aria-hidden="true"></div>
       <div class="wrap">
         <div class="shop-hero__meta t-mono"><span>Drop 01 / FW26</span><span><span data-shop-total>—</span> pieces left across the drop</span></div>
-        <h1 class="shop-hero__title"><span data-split="chars">The</span> <span class="t-chrome">Drop</span></h1>
+        <h1 class="shop-hero__title" aria-label="The Drop"><span data-split="chars" aria-hidden="true">The</span> <span class="t-chrome" aria-hidden="true">drop</span></h1>
         <p class="t-lead shop-hero__lead" data-reveal>Six down jackets. Two colours. Numbered, never restocked — when a size is gone, it's gone.</p>
       </div>
     </section>
@@ -48,7 +49,7 @@
           </div>
         </div>
         <p class="t-mono t-muted shop-count" aria-live="polite" data-shop-count></p>
-        <div class="product-grid" data-grid data-cols="3"></div>
+        <div class="product-grid" data-grid data-cols="3"><!-- @render products --></div>
         <div class="shop-empty" data-empty hidden><p class="t-h3">Nothing matches that combination.</p><button class="btn btn--dark" type="button" data-filter="all"><span class="btn__label">Show all pieces</span></button></div>
       </div>
     </section>

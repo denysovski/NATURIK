@@ -226,7 +226,7 @@ select.field__input option { color: #000; }
 
 /* ---------- Preloader ---------- */
 .loader { position: fixed; inset: 0; z-index: var(--z-loader); background: var(--c-void); color: var(--c-bone); display: grid; padding: var(--gutter); grid-template-rows: auto 1fr auto; }
-.loader__brand { font-size: var(--fs-mega); font-weight: 500; letter-spacing: -0.07em; line-height: 0.8; align-self: end; overflow: hidden; }
+.loader__brand { font-size: var(--fs-mega); font-weight: 400; letter-spacing: -0.01em; line-height: 0.8; align-self: end; overflow: hidden; }
 .loader__brand span { display: inline-block; transform: translateY(105%); }
 .loader__count { font-family: var(--f-mono); font-size: var(--fs-small); letter-spacing: var(--track-mono); }
 .loader__bar { height: 2px; background: rgba(255,255,255,0.15); margin-top: 14px; }
@@ -281,3 +281,37 @@ select.field__input option { color: #000; }
 .socials svg { width: 17px; height: 17px; }
 @media (max-width: 1000px) { .footer-top { grid-template-columns: 1fr; } .footer-mid { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 640px) { .footer-cols { grid-template-columns: 1fr 1fr; } .news-form { flex-direction: column; } }
+
+/* ---------- loading states ---------- */
+html.seen .loader { display: none; }
+/* shimmer skeleton behind every photo until it has decoded */
+.p-card__media, .who-card__media, .look, .pdp__stage, .pdp__thumbs button, .line-item__img, .stage__frame, .details__media, .hero__thumbs figure {
+  background-color: #17171a;
+  background-image: linear-gradient(100deg, rgba(255,255,255,0) 30%, rgba(255,255,255,0.07) 50%, rgba(255,255,255,0) 70%);
+  background-size: 220% 100%; animation: skel 1.4s linear infinite;
+}
+.theme-light .p-card__media, .pdp__stage, .pdp__thumbs button { background-color: #cdcdcb; background-image: linear-gradient(100deg, rgba(255,255,255,0) 30%, rgba(255,255,255,0.45) 50%, rgba(255,255,255,0) 70%); }
+@keyframes skel { from { background-position: 120% 0; } to { background-position: -120% 0; } }
+html.js img.fade-in { opacity: 0; transition: opacity 0.7s var(--ease-out); }
+html.js img.fade-in.is-loaded { opacity: 1; }
+
+/* ---------- scroll progress ---------- */
+.scroll-progress { position: fixed; left: 0; right: 0; top: 0; z-index: calc(var(--z-header) + 1); height: 2px; pointer-events: none; }
+.scroll-progress i { display: block; height: 100%; background: linear-gradient(90deg, var(--c-cobalt), var(--c-acid)); transform-origin: left; transform: scaleX(0); }
+
+/* ---------- waitlist ---------- */
+.size-chip.is-soldout { opacity: 0.45; text-decoration: line-through; }
+.waitlist { display: grid; gap: 10px; padding: 14px; border-radius: 10px; background: var(--c-bone); }
+.waitlist form { display: flex; gap: 8px; }
+.waitlist .field__input { height: 44px; }
+.waitlist .btn { height: 44px; }
+
+/* ---------- checkout processing ---------- */
+.co-processing { position: absolute; inset: 0; z-index: 10; display: grid; place-content: center; justify-items: center; gap: 22px; background: rgba(226,226,224,0.82); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+.co-ring { width: 64px; height: 64px; border-radius: 50%; background: conic-gradient(from 0deg, transparent 0 25%, var(--c-cobalt) 60%, var(--c-acid) 100%); -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 3px)); mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 3px)); animation: spin 0.9s linear infinite; }
+.co-processing ol { display: grid; gap: 8px; }
+.co-processing li { display: flex; gap: 10px; align-items: center; color: #8b8b8f; transition: color 0.3s; }
+.co-processing li::before { content: ''; width: 8px; height: 8px; border-radius: 50%; border: 1px solid currentColor; }
+.co-processing li.is-active { color: var(--c-ink); }
+.co-processing li.is-done { color: var(--c-cobalt); }
+.co-processing li.is-done::before { background: currentColor; }
