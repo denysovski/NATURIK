@@ -1,4 +1,4 @@
-// Partners divider: a 9×2 grid (3×6 on phones) with white rules. The four partners land in random
+// Partners divider: a 7×2 grid filling the whole section (2×7 on phones) with white rules. The four partners land in random
 // cells (never two in one column), the rest carry tracker coordinates. Picking a partner opens a
 // panel styled like the Live count buy box. A terminal log streams behind it while it's on screen.
 const LOGOS = {
@@ -28,7 +28,7 @@ export function mountPartners(root) {
   const sec = root.querySelector('.partners');
   if (!sec) return () => {};
   const grid = sec.querySelector('[data-partners-grid]'), panel = sec.querySelector('[data-partners-panel]'), term = sec.querySelector('[data-partners-term]');
-  const mobile = innerWidth < 820, cols = mobile ? 3 : 9, rows = mobile ? 6 : 2;
+  const mobile = innerWidth < 820, cols = mobile ? 2 : 7, rows = mobile ? 7 : 2;
   // random cells, one partner per column at most
   const colsPick = [...Array(cols).keys()].sort(() => Math.random() - 0.5).slice(0, PARTNERS.length);
   const slots = new Map(colsPick.map((c, i) => [((Math.random() * rows) | 0) * cols + c, PARTNERS[i]]));
@@ -39,8 +39,8 @@ export function mountPartners(root) {
     if (!p) return `<div class="pcell" role="presentation"><span class="pcell__x">+</span><span class="pcell__lab">${WORDS[wi++ % WORDS.length]}</span></div>`;
     return `<div class="pcell pcell--p" role="listitem"><button class="partner partner--${p.c}" type="button" aria-expanded="false" data-partner="${p.id}">
       <span class="partner__logo" aria-hidden="true">${LOGOS[p.id]}</span>
-      <span class="partner__name">${p.name}</span><span class="partner__role">${p.role} · since ${p.since}</span>
-      <span class="partner__more">Open <b>+</b></span></button></div>`;
+      <span class="partner__txt"><span class="partner__name">${p.name}</span><span class="partner__role">${p.role} • Since ${p.since}</span></span>
+      <span class="partner__more">Open +</span></button></div>`;
   }).join('');
 
   let open = null;
