@@ -16,19 +16,22 @@ function starShape(T, points = 5, outer = 1, inner = 0.46) {
 function build(T, kind) {
   const g = new T.Group();
   if (kind === 'crystal') {
-    const m = new T.Mesh(new T.IcosahedronGeometry(1.05, 0), new T.MeshPhysicalMaterial({ color: '#dfe9ff', metalness: 0.1, roughness: 0.06, clearcoat: 1, clearcoatRoughness: 0.04, flatShading: true, iridescence: 0.6, iridescenceIOR: 1.3 }));
+    const m = new T.Mesh(new T.IcosahedronGeometry(1.05, 0), new T.MeshPhysicalMaterial({ color: '#2f52ff', metalness: 0.2, roughness: 0.08, clearcoat: 1, clearcoatRoughness: 0.04, flatShading: true, iridescence: 0.5, iridescenceIOR: 1.3 }));
     m.scale.set(0.8, 1.25, 0.8); g.add(m);
-    const s = new T.Mesh(new T.IcosahedronGeometry(0.24, 0), m.material); s.position.set(1.1, 0.75, 0.2); g.add(s);
-    const s2 = new T.Mesh(new T.IcosahedronGeometry(0.15, 0), m.material); s2.position.set(-1.05, -0.8, 0.3); g.add(s2);
+    const green = new T.MeshPhysicalMaterial({ color: '#b6ff2e', roughness: 0.15, clearcoat: 1, flatShading: true });
+    const s = new T.Mesh(new T.IcosahedronGeometry(0.24, 0), green); s.position.set(1.1, 0.75, 0.2); g.add(s);
+    const s2 = new T.Mesh(new T.IcosahedronGeometry(0.15, 0), green); s2.position.set(-1.05, -0.8, 0.3); g.add(s2);
     g.userData.spin = [0.15, 0.35];
   } else if (kind === 'ring') {
-    g.add(new T.Mesh(new T.TorusGeometry(1, 0.2, 48, 160), new T.MeshPhysicalMaterial({ color: '#e8e8ea', metalness: 1, roughness: 0.14, clearcoat: 0.6 })));
+    g.add(new T.Mesh(new T.TorusGeometry(1, 0.2, 48, 160), new T.MeshPhysicalMaterial({ color: '#3a5bff', metalness: 0.9, roughness: 0.16, clearcoat: 1 })));
     const orb = new T.Mesh(new T.SphereGeometry(0.42, 48, 48), new T.MeshPhysicalMaterial({ color: '#b6ff2e', emissive: '#6fbf00', emissiveIntensity: 0.9, roughness: 0.25, clearcoat: 1 }));
     g.add(orb); g.userData.orb = orb; g.userData.spin = [0.25, 0.5];
   } else {
     const geo = new T.ExtrudeGeometry(starShape(T), { depth: 0.32, bevelEnabled: true, bevelThickness: 0.14, bevelSize: 0.1, bevelSegments: 8, curveSegments: 4 });
     geo.center();
     g.add(new T.Mesh(geo, new T.MeshPhysicalMaterial({ color: '#b6ff2e', metalness: 0.15, roughness: 0.18, clearcoat: 1, clearcoatRoughness: 0.05 })));
+    const moon = new T.Mesh(new T.SphereGeometry(0.2, 32, 32), new T.MeshPhysicalMaterial({ color: '#3a5bff', metalness: 0.6, roughness: 0.15, clearcoat: 1 }));
+    moon.position.set(1.15, 0.85, 0.2); g.add(moon);
     g.userData.spin = [0.1, 0.6];
   }
   return g;
