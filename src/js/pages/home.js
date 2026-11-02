@@ -31,10 +31,15 @@ export function mount(root = document) {
   const heroLeft = $('.hero__stock-num [data-m1-left]');
   if (heroLeft && !reduceMotion) {
     const end = totalStock(m1);
-    heroLeft.style.width = `${heroLeft.getBoundingClientRect().width}px`;   // lock the width at the final value
-    const o = { v: 0 };
-    heroLeft.textContent = '0';
-    gsap.to(o, { v: end, duration: 1.6, delay: 0.3, ease: 'power2.out', onUpdate: () => (heroLeft.textContent = Math.round(o.v)) });
+    // lock the width at the final value — measured only after the display font has loaded
+    const run = () => {
+      heroLeft.style.width = ''; heroLeft.textContent = end;
+      heroLeft.style.width = `${Math.ceil(heroLeft.getBoundingClientRect().width) + 2}px`;
+      const o = { v: 0 };
+      heroLeft.textContent = '0';
+      gsap.to(o, { v: end, duration: 1.6, ease: 'power2.out', onUpdate: () => (heroLeft.textContent = Math.round(o.v)) });
+    };
+    (document.fonts?.ready || Promise.resolve()).then(() => requestAnimationFrame(run));
   }
   $('[data-size-stock]').innerHTML = SIZES.map((s) => {
     const n = m1.stock[s];

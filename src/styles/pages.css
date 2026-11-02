@@ -1264,3 +1264,6 @@ body.is-locked { overflow: visible; }
 .who3d-canvas { position: absolute; left: 0; top: 0; z-index: 1; pointer-events: none; display: block; }
 .who-star { z-index: 2; }
 .who-star--2 { z-index: 0 !important; }
+/* hero 21/78: clear space between the count and the slash */
+.hero__stock-num { display: inline-flex; align-items: baseline; gap: 0.12em; }
+.hero__stock-num [data-m1-left] { margin-right: 0.04em; }
