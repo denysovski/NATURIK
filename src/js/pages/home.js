@@ -53,7 +53,7 @@ export function mount(root = document) {
 
   // Writes only when the scroll-driven state actually changed: zero work while idle.
   tick(() => {
-    if (S.opacity < 0.01) { if (!hidden) { stage.style.visibility = 'hidden'; hidden = true; } return; }
+    if (S.opacity < 0.01) { if (!hidden) { stage.style.visibility = 'hidden'; stage.style.opacity = '0'; hidden = true; lastKey = ''; } return; }
     if (hidden) { stage.style.visibility = 'visible'; hidden = false; }
     const key = `${S.x.toFixed(4)}|${S.y.toFixed(4)}|${S.scale.toFixed(4)}|${S.rotY.toFixed(2)}|${S.rotZ.toFixed(2)}|${S.img.toFixed(3)}|${S.zoom.toFixed(4)}|${S.pan.toFixed(4)}|${S.opacity.toFixed(3)}|${vp.w}|${vp.h}`;
     if (key === lastKey) return;
@@ -191,17 +191,17 @@ export function mount(root = document) {
       const step = (trigger, to, st = {}) => gsap.to(S, { ...to, ease: 'none', immediateRender: false, scrollTrigger: { trigger, start: 'top bottom', end: 'top top', scrub: true, ...st } });
       step('#spec', { x: d ? -0.22 : 0, y: d ? 0 : -0.17, scale: d ? 1.1 : 0.72, rotY: 0, rotZ: 0, img: 1, zoom: 1.12, pan: 0 });
       // The Drop: the card slides right, then dissolves — the giant count is revealed where it was
-      gsap.timeline({ scrollTrigger: { trigger: '#drop', start: 'top bottom', end: 'top 5%', scrub: true } })
-        .to(S, { x: d ? 0.22 : 0, y: d ? 0 : -0.19, scale: d ? 1.12 : 0.76, img: 2, zoom: 1.08, pan: 0, ease: 'none', duration: 0.55 })
-        .to(S, { scale: d ? 1.4 : 1, zoom: 1.2, opacity: 0, ease: 'power1.in', duration: 0.45 });
+      gsap.timeline({ scrollTrigger: { trigger: '#drop', start: 'top bottom', end: 'top 30%', scrub: true } })
+        .to(S, { x: d ? 0.22 : 0, y: d ? 0 : -0.19, scale: d ? 0.66 : 0.5, img: 2, zoom: 1.08, pan: 0, ease: 'none', duration: 0.55 })
+        .to(S, { scale: d ? 0.5 : 0.4, zoom: 1.2, opacity: 0, ease: 'power1.in', duration: 0.45 });
       // the giant count surfaces as the photo dissolves
       gsap.fromTo('.drop-last', { opacity: 0, scale: 0.88 }, { opacity: 1, scale: 1, ease: 'none', immediateRender: true,
-        scrollTrigger: { trigger: '#drop', start: d ? 'top 38%' : 'top 30%', end: 'top 2%', scrub: true } });
+        scrollTrigger: { trigger: '#drop', start: d ? 'top 34%' : 'top 30%', end: 'top 2%', scrub: true } });
       detailsST = gsap.to(Z, { step: STEPS.length - 1, ease: 'none', scrollTrigger: { trigger: '#details', start: 'top top', end: d ? '+=460%' : '+=340%', pin: '[data-details-pin]', scrub: true } }).scrollTrigger;
     });
     ScrollTrigger.create({ trigger: '#details', start: 'top bottom', end: 'bottom top', onToggle: (s) => { Z.active = s.isActive; Z.dirty = true; media.style.visibility = s.isActive ? 'visible' : 'hidden'; } });
     // release: the full-bleed photo folds back into a card as the next section arrives (mirror of the entry)
-    gsap.timeline({ scrollTrigger: { trigger: '#manifesto', start: 'top bottom', end: 'top 25%', scrub: true } })
+    gsap.timeline({ scrollTrigger: { trigger: root.querySelector('#details').nextElementSibling, start: 'top bottom', end: 'top 25%', scrub: true } })
       .fromTo(media, { scale: 1, borderRadius: 0 }, { scale: 0.68, borderRadius: 28, ease: 'none', immediateRender: false }, 0)
       .to(root.querySelector('.details__ui'), { opacity: 0, y: -30, ease: 'none' }, 0);
     gsap.fromTo(media, { scale: 0.68, borderRadius: 28 }, { scale: 1, borderRadius: 0, ease: 'none', immediateRender: true, scrollTrigger: { trigger: '#details', start: 'top 85%', end: 'top top', scrub: true } });
@@ -215,6 +215,10 @@ export function mount(root = document) {
     gsap.to(track, { x: () => -dist(), ease: 'none', scrollTrigger: { trigger: '[data-look-pin]', start: 'top top', end: () => `+=${dist()}`, pin: true, scrub: true, invalidateOnRefresh: true } });
 
 
+    initCounters(root);
+    // stock bars fill up to their level as the size list scrolls in
+    gsap.fromTo(root.querySelectorAll('.size-stock .stock__fill'), { scaleX: 0 }, { scaleX: 1, duration: 1.2, ease: 'expo.out', stagger: 0.08,
+      scrollTrigger: { trigger: '[data-size-stock]', start: 'top 85%', once: true } });
     initReveals(root);
   }, root === document ? undefined : root);
 
