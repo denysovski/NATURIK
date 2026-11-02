@@ -51,6 +51,7 @@
           <button type="button" class="hero__thumb hv" data-lb="hero" data-lb-src="./images/m1-editorial-sleeve.webp" data-lb-caption="Shoulder cell and M1 print" data-cursor="View" aria-label="View photo: shoulder and print"><img src="./images/m1-editorial-sleeve-sm.webp" alt="Shoulder cell and chest print" width="72" height="90"></button>
           <button type="button" class="hero__thumb hv" data-lb="hero" data-lb-src="./images/m1-editorial-back.webp" data-lb-caption="Back collar" data-cursor="View" aria-label="View photo: back collar"><img src="./images/m1-editorial-back-sm.webp" alt="Back collar of the M1 Puffer" width="72" height="90"></button>
           <p class="hero__thumbs-text">M1 Puffer 78C<br>Limited edition</p>
+          <p class="hero__lede">Seventy-eight hand-filled down cells, sealed in satin ripstop. Built for −25 °C city nights.</p>
         </div>
         <div class="hero__center">
           <div class="hero__pills"><span class="pill pill--dark" aria-hidden="true">●●</span><span class="pill">FW · 2026</span></div>
@@ -72,7 +73,6 @@
       <div class="wrap hero__bottom">
         <div class="hero__side">
           <span class="btn btn--acid btn--static">Drop 01 is live</span>
-          <p>Seventy-eight hand-filled down cells, sealed in satin ripstop. Built for −25 °C city nights.</p>
         </div>
         <div class="hero__cta">
           <a class="btn btn--acid" href="./shop.html?p=m1-obsidian" data-magnetic><span class="btn__label">Shop M1 — €890</span><svg class="btn__icon"><use href="#i-arrow"/></svg></a>
@@ -171,7 +171,10 @@
     <section class="who theme-dark" aria-labelledby="who-title">
       <div class="wrap">
         <div class="who__head">
-          <p class="index-num">Who it's for</p>
+          <div class="who__intro">
+            <p class="who__kicker">Not for the catwalk. For the walk home at 2 am, the last tram, the wind off the river.</p>
+            <p class="index-num">Who it's for</p>
+          </div>
           <h2 class="t-h2" id="who-title" data-split>Made for the ones<br>out after <em>dark</em>.</h2>
         </div>
         <div class="who__grid"><svg class="who-star who-star--1" viewBox="0 0 100 100" aria-hidden="true"><path d="M50 0C53 30 70 47 100 50C70 53 53 70 50 100C47 70 30 53 0 50C30 47 47 30 50 0Z"/></svg><svg class="who-star who-star--2" viewBox="0 0 100 100" aria-hidden="true"><path d="M50 0C53 30 70 47 100 50C70 53 53 70 50 100C47 70 30 53 0 50C30 47 47 30 50 0Z"/></svg><svg class="who-star who-star--3" viewBox="0 0 100 100" aria-hidden="true"><path d="M50 0C53 30 70 47 100 50C70 53 53 70 50 100C47 70 30 53 0 50C30 47 47 30 50 0Z"/></svg><svg class="who-star who-star--4" viewBox="0 0 100 100" aria-hidden="true"><path d="M50 0C53 30 70 47 100 50C70 53 53 70 50 100C47 70 30 53 0 50C30 47 47 30 50 0Z"/></svg>
@@ -213,7 +216,15 @@
       <div class="wrap">
         <div class="drop-row__head">
           <h2 class="t-h2" id="row-title" data-split>Drop 01 —<br>six <em>pieces</em></h2>
-          <a class="btn btn--dark" href="./shop.html" data-magnetic><span class="btn__label">Shop all</span><svg class="btn__icon"><use href="#i-arrow"/></svg></a>
+          <div class="drop-row__aside">
+            <dl class="drop-stats">
+              <div><dt>Silhouettes</dt><dd>3</dd></div>
+              <div><dt>Colourways</dt><dd>2</dd></div>
+              <div><dt>Fill power</dt><dd>800</dd></div>
+              <div><dt>Restocks</dt><dd>0</dd></div>
+            </dl>
+            <a class="btn btn--dark" href="./shop.html" data-magnetic><span class="btn__label">Shop all</span><svg class="btn__icon"><use href="#i-arrow"/></svg></a>
+          </div>
         </div>
         <div class="product-grid product-grid--row" data-home-products><!-- @render products --></div>
       </div>

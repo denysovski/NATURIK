@@ -35,22 +35,45 @@ function syncNav(page) {
   });
 }
 
-const bars = () => [...document.querySelectorAll('[data-curtain] i')];
-function cover() {
-  if (reduceMotion || document.hidden) return Promise.resolve();
+// Transition: a black panel with the wordmark and a loading ring rises over the page,
+// the next page is swapped behind it, then the panel lifts away.
+const $c = (sel) => document.querySelector(sel);
+const LABEL = { home: 'Home', shop: 'Shop', contact: 'Contact' };
+let wordSplit = false;
+function chars() {
+  const w = $c('[data-curtain-word]');
+  if (w && !wordSplit) {
+    const sup = w.querySelector('sup')?.outerHTML || '';
+    const txt = w.firstChild.textContent;
+    w.innerHTML = `<span class="curtain__mask">${[...txt].map((ch) => `<span class="curtain__ch">${ch}</span>`).join('')}${sup}</span>`;
+    wordSplit = true;
+  }
+  return [...document.querySelectorAll('.curtain__ch')];
+}
+function cover(dest) {
+  const panel = $c('[data-curtain-panel]');
+  if (!panel || reduceMotion || document.hidden) return Promise.resolve();
+  const label = $c('[data-curtain-label]'); if (label) label.textContent = LABEL[dest] || 'Loading';
+  const ch = chars();
   // never let a paused animation (background tab) block navigation
-  return new Promise((r) => { setTimeout(r, 900); gsap.timeline({ onComplete: r })
-    .set(bars(), { transformOrigin: 'bottom' })
-    .to(bars(), { scaleY: 1, duration: 0.5, ease: 'expo.inOut', stagger: 0.04 })
-    .to('main', { opacity: 0.4, duration: 0.5, ease: 'expo.inOut' }, 0); });
+  return new Promise((r) => { setTimeout(r, 1400); gsap.timeline({ onComplete: r })
+    .set(panel, { visibility: 'visible', yPercent: 100 })
+    .set(ch, { yPercent: 110 })
+    .set('.curtain__meta', { opacity: 0, y: 12 })
+    .to(panel, { yPercent: 0, duration: 0.6, ease: 'expo.inOut' })
+    .to('main', { opacity: 0.5, duration: 0.6, ease: 'expo.inOut' }, 0)
+    .to(ch, { yPercent: 0, duration: 0.6, ease: 'expo.out', stagger: 0.035 }, 0.3)
+    .to('.curtain__meta', { opacity: 1, y: 0, duration: 0.4, ease: 'power2.out' }, 0.4); });
 }
 function reveal() {
-  if (reduceMotion) { gsap.set('main', { clearProps: 'all' }); return; }
-  gsap.set('main', { opacity: 1 });
-  gsap.timeline()
-    .set(bars(), { transformOrigin: 'top' })
-    .fromTo('main', { opacity: 0.4 }, { opacity: 1, duration: 0.6, ease: 'power2.out', clearProps: 'opacity' }, 0.05)
-    .to(bars(), { scaleY: 0, duration: 0.65, ease: 'expo.inOut', stagger: 0.04 }, 0);
+  const panel = $c('[data-curtain-panel]');
+  if (reduceMotion || !panel) { gsap.set('main', { clearProps: 'opacity' }); return; }
+  gsap.timeline({ delay: 0.15 })
+    .to('.curtain__ch', { yPercent: -110, duration: 0.45, ease: 'expo.in', stagger: 0.02 }, 0)
+    .to('.curtain__meta', { opacity: 0, duration: 0.25 }, 0)
+    .to(panel, { yPercent: -100, duration: 0.75, ease: 'expo.inOut' }, 0.2)
+    .fromTo('main', { opacity: 0.5 }, { opacity: 1, duration: 0.6, ease: 'power2.out', clearProps: 'opacity' }, 0.35)
+    .set(panel, { visibility: 'hidden', yPercent: 100 });
 }
 
 async function go(href, { push = true } = {}) {
@@ -64,7 +87,8 @@ async function go(href, { push = true } = {}) {
   window.naturikMenuClose?.();
   window.naturikCart?.close();
   try {
-    const [html] = await Promise.all([htmlP, cover()]);
+    const dest = /shop/.test(url.pathname) ? 'shop' : /contact/.test(url.pathname) ? 'contact' : 'home';
+    const [html] = await Promise.all([htmlP, cover(dest)]);
     const doc = new DOMParser().parseFromString(html, 'text/html');
     const next = pageOf(doc);
     current?.();                                   // unmount the old page

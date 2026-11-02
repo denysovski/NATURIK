@@ -47,14 +47,18 @@ export function openLightbox(group, start, fromEl) {
   show(start);
   el.classList.add('is-open');
   const img = el.querySelector('.lb__img');
-  gsap.fromTo(el.querySelector('.lb__backdrop'), { opacity: 0 }, { opacity: 1, duration: 0.4 });
-  gsap.fromTo(el.querySelectorAll('.lb__btn, .lb__dots, .lb__cap'), { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.5, delay: 0.25, stagger: 0.04 });
+  gsap.fromTo(el.querySelector('.lb__backdrop'), { opacity: 0 }, { opacity: 1, duration: 0.25 });
+  gsap.fromTo(el.querySelectorAll('.lb__btn, .lb__dots, .lb__cap'), { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.35, delay: 0.12, stagger: 0.03 });
   const thumb = fromEl?.querySelector('img') || fromEl;
+  // always grows: from the thumbnail if it is smaller, otherwise a short scale-up in place
   const fly = () => {
-    if (!thumb?.getBoundingClientRect) { gsap.fromTo(img, { opacity: 0, scale: 0.94 }, { opacity: 1, scale: 1, duration: 0.6, ease: 'expo.out' }); return; }
-    const a = thumb.getBoundingClientRect(), b = img.getBoundingClientRect();
-    gsap.fromTo(img, { x: a.left + a.width / 2 - (b.left + b.width / 2), y: a.top + a.height / 2 - (b.top + b.height / 2), scale: a.width / b.width, opacity: 0.6 },
-      { x: 0, y: 0, scale: 1, opacity: 1, duration: 0.85, ease: 'expo.inOut' });
+    const b = img.getBoundingClientRect();
+    const a = thumb?.getBoundingClientRect ? thumb.getBoundingClientRect() : null;
+    const inView = a && a.width > 0 && a.bottom > 0 && a.top < innerHeight;
+    const s0 = a ? Math.min(a.width / b.width, a.height / b.height) : 1;
+    if (!inView || s0 > 0.82) { gsap.fromTo(img, { x: 0, y: 0, scale: 0.86, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.45, ease: 'expo.out' }); return; }
+    gsap.fromTo(img, { x: a.left + a.width / 2 - (b.left + b.width / 2), y: a.top + a.height / 2 - (b.top + b.height / 2), scale: s0, opacity: 0.7 },
+      { x: 0, y: 0, scale: 1, opacity: 1, duration: 0.5, ease: 'expo.out' });
   };
   if (img.complete && img.naturalWidth) fly(); else img.onload = () => { img.onload = null; fly(); };
   setTimeout(() => el.querySelector('.lb__close').focus({ preventScroll: true }), 100);
@@ -62,7 +66,7 @@ export function openLightbox(group, start, fromEl) {
 
 function close() {
   if (!el?.classList.contains('is-open')) return;
-  gsap.to(el, { opacity: 0, duration: 0.3, onComplete: () => { el.classList.remove('is-open'); gsap.set(el, { clearProps: 'opacity' }); } });
+  gsap.to(el, { opacity: 0, duration: 0.22, onComplete: () => { el.classList.remove('is-open'); gsap.set(el, { clearProps: 'opacity' }); } });
   lastFocus?.focus?.({ preventScroll: true });
 }
 

@@ -562,7 +562,7 @@ body.is-locked { overflow: visible; }
 .choice input:checked { border-color: var(--c-ink); }
 .choice:has(input:checked) { border-color: var(--c-ink); background: rgba(182,255,46,0.16); }
 .ship-meter .stock__fill, .loader__bar i { background: var(--c-acid); }
-.curtain i:nth-child(3) { background: var(--c-acid); }
+
 .co-processing li.is-done, .co-steps li.is-done { color: var(--c-ink); }
 .co-steps li.is-done { background: rgba(182,255,46,0.35); }
 .co-ring { background: conic-gradient(from 0deg, transparent 0 25%, var(--c-ink) 60%, var(--c-acid) 100%); }
@@ -900,3 +900,46 @@ body.is-locked { overflow: visible; }
 /* narrow lookbook frames: drop the bottom-right note so it never meets the caption */
 .look--s5 .look__i--br { display: none; }
 @media (max-width: 819px) { .look--s3 .look__i--br, .look--s7 .look__i--br, .look--s1 .look__i--br { display: none; } }
+
+/* =========================== round: hero layout, intros, stats, transition =========================== */
+/* hero: lede moves top-left under the M1 caption */
+.hero__thumbs { position: relative; }
+.hero__lede { position: absolute; left: 0; top: calc(100% + 150px); width: 21ch; margin: 0; max-width: 21ch; font-family: var(--f-display); font-weight: 500; font-size: 1.15rem; line-height: 1.12; letter-spacing: -0.03em; color: #fff; }
+@media (max-width: 819px) { .hero__lede { display: none; } }
+/* hero: LIMITED and 78C closer together and higher; the button row rises with them */
+@media (min-width: 820px) {
+  .ht--2 { top: 25%; }
+  .ht--5 { top: 47% !important; margin-top: 0 !important; }
+  .hero__bottom { align-items: center; }
+}
+
+/* who: small bold intro above the label */
+.who__intro { display: grid; gap: 14px; max-width: 34ch; }
+.who__kicker { margin: 0; color: #fff; font-family: var(--f-display); font-weight: 600; font-size: 1.05rem; line-height: 1.25; letter-spacing: -0.02em; }
+
+/* drop row: stats above "Shop all" */
+.drop-row__aside { display: grid; gap: 22px; justify-items: end; }
+.drop-stats { display: flex; gap: clamp(18px, 3vw, 44px); margin: 0; }
+.drop-stats div { display: grid; gap: 2px; }
+.drop-stats dt { order: 2; font-family: var(--f-display); font-weight: 500; font-size: 1rem; letter-spacing: -0.02em; color: #55555b; }
+.drop-stats dd { order: 1; margin: 0; font-family: var(--f-display); font-weight: 500; font-size: clamp(2.2rem, 3.6vw, 3.4rem); line-height: 0.95; letter-spacing: -0.05em; color: var(--c-ink); }
+.drop-stats div:last-child dd { color: var(--c-cobalt); }
+@media (max-width: 819px) { .drop-row__aside { justify-items: start; } .drop-stats { gap: 18px; } .drop-stats dd { font-size: 2rem; } .drop-stats dt { font-size: 0.85rem; } }
+
+/* page transition: black panel, wordmark, loading ring */
+.curtain { display: block !important; }
+.curtain__panel { position: absolute; inset: 0; visibility: hidden; background: var(--c-void); color: var(--c-bone);
+  display: grid; place-content: center; justify-items: center; gap: 28px; }
+.curtain__edge { position: absolute; left: 0; right: 0; top: 0; height: 3px; background: var(--c-acid); }
+.curtain__word { margin: 0; font-family: var(--f-display); font-weight: 500; font-size: clamp(3.6rem, 15vw, 15rem); line-height: 0.9; letter-spacing: -0.06em; text-transform: uppercase; }
+.curtain__mask { display: inline-flex; overflow: hidden; padding: 0.04em 0.04em 0.06em; }
+.curtain__ch { display: inline-block; }
+.curtain__word sup { font-size: 0.16em; margin-left: 0.15em; align-self: flex-start; letter-spacing: 0; }
+.curtain__meta { display: flex; align-items: center; gap: 12px; font-family: var(--f-display); font-weight: 500; font-size: 1.05rem; letter-spacing: -0.02em; }
+.curtain__ring { width: 30px; height: 30px; animation: ring-spin 0.9s linear infinite; }
+.curtain__ring circle { fill: none; stroke-width: 3; }
+.curtain__track { stroke: rgba(255,255,255,0.14); }
+.curtain__arc { stroke: var(--c-acid); stroke-linecap: round; stroke-dasharray: 40 120; }
+@keyframes ring-spin { to { transform: rotate(360deg); } }
+.hero__thumbs p.hero__lede { padding: 0; margin: 0; }
+@media (min-width: 820px) and (min-height: 800px) { .hero__bottom { position: relative; top: -9vh; } }

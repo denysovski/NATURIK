@@ -187,8 +187,8 @@ function initCookies() {
 
 /* ---------- curtain: router drives it; make sure it never sticks after bfcache restores ---------- */
 function initCurtainFallback() {
-  const bars = document.querySelectorAll('[data-curtain] i');
-  window.addEventListener('pageshow', () => gsap.set(bars, { scaleY: 0 }));
+  const panel = document.querySelector('[data-curtain-panel]');
+  if (panel) window.addEventListener('pageshow', () => gsap.set(panel, { yPercent: 100, visibility: 'hidden' }));
 }
 
 /* ---------- footer wordmark: letters rise as the footer enters ---------- */
