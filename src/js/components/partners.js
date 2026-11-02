@@ -51,10 +51,17 @@ export function mountPartners(root) {
   const n = cols * rows, nInfo = Math.min(INFO.length, mobile ? 3 : 3);
   // one partner per column (desktop) / per row (phone), dropped randomly top or bottom / left or right
   const kinds = new Array(n).fill(null), ps = [...PARTNERS].sort(() => Math.random() - 0.5);
-  if (!mobile) for (let c = 0; c < cols; c++) kinds[((Math.random() * rows) | 0) * cols + c] = { t: 'p', p: ps[c % ps.length] };
+  if (!mobile) {
+    // fixed anchors: column 1 = partner on top + tracker glitch below; column 7 top = Morava Textile
+    const mor = PARTNERS.find((p) => p.id === 'morava'), others = ps.filter((p) => p !== mor);
+    kinds[0] = { t: 'p', p: others[0] }; kinds[cols] = { t: 'g' };
+    kinds[cols - 1] = { t: 'p', p: mor };
+    for (let c = 1; c < cols - 1; c++) kinds[((Math.random() * rows) | 0) * cols + c] = { t: 'p', p: others[c] };
+  }
   else for (let r = 0; r < rows; r++) kinds[r * cols + ((Math.random() * cols) | 0)] = { t: 'p', p: ps[r % ps.length] };
   const rest = [...INFO.slice(0, nInfo).map((x) => ({ t: 'i', x }))];
   while (rest.length < kinds.filter((k) => !k).length) rest.push({ t: 'g' });
+  if (rest.length > kinds.filter((k) => !k).length) rest.length = kinds.filter((k) => !k).length;
   rest.sort(() => Math.random() - 0.5);
   for (let k = 0; k < n; k++) if (!kinds[k]) kinds[k] = rest.pop();
   const ERRS = ['ERR 0x41 cell_overflow', 'WARN restock_disabled', 'SIGNAL LOST', 'ERR cold_spot_not_found', '404 logo_on_jacket', 'retry 3/3 …', 'checksum ≠ 78', 'FATAL warmth > 100%', 'ERR 0x7f satin_glare'];
