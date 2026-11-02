@@ -84,7 +84,7 @@ function make(model, cw, stock, imgs, extra = {}) {
 export const PRODUCTS = [
   // black first, then white — the home row reads three Obsidian, three Arctic.
   // The first two images of every card (default + hover) are never repeated on another card.
-  make('m1', 'obsidian', { XS: 2, S: 4, M: 6, L: 5, XL: 3, XXL: 1 }, ['m1-back', 'm1-editorial-hero', 'm1-front', 'm1-chest', 'm1-three', 'm1-side', 'm1-editorial-sleeve', 'm1-editorial-back', 'm1-detail-print'], { hero: true }),
+  make('m1', 'obsidian', { XS: 2, S: 4, M: 6, L: 5, XL: 3, XXL: 1 }, ['m1-editorial-hero', 'm1-back', 'm1-front', 'm1-chest', 'm1-three', 'm1-side', 'm1-editorial-sleeve', 'm1-editorial-back', 'm1-detail-print'], { hero: true }),
   make('c3', 'obsidian', { XS: 4, S: 7, M: 9, L: 8, XL: 4, XXL: 2 }, ['m1-hand', 'm1-acid-rain', 'm1-chest', 'm1-editorial-sleeve']),
   make('l7', 'obsidian', { XS: 1, S: 2, M: 3, L: 2, XL: 1, XXL: 1 }, ['m1-goggles', 'm1-zip', 'm1-editorial-back', 'm1-three']),
   make('m1', 'arctic', { XS: 1, S: 3, M: 5, L: 4, XL: 2, XXL: 0 }, ['arctic-splash-close', 'arctic-front', 'arctic-back', 'arctic-shoulder']),
