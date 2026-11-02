@@ -49,30 +49,56 @@ export function mountPartners(root) {
     ['1 night', 'at −40 °C before a rating goes on the label.'],
   ];
   const n = cols * rows, nInfo = Math.min(INFO.length, mobile ? 3 : 3);
-  const kinds = [...PARTNERS.map((p) => ({ t: 'p', p })), ...INFO.slice(0, nInfo).map((x) => ({ t: 'i', x }))];
-  while (kinds.length < n) kinds.push({ t: 'g' });
-  kinds.sort(() => Math.random() - 0.5);
+  // one partner per column (desktop) / per row (phone), dropped randomly top or bottom / left or right
+  const kinds = new Array(n).fill(null), ps = [...PARTNERS].sort(() => Math.random() - 0.5);
+  if (!mobile) for (let c = 0; c < cols; c++) kinds[((Math.random() * rows) | 0) * cols + c] = { t: 'p', p: ps[c % ps.length] };
+  else for (let r = 0; r < rows; r++) kinds[r * cols + ((Math.random() * cols) | 0)] = { t: 'p', p: ps[r % ps.length] };
+  const rest = [...INFO.slice(0, nInfo).map((x) => ({ t: 'i', x }))];
+  while (rest.length < kinds.filter((k) => !k).length) rest.push({ t: 'g' });
+  rest.sort(() => Math.random() - 0.5);
+  for (let k = 0; k < n; k++) if (!kinds[k]) kinds[k] = rest.pop();
   const ERRS = ['ERR 0x41 cell_overflow', 'WARN restock_disabled', 'SIGNAL LOST', 'ERR cold_spot_not_found', '404 logo_on_jacket', 'retry 3/3 …', 'checksum ≠ 78', 'FATAL warmth > 100%', 'ERR 0x7f satin_glare'];
   grid.style.setProperty('--cols', cols);
   grid.innerHTML = kinds.map((k) => {
     if (k.t === 'i') return `<div class="pcell pcell--info" role="presentation"><b class="pinfo__big">${k.x[0]}</b><span class="pinfo__txt">${k.x[1]}</span></div>`;
-    if (k.t === 'g') return `<div class="pcell pcell--glitch" role="presentation" aria-hidden="true"><span class="gl__box"><b>+</b><i></i></span><span class="gl__box gl__box--b"><b>+</b><i></i></span><pre class="gl__txt"></pre></div>`;
+    if (k.t === 'g') return `<div class="pcell pcell--glitch" role="presentation" aria-hidden="true"><span class="gl__box"><b>+</b><i></i></span><span class="gl__box gl__box--b"><b>+</b><i></i></span><span class="gl__box"><b>+</b><i></i></span><pre class="gl__txt"></pre></div>`;
     const p = k.p;
     return `<div class="pcell pcell--p" role="listitem"><button class="partner partner--${p.c}" type="button" aria-expanded="false" data-partner="${p.id}">
       <span class="partner__logo" aria-hidden="true">${LOGOS[p.id]}</span>
       <span class="partner__txt"><span class="partner__name">${p.name}</span><span class="partner__role">${p.role} • Since ${p.since}</span></span>
       <span class="partner__more">Open +</span></button></div>`;
   }).join('');
+  // dashed lines stitching every tracked box across the whole grid
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); svg.setAttribute('class', 'partners__lines'); svg.setAttribute('aria-hidden', 'true');
+  grid.appendChild(svg);
   const glitch = [...grid.querySelectorAll('.pcell--glitch')].map((c) => ({ c, txt: c.querySelector('.gl__txt'), boxes: [...c.querySelectorAll('.gl__box')] }));
   const rnd = (a, b) => a + Math.random() * (b - a);
   const pick = (a) => a[(Math.random() * a.length) | 0];
-  const glitchStep = () => glitch.forEach((g) => {
+  const allBoxes = () => glitch.flatMap((g) => g.boxes.filter((b) => b.style.display !== 'none'));
+  let order = [];
+  const drawLines = () => {
+    const gr = grid.getBoundingClientRect();
+    const pts = allBoxes().map((b) => { const r = b.getBoundingClientRect(); return [r.left - gr.left + r.width / 2, r.top - gr.top + r.height / 2]; });
+    if (order.length !== pts.length || Math.random() < 0.2) order = pts.map((_, i) => i).sort(() => Math.random() - 0.5);
+    svg.setAttribute('viewBox', `0 0 ${gr.width | 0} ${gr.height | 0}`);
+    let d = '', d2 = '';
+    order.forEach((i, k) => {
+      const p = pts[i], q = pts[order[(k + 1) % order.length]]; if (!p || !q) return;
+      const kk = k % 2 ? 0.28 : -0.28, mx = (p[0] + q[0]) / 2 - (q[1] - p[1]) * kk, my = (p[1] + q[1]) / 2 + (q[0] - p[0]) * kk;
+      const seg = `M${p[0] | 0} ${p[1] | 0}Q${mx | 0} ${my | 0} ${q[0] | 0} ${q[1] | 0}`;
+      k % 3 ? (d += seg) : (d2 += seg);
+    });
+    svg.innerHTML = `<path d="${d}"/><path class="is-b" d="${d2}"/>`;
+  };
+  const glitchStep = () => { glitchCells(); drawLines(); };
+  const glitchCells = () => glitch.forEach((g) => {
     if (Math.random() < 0.55) g.txt.textContent = Array.from({ length: 3 + (Math.random() * 3 | 0) }, () => Math.random() < 0.6 ? pick(ERRS) : `${HEX()} ${HEX().slice(0, 4)}`).join('\n');
     g.c.classList.toggle('is-jolt', Math.random() < 0.18);
-    g.boxes.forEach((b) => {
-      if (Math.random() < 0.5) return;
+    g.boxes.forEach((b, bi) => {
+      if (bi === 2) b.style.display = Math.random() < 0.5 ? 'none' : '';
+      if (Math.random() < 0.5 && b.style.left) return;
       const w = rnd(26, 62), h = rnd(22, 54);
-      b.style.cssText = `left:${rnd(4, 70) | 0}%;top:${rnd(6, 70) | 0}%;width:${w | 0}px;height:${h | 0}px`;
+      Object.assign(b.style, { left: `${rnd(4, 70) | 0}%`, top: `${rnd(6, 70) | 0}%`, width: `${w | 0}px`, height: `${h | 0}px` });
       b.lastChild.textContent = `X${String(rnd(0, 160) | 0).padStart(3, '0')}Y${String(rnd(0, 160) | 0).padStart(3, '0')}`;
     });
   });
@@ -104,7 +130,7 @@ export function mountPartners(root) {
   // scroll-in: the left and right halves of the grid slide in from the sides and close over "Our partners"
   let st = null;
   if (!reduceMotion) {
-    const cells = [...grid.children], half = cols / 2;
+    const cells = [...grid.querySelectorAll('.pcell')], half = cols / 2;
     const left = cells.filter((_, k) => (k % cols) < Math.floor(half)), right = cells.filter((_, k) => (k % cols) >= Math.ceil(half)), mid = cells.filter((_, k) => cols % 2 && (k % cols) === Math.floor(half));
     const intro = sec.querySelector('[data-partners-intro]');
     const tl = gsap.timeline({ scrollTrigger: mobile
@@ -113,7 +139,8 @@ export function mountPartners(root) {
     tl.fromTo(left, { xPercent: -100 * Math.ceil(half) }, { xPercent: 0, ease: 'power2.inOut', duration: 1 }, 0)
       .fromTo(right, { xPercent: 100 * Math.ceil(half) }, { xPercent: 0, ease: 'power2.inOut', duration: 1 }, 0)
       .fromTo(mid, { opacity: 0, scaleY: 0.2 }, { opacity: 1, scaleY: 1, ease: 'power2.out', duration: 0.35 }, 0.65)
-      .fromTo(intro, { scale: 1, opacity: 1 }, { scale: 0.86, opacity: 0, ease: 'power1.in', duration: 0.35 }, 0.62);
+      .fromTo(intro, { scale: 1, opacity: 1 }, { scale: 0.86, opacity: 0, ease: 'power1.in', duration: 0.35 }, 0.62)
+      .fromTo(svg, { opacity: 0 }, { opacity: 1, ease: 'none', duration: 0.15 }, 0.85);
     st = tl.scrollTrigger;
   }
   let timer = 0;
