@@ -5,6 +5,8 @@ import { SIZES, bySlug, totalStock } from '../data/products.js';
 import { mountSignal } from '../components/signal.js';
 import { mountBlob } from '../components/blob.js';
 import { mountLookOrbs } from '../components/lookOrbs.js';
+import { mountWho3d } from '../components/who3d.js';
+import { mountPartners } from '../components/partners.js';
 
 /* Homepage module — mount() wires everything up, the returned function tears it down
    so the router can swap pages without reloads or leaks. */
@@ -201,15 +203,12 @@ export function mount(root = document) {
       // (or jumping) can never leave the card half-way or make it blink in and out.
       const HERO = { x: 0, y: d ? 0.07 : 0.12, scale: d ? 0.96 : 0.8, img: 0, zoom: 1.06, pan: 0, opacity: 1, dim: 0 };
       const SPEC = { x: d ? -0.22 : 0, y: d ? 0 : -0.17, scale: d ? 1.1 : 0.72, img: 1, zoom: 1.12, pan: 0, opacity: 1, dim: 0 };
-      // The Drop: the card slides under the giant 21, shrinks and fades back — the count takes the focus
-      const DROP = { x: d ? 0.24 : 0, y: d ? -0.02 : 0.1, scale: d ? 0.66 : 0.5, img: 2, zoom: 1.08, pan: 0, opacity: 0.6, dim: 0.6 };
-      const GONE = { ...DROP, scale: d ? 0.56 : 0.44, opacity: 0, dim: 1 };
-      const range = (trigger, from, to, start, end) => gsap.fromTo(S, { ...from }, { ...to, ease: 'none', immediateRender: false,
-        scrollTrigger: { trigger, start, end, scrub: 0.4 } });
+      // after Warmth the card simply leaves with the section (moves up 1:1 with the scroll) — no fade, no travel
+      const OUT = { ...SPEC, y: SPEC.y - 1.15 };
+      const range = (trigger, from, to, start, end, scrub = 0.4) => gsap.fromTo(S, { ...from }, { ...to, ease: 'none', immediateRender: false,
+        scrollTrigger: { trigger, start, end, scrub } });
       range('#spec', HERO, SPEC, 'top bottom', 'top top');
-      // slide under the 21 and fade out completely before the count reaches full size
-      range('#drop', SPEC, DROP, 'top bottom', 'top 72%');
-      range('#drop', DROP, GONE, 'top 72%', 'top 38%');
+      range(root.querySelector('#spec').nextElementSibling, SPEC, OUT, 'top bottom', 'top -15%', true);
       // the giant count surfaces as the photo sinks under it
       gsap.fromTo('.drop-last', { opacity: 0, scale: 0.9 }, { opacity: 1, scale: 1, ease: 'none', immediateRender: true,
         scrollTrigger: { trigger: '#drop', start: 'top 70%', end: 'top 15%', scrub: 0.4 } });
@@ -238,7 +237,7 @@ export function mount(root = document) {
     initReveals(root);
   }, root === document ? undefined : root);
 
-  cleanups.push(mountSignal(root), mountBlob(root), mountLookOrbs(root));
+  cleanups.push(mountSignal(root), mountBlob(root), mountLookOrbs(root), mountWho3d(root), mountPartners(root));
   measure();
   on(window, 'resize', measure);
   intro();
