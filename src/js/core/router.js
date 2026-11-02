@@ -50,11 +50,60 @@ function chars() {
   }
   return [...document.querySelectorAll('.curtain__ch')];
 }
+// Transition FX: tracked boxes with photo crops and coordinates jump around behind the wordmark,
+// stitched by dashed lines, while a terminal log streams in the corner.
+const FX_IMG = ['m1-acid-rain-sm', 'm1-hand-sm', 'm1-goggles-sm', 'm1-zip-sm', 'arctic-front-sm', 'arctic-splash-close-sm', 'm1-chest-sm', 'arctic-back-sm'];
+const FX_WORD = ['DROP01', 'CELL78', '800 FP', '−25 °C', 'M1 / 78C', 'cell 41', 'no restock', 'after dark', 'funnel collar', '21 left'];
+const rnd = (a, b) => a + Math.random() * (b - a), pick = (a) => a[(Math.random() * a.length) | 0];
+const hex = (n) => Array.from({ length: n }, () => '0123456789abcdef'[(Math.random() * 16) | 0]).join('');
+let fxTimer = 0;
+function fxStart(dest) {
+  const fx = $c('[data-curtain-fx]'), svg = $c('[data-curtain-lines]'), term = $c('[data-curtain-term]');
+  if (!fx || reduceMotion) return;
+  const W = innerWidth, H = innerHeight, n = W < 820 ? 6 : 10, base = new URL('./images/', location.href).href;
+  fx.querySelectorAll('.cfx').forEach((b) => b.remove());
+  const boxes = Array.from({ length: n }, (_, i) => {
+    const el = document.createElement('div'); el.className = 'cfx' + (i % 4 === 0 ? ' cfx--blue' : '');
+    el.innerHTML = '<i></i><b>+</b><span></span>'; fx.appendChild(el); return el;
+  });
+  const place = (el) => {
+    const w = rnd(0.05, 0.2) * W, h = w * rnd(0.6, 1.3), x = rnd(0, W - w), y = rnd(0, H - h);
+    Object.assign(el.style, { transform: `translate3d(${x | 0}px, ${y | 0}px, 0)`, width: `${w | 0}px`, height: `${h | 0}px` });
+    el.dataset.cx = x + w / 2; el.dataset.cy = y + h / 2;
+    const img = el.firstChild, useImg = Math.random() < 0.6;
+    img.style.backgroundImage = useImg ? `url(${base}${pick(FX_IMG)}.webp)` : 'none';
+    img.style.backgroundPosition = `${rnd(0, 100) | 0}% ${rnd(0, 100) | 0}%`;
+    el.lastChild.textContent = Math.random() < 0.55 ? `X${String(x / W * 160 | 0).padStart(3, '0')}Y${String(y / H * 160 | 0).padStart(3, '0')}` : pick(FX_WORD);
+  };
+  const lines = () => {
+    const c = boxes.map((b) => [+b.dataset.cx, +b.dataset.cy]);
+    svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+    svg.innerHTML = c.map((p, i) => { const q = c[(i + 1) % c.length], k = i % 2 ? 0.3 : -0.3;
+      return `<path d="M${p[0] | 0} ${p[1] | 0} Q${((p[0] + q[0]) / 2 - (q[1] - p[1]) * k) | 0} ${((p[1] + q[1]) / 2 + (q[0] - p[0]) * k) | 0} ${q[0] | 0} ${q[1] | 0}"/>`; }).join('')
+      + `<path class="is-hub" d="M${c[0][0] | 0} ${c[0][1] | 0} L${W / 2} ${H / 2} L${c[2][0] | 0} ${c[2][1] | 0}"/>`;
+  };
+  boxes.forEach(place); lines();
+  const page = dest === 'home' ? 'index' : dest;
+  const log = [`> naturik route --to ./${page}.html`, `  GET ./${page}.html … 200 OK`, `  session ${hex(8)}-${hex(4)}`, '  decrypting cells  78/78', '  WARN cold_spot_not_found', `  stock.sync m1-obsidian  ${hex(6)}`, `  ERR 0x${hex(4)} restock_disabled (expected)`, '  mounting page …', `  frame ${hex(12)}`];
+  term.textContent = ''; let li = 0, tick = 0;
+  clearInterval(fxTimer);
+  fxTimer = setInterval(() => {
+    tick++;
+    for (let k = 0; k < 2; k++) place(pick(boxes));
+    lines();
+    if (li < log.length) term.textContent += (li ? '\n' : '') + log[li++];
+    else if (tick % 2) term.textContent += `\n  ${hex(4)} ${hex(8)} ${hex(6)}`;
+    const rows = term.textContent.split('\n'); if (rows.length > 11) term.textContent = rows.slice(-11).join('\n');
+  }, 70);
+}
+const fxStop = () => clearInterval(fxTimer);
+
 function cover(dest) {
   const panel = $c('[data-curtain-panel]');
   if (!panel || reduceMotion || document.hidden) return Promise.resolve();
   const label = $c('[data-curtain-label]'); if (label) label.textContent = LABEL[dest] || 'Loading';
   const ch = chars();
+  fxStart(dest);
   // never let a paused animation (background tab) block navigation
   return new Promise((r) => { setTimeout(r, 1400); gsap.timeline({ onComplete: r })
     .set(panel, { visibility: 'visible', yPercent: 100 })
@@ -73,7 +122,7 @@ function reveal() {
     .to('.curtain__meta', { opacity: 0, duration: 0.25 }, 0)
     .to(panel, { yPercent: -100, duration: 0.75, ease: 'expo.inOut' }, 0.2)
     .fromTo('main', { opacity: 0.5 }, { opacity: 1, duration: 0.6, ease: 'power2.out', clearProps: 'opacity' }, 0.35)
-    .set(panel, { visibility: 'hidden', yPercent: 100 });
+    .set(panel, { visibility: 'hidden', yPercent: 100, onComplete: fxStop });
 }
 
 async function go(href, { push = true } = {}) {

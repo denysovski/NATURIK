@@ -4,6 +4,7 @@ import { initReveals, initCounters, split } from '../components/ui.js';
 import { SIZES, bySlug, totalStock } from '../data/products.js';
 import { mountSignal } from '../components/signal.js';
 import { mountBlob } from '../components/blob.js';
+import { mountLookOrbs } from '../components/lookOrbs.js';
 
 /* Homepage module — mount() wires everything up, the returned function tears it down
    so the router can swap pages without reloads or leaks. */
@@ -25,6 +26,14 @@ export function mount(root = document) {
 
   /* ---------- live data ---------- */
   $$('[data-m1-left], [data-m1-left-count]').forEach((n) => (n.textContent = totalStock(m1)));
+  const heroLeft = $('.hero__stock-num [data-m1-left]');
+  if (heroLeft && !reduceMotion) {
+    const end = totalStock(m1);
+    heroLeft.style.width = `${heroLeft.getBoundingClientRect().width}px`;   // lock the width at the final value
+    const o = { v: 0 };
+    heroLeft.textContent = '0';
+    gsap.to(o, { v: end, duration: 1.6, delay: 0.3, ease: 'power2.out', onUpdate: () => (heroLeft.textContent = Math.round(o.v)) });
+  }
   $('[data-size-stock]').innerHTML = SIZES.map((s) => {
     const n = m1.stock[s];
     return `<div class="size-stock__row"><span class="t-mono">${s}</span><span class="stock__bar"><span class="stock__fill" style="--p:${(n / 8) * 100}%"></span></span><span class="t-mono ${n <= 2 ? 'is-low' : ''}">${n ? `${n} left` : 'Sold out'}</span></div>`;
@@ -229,7 +238,7 @@ export function mount(root = document) {
     initReveals(root);
   }, root === document ? undefined : root);
 
-  cleanups.push(mountSignal(root), mountBlob(root));
+  cleanups.push(mountSignal(root), mountBlob(root), mountLookOrbs(root));
   measure();
   on(window, 'resize', measure);
   intro();
