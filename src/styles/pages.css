@@ -943,3 +943,69 @@ body.is-locked { overflow: visible; }
 @keyframes ring-spin { to { transform: rotate(360deg); } }
 .hero__thumbs p.hero__lede { padding: 0; margin: 0; }
 @media (min-width: 820px) and (min-height: 800px) { .hero__bottom { position: relative; top: -9vh; } }
+
+/* =========================== round: crosshair, drop count, signal, blob =========================== */
+/* no glow behind the travelling card */
+.stage__glow { display: none !important; }
+.manifesto::before { content: none !important; }
+
+/* Closer: green gun-sight crosshair instead of the lens ring */
+.details__focus { border: 0 !important; border-radius: 0 !important; box-shadow: none !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
+.details__focus::after { content: none !important; }
+.details__focus svg { width: 100%; height: 100%; overflow: visible; fill: none; stroke: var(--c-acid); stroke-width: 2; filter: drop-shadow(0 0 4px rgba(182,255,46,0.7)); }
+.details__focus svg .tick { stroke-width: 1.4; opacity: 0.8; }
+.details__focus svg .dot { fill: var(--c-acid); stroke: none; }
+
+/* Warmth counters: no width jitter while counting */
+.specs dd { font-variant-numeric: tabular-nums; }
+
+/* The Drop: giant remaining count on the right, where the photo dissolves */
+#drop .chapter__grid { align-items: center; }
+.drop-last { grid-column: 2; grid-row: 1; justify-self: end; display: grid; justify-items: end; text-align: right; }
+.drop-last__num { font-family: var(--f-art); font-size: clamp(14rem, 34vw, 36rem); line-height: 0.78; letter-spacing: -0.02em; color: var(--c-cobalt); margin-right: -0.04em; }
+.drop-last__cap { margin: 18px 0 0; max-width: 30ch; font-family: var(--f-display); font-weight: 500; font-size: 1.15rem; line-height: 1.2; letter-spacing: -0.03em; color: #2a2a2f; }
+.drop-last__cap b { color: var(--c-ink); font-weight: 600; }
+@media (max-width: 819px) {
+  .drop-last { grid-column: 1; grid-row: auto; justify-self: start; justify-items: start; text-align: left; margin-top: 28px; }
+  .drop-last__num { font-size: 52vw; }
+  #drop.chapter { padding-top: 30vh; }
+}
+
+/* Signal: full-screen tracker with flashing linked phrases */
+.signal { position: relative; z-index: var(--z-content); height: 100vh; min-height: 620px; overflow: hidden; background: #050506; color: #fff; isolation: isolate; }
+.signal__field { position: absolute; inset: 0; pointer-events: none; }
+.signal__lines { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.signal__lines path { fill: none; stroke: rgba(182,255,46,0.55); stroke-width: 1; stroke-dasharray: 4 5; }
+.signal__lines path.is-hub { stroke: rgba(22,56,255,0.9); stroke-width: 1.2; }
+.trk { position: absolute; left: 0; top: 0; border: 1.5px solid var(--c-acid); box-shadow: 0 0 14px rgba(182,255,46,0.35), inset 0 0 18px rgba(182,255,46,0.12); will-change: transform; }
+.trk--blue { border-color: #3a5bff; box-shadow: 0 0 14px rgba(22,56,255,0.5); }
+.trk__img { position: absolute; inset: 0; background-size: 320% auto; opacity: 0; filter: grayscale(1) contrast(1.2); }
+.trk.has-img .trk__img { opacity: 0.85; }
+.trk.has-img::before { content: ""; position: absolute; inset: 0; z-index: 1; background: repeating-linear-gradient(0deg, rgba(0,0,0,0.35) 0 1px, transparent 1px 3px), rgba(120,255,40,0.28); mix-blend-mode: normal; }
+.trk--blue.has-img::before { background: repeating-linear-gradient(0deg, rgba(0,0,0,0.35) 0 1px, transparent 1px 3px), rgba(22,56,255,0.35); }
+.trk__x { position: absolute; z-index: 2; left: 50%; top: 50%; transform: translate(-50%, -54%); color: var(--c-acid); font: 400 20px/1 var(--f-display); }
+.trk--blue .trk__x { color: #8ea2ff; }
+.trk__lab { position: absolute; z-index: 3; left: -1.5px; bottom: -1.5px; transform: translateY(100%); padding: 3px 7px 4px; background: var(--c-acid); color: #000; font: 500 13px/1 var(--f-display); letter-spacing: 0.02em; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.trk--blue .trk__lab { background: #3a5bff; color: #fff; }
+.signal__center { position: absolute; inset: 0; z-index: 2; display: grid; place-content: center; justify-items: center; gap: 18px; text-align: center; padding: 0 var(--gutter); pointer-events: none; }
+.signal__kicker, .signal__hint { margin: 0; font-family: var(--f-display); font-weight: 500; font-size: 0.95rem; letter-spacing: -0.01em; color: rgba(255,255,255,0.7); font-variant-numeric: tabular-nums; }
+.signal__hint { opacity: 0.55; font-size: 0.85rem; }
+.signal__link { pointer-events: auto; display: inline-block; padding: 0.06em 0.18em 0.12em; text-decoration: none; transition: background-color 0.2s, color 0.2s; }
+.signal__text { display: block; font-family: var(--f-display); font-weight: 500; font-size: clamp(2.8rem, 8.4vw, 9.5rem); line-height: 0.95; letter-spacing: -0.055em; white-space: nowrap; }
+.signal__link[data-c="acid"] { color: var(--c-acid); }
+.signal__link[data-c="blue"] { color: #4a68ff; }
+.signal.is-flash .signal__link { animation: sig-flash 0.24s steps(2, end) 1; }
+@keyframes sig-flash { 0% { background: var(--c-acid); color: #000; } 50% { background: var(--c-cobalt); color: var(--c-acid); } 100% { background: transparent; } }
+.signal.is-flash::after { content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none; background: rgba(182,255,46,0.06); animation: sig-wash 0.2s ease-out 1 forwards; }
+@keyframes sig-wash { to { opacity: 0; } }
+.signal.is-hold .signal__link { background: var(--c-acid); color: #000; }
+.signal.is-hold .signal__link[data-c="blue"] { background: var(--c-cobalt); color: #fff; }
+@media (max-width: 819px) { .signal__text { white-space: normal; font-size: 13vw; } .trk__lab { font-size: 11px; } }
+
+/* Who we are: 3D blob on the right */
+.blob { position: absolute; z-index: 0; right: -2vw; top: 4%; width: min(46vw, 640px); aspect-ratio: 1; pointer-events: none; }
+.blob canvas { width: 100% !important; height: 100% !important; display: block; }
+.blob__shadow { position: absolute; left: 50%; bottom: 6%; width: 52%; height: 9%; border-radius: 50%; background: radial-gradient(closest-side, rgba(20,40,0,0.45), rgba(20,40,0,0.12) 60%, transparent); transform: translateX(-50%); filter: blur(6px); }
+.manifesto .wrap { z-index: 1; }
+@media (max-width: 819px) { .blob { width: 78vw; right: -18vw; top: 2%; opacity: 0.9; } }
+.drop-last { transform-origin: 100% 50%; }

@@ -69,11 +69,13 @@ export function fitHeadlines(scope = document) {
 export function initCounters(scope = document) {
   $$('[data-count]', scope).forEach((el) => {
     const end = +el.dataset.count, pad = el.dataset.pad ? +el.dataset.pad : 0;
-    const o = { v: 0 };
+    // start from the smallest number with the same digit count (800 from 100, 25 from 10)
+    const start = el.dataset.countFrom ? +el.dataset.countFrom : end >= 10 ? 10 ** (String(Math.round(end)).length - 1) : 0;
+    const o = { v: start };
     const fmt = (v) => String(Math.round(v)).padStart(pad, '0');
     if (reduceMotion) { el.textContent = fmt(end); return; }
-    el.textContent = fmt(0);
-    gsap.to(o, { v: end, duration: 2, ease: 'power3.out', scrollTrigger: { trigger: el, start: 'top 90%', once: true }, onUpdate: () => (el.textContent = fmt(o.v)) });
+    el.textContent = fmt(start);
+    gsap.to(o, { v: end, duration: 1.8, ease: 'power2.out', scrollTrigger: { trigger: el, start: 'top 90%', once: true }, onUpdate: () => (el.textContent = fmt(o.v)) });
   });
 }
 

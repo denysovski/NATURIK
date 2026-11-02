@@ -2,6 +2,8 @@ import { addToBag } from '../core/app.js';
 import { gsap, ScrollTrigger, reduceMotion } from '../core/scroll.js';
 import { initReveals, initCounters, split } from '../components/ui.js';
 import { SIZES, bySlug, totalStock } from '../data/products.js';
+import { mountSignal } from '../components/signal.js';
+import { mountBlob } from '../components/blob.js';
 
 /* Homepage module — mount() wires everything up, the returned function tears it down
    so the router can swap pages without reloads or leaks. */
@@ -44,7 +46,7 @@ export function mount(root = document) {
   /* =========================================================
      IMAGE STAGE — one glass-framed photo that travels with the story
      ========================================================= */
-  const stage = $('[data-stage]'), frame = $('[data-stage-frame]'), glow = $('[data-stage-glow]');
+  const stage = $('[data-stage]'), frame = $('[data-stage-frame]');
   const stageImgs = $$('[data-stage-img]');
   const S = { x: 0, y: vp.mobile ? 0.12 : 0.07, scale: vp.mobile ? 0.8 : 0.96, rotY: 0, rotZ: 0, img: 0, zoom: 1.06, pan: 0, opacity: 1 };
   let lastImg = -1, hidden = false, lastKey = '';
@@ -58,7 +60,6 @@ export function mount(root = document) {
     lastKey = key;
     const tx = S.x * vp.w, ty = S.y * vp.h;
     frame.style.transform = `translate3d(calc(-50% + ${tx.toFixed(1)}px), calc(-50% + ${ty.toFixed(1)}px), 0) scale(${S.scale.toFixed(4)})`;
-    glow.style.transform = `translate3d(calc(-50% + ${(tx * 0.9).toFixed(1)}px), calc(-50% + ${ty.toFixed(1)}px), 0) scale(${S.scale.toFixed(3)})`;
     stageImgs.forEach((im, i) => {
       const o = Math.min(1, Math.max(0, (0.5 - Math.abs(i - S.img)) * 4 + 0.5));
       im.style.opacity = o.toFixed(3);
@@ -67,6 +68,9 @@ export function mount(root = document) {
     });
     const cur = Math.round(S.img);
     stage.style.opacity = S.opacity.toFixed(3);
+    // dissolve: the card softens as it fades out in The Drop
+    const bl = S.opacity < 0.985 ? (1 - S.opacity) * 16 : 0;
+    frame.style.filter = bl ? `blur(${bl.toFixed(1)}px)` : '';
   });
 
   // hover over the travelling photo (it sits behind the content, so hit-test it ourselves)
@@ -186,8 +190,13 @@ export function mount(root = document) {
       const d = c.conditions.desk;
       const step = (trigger, to, st = {}) => gsap.to(S, { ...to, ease: 'none', immediateRender: false, scrollTrigger: { trigger, start: 'top bottom', end: 'top top', scrub: true, ...st } });
       step('#spec', { x: d ? -0.22 : 0, y: d ? 0 : -0.17, scale: d ? 1.1 : 0.72, rotY: 0, rotZ: 0, img: 1, zoom: 1.12, pan: 0 });
-      step('#drop', { x: d ? 0.22 : 0, y: d ? 0 : -0.19, scale: d ? 1.2 : 0.76, rotY: 0, rotZ: 0, img: 2, zoom: 1.08, pan: 0 });
-      step('#details', { x: d ? 0.36 : 0.2, y: d ? -0.04 : -0.1, scale: d ? 0.42 : 0.4, rotY: 0, rotZ: 0, img: 2, zoom: 1.08, pan: 0, opacity: 0 }, { end: 'top 10%' });
+      // The Drop: the card slides right, then dissolves — the giant count is revealed where it was
+      gsap.timeline({ scrollTrigger: { trigger: '#drop', start: 'top bottom', end: 'top 5%', scrub: true } })
+        .to(S, { x: d ? 0.22 : 0, y: d ? 0 : -0.19, scale: d ? 1.12 : 0.76, img: 2, zoom: 1.08, pan: 0, ease: 'none', duration: 0.55 })
+        .to(S, { scale: d ? 1.4 : 1, zoom: 1.2, opacity: 0, ease: 'power1.in', duration: 0.45 });
+      // the giant count surfaces as the photo dissolves
+      gsap.fromTo('.drop-last', { opacity: 0, scale: 0.88 }, { opacity: 1, scale: 1, ease: 'none', immediateRender: true,
+        scrollTrigger: { trigger: '#drop', start: d ? 'top 38%' : 'top 30%', end: 'top 2%', scrub: true } });
       detailsST = gsap.to(Z, { step: STEPS.length - 1, ease: 'none', scrollTrigger: { trigger: '#details', start: 'top top', end: d ? '+=460%' : '+=340%', pin: '[data-details-pin]', scrub: true } }).scrollTrigger;
     });
     ScrollTrigger.create({ trigger: '#details', start: 'top bottom', end: 'bottom top', onToggle: (s) => { Z.active = s.isActive; Z.dirty = true; media.style.visibility = s.isActive ? 'visible' : 'hidden'; } });
@@ -209,6 +218,7 @@ export function mount(root = document) {
     initReveals(root);
   }, root === document ? undefined : root);
 
+  cleanups.push(mountSignal(root), mountBlob(root));
   measure();
   on(window, 'resize', measure);
   intro();

@@ -28,7 +28,7 @@
 
   <!-- Image stage: one glass-framed photo that follows the story down the page -->
   <div class="stage" data-stage aria-hidden="true">
-    <div class="stage__glow" data-stage-glow></div>
+    
     <div class="stage__frame" data-stage-frame>
       <div class="stage__clip">
         <img class="stage__img is-on" src="./images/m1-editorial-hero-stage.webp" alt="" data-stage-img fetchpriority="high">
@@ -86,7 +86,7 @@
       <div class="wrap chapter__grid">
         <div class="chapter__text">
           <p class="index-num">Warmth</p>
-          <h2 class="t-h2" data-split>78 <span class="hl">cells.</span><br>Zero cold <em class="hl">spots</em>.</h2>
+          <h2 class="t-h2" data-split>Portable<br><em class="hl">summer</em>.</h2>
           <p class="t-lead" data-reveal>Every cell is filled by hand and sewn shut on its own, so the down can't migrate. You get even warmth from the collar to the hem — and that heavy, sculpted silhouette.</p>
           <dl class="specs" data-reveal-stagger>
             <div><dt class="t-mono">Fill power</dt><dd><span data-count="800">800</span><small>FP</small></dd></div>
@@ -106,11 +106,7 @@
       <div class="wrap chapter__grid">
         <div class="chapter__text">
           <p class="index-num">The drop</p>
-          <h2 class="t-h2" data-split>Numbered.<br><span class="hl">Never</span> <em>restocked</em>.</h2>
-          <div class="drop-counter" data-reveal>
-            <span class="drop-counter__big" data-m1-left-count>21</span>
-            <span class="drop-counter__of t-mono">of 78 M1 Obsidian<br>pieces remain</span>
-          </div>
+          <h2 class="t-h2" data-split>The final<br><em class="hl">count</em>.</h2>
           <div class="size-stock" data-size-stock aria-label="Stock by size"></div>
           <div class="drop-buy" data-reveal>
             <div class="drop-buy__top">
@@ -121,7 +117,22 @@
             <button class="btn btn--dark btn--block drop-buy__add" type="button" data-drop-add disabled><span class="btn__label">Choose a size</span><svg class="btn__icon"><use href="#i-arrow"/></svg></button>
           </div>
         </div>
+        <div class="drop-last" aria-label="M1 Obsidian pieces remaining">
+          <span class="drop-last__num" data-m1-left-count>21</span>
+          <p class="drop-last__cap"><b>left of 78.</b> These are the last M1 Obsidian ever made. No second run, no restock, no waitlist that turns into one.</p>
+        </div>
       </div>
+    </section>
+
+    <!-- SIGNAL — flashing links + tracker -->
+    <section class="signal" id="signal" aria-label="Quick links">
+      <div class="signal__field" data-signal-field aria-hidden="true"><svg class="signal__lines" data-signal-lines></svg></div>
+      <div class="signal__center">
+        <p class="signal__kicker"><span data-signal-idx>01</span> / signal</p>
+        <a class="signal__link" href="./shop.html" data-signal-link><span class="signal__text" data-signal-text>Shop the M1.</span></a>
+        <p class="signal__hint">Hover to hold · click to go</p>
+      </div>
+      <noscript><p class="signal__text">Shop the M1.</p></noscript>
     </section>
 
     <!-- 03 DETAILS — pinned full-bleed zoom into the jacket -->
@@ -130,7 +141,7 @@
         <div class="details__media" data-zoom-media>
           <img class="details__img is-on" src="./images/m1-closer-front.jpeg" alt="M1 Puffer 78C front view with green goggles and knit balaclava" data-zoom-img="hero" data-w="2688" data-h="1536" loading="lazy">
           <span class="details__vignette"></span>
-          <span class="details__focus" data-focus-ring></span>
+          <span class="details__focus" data-focus-ring><svg viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="34"/><path d="M60 6v30M60 84v30M6 60h30M84 60h30"/><path class="tick" d="M60 22v6M60 92v6M22 60h6M92 60h6"/><circle class="dot" cx="60" cy="60" r="2.4"/></svg></span>
         </div>
         <div class="wrap details__ui">
           <header class="details__head">
@@ -156,6 +167,7 @@
 
     <!-- 04 ABOUT / MESSAGE -->
     <section class="manifesto theme-light" id="manifesto" data-header-light>
+      <div class="blob" data-blob aria-hidden="true"><span class="blob__shadow" data-blob-shadow></span></div>
       <div class="wrap">
         <p class="index-num">Who we are</p>
         <p class="manifesto__text" data-scrub-text>We are a small studio in Prague that makes one jacket at a time, properly. No seasons, no sale rail, no landfill. A drop is finished when the last cell is sold — then we start drawing the next one.</p>
