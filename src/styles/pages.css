@@ -1032,3 +1032,11 @@ body.is-locked { overflow: visible; }
 .details__index li { font-size: 1.2rem !important; padding: 11px 16px !important; border-radius: 11px !important; letter-spacing: -0.02em; }
 .details__index li button { font: inherit; }
 .stage__dim { position: absolute; inset: 0; z-index: 1; pointer-events: none; opacity: 0; background: #d6d6d4; mix-blend-mode: normal; }
+
+/* Closer index: active item is simply green — no grey frame around it */
+.details__index li, .details__index li.is-on { padding: 0 !important; background: none !important; transition: none !important; }
+.details__index button { padding: 11px 16px !important; border-radius: 11px !important; font-size: 1.2rem !important; color: rgba(255,255,255,0.6); transition: color 0.2s, transform 0.35s var(--ease-out) !important; }
+.details__index li.is-on button { background: var(--c-acid) !important; color: #000 !important; }
+/* Closer wordmark: pinned in one place, independent of the card height */
+.details__brand { position: absolute; right: calc(var(--gutter) + 200px); top: 30vh; margin: 0; }
+@media (max-width: 819px) { .details__brand { position: static; grid-column: 1; grid-row: 3; } .details__right { grid-row: 4; } }

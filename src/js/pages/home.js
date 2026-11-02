@@ -193,13 +193,14 @@ export function mount(root = document) {
       const HERO = { x: 0, y: d ? 0.07 : 0.12, scale: d ? 0.96 : 0.8, img: 0, zoom: 1.06, pan: 0, opacity: 1, dim: 0 };
       const SPEC = { x: d ? -0.22 : 0, y: d ? 0 : -0.17, scale: d ? 1.1 : 0.72, img: 1, zoom: 1.12, pan: 0, opacity: 1, dim: 0 };
       // The Drop: the card slides under the giant 21, shrinks and fades back — the count takes the focus
-      const DROP = { x: d ? 0.24 : 0, y: d ? -0.02 : 0.1, scale: d ? 0.6 : 0.48, img: 2, zoom: 1.08, pan: 0, opacity: 0.55, dim: 1 };
-      const GONE = { ...DROP, scale: d ? 0.52 : 0.42, opacity: 0 };
+      const DROP = { x: d ? 0.24 : 0, y: d ? -0.02 : 0.1, scale: d ? 0.66 : 0.5, img: 2, zoom: 1.08, pan: 0, opacity: 0.6, dim: 0.6 };
+      const GONE = { ...DROP, scale: d ? 0.56 : 0.44, opacity: 0, dim: 1 };
       const range = (trigger, from, to, start, end) => gsap.fromTo(S, { ...from }, { ...to, ease: 'none', immediateRender: false,
         scrollTrigger: { trigger, start, end, scrub: 0.4 } });
       range('#spec', HERO, SPEC, 'top bottom', 'top top');
-      range('#drop', SPEC, DROP, 'top bottom', 'top 20%');
-      range('#signal', DROP, GONE, 'top bottom', 'top 45%');
+      // slide under the 21 and fade out completely before the count reaches full size
+      range('#drop', SPEC, DROP, 'top bottom', 'top 72%');
+      range('#drop', DROP, GONE, 'top 72%', 'top 38%');
       // the giant count surfaces as the photo sinks under it
       gsap.fromTo('.drop-last', { opacity: 0, scale: 0.9 }, { opacity: 1, scale: 1, ease: 'none', immediateRender: true,
         scrollTrigger: { trigger: '#drop', start: 'top 70%', end: 'top 15%', scrub: 0.4 } });
