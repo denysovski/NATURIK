@@ -18,7 +18,7 @@ const PHRASES = [
   { t: 'Repaired for life.', href: './contact.html', c: 'blue' },
 ];
 const WORDS = ['DROP01', 'CELL78', '800 FP', '−25 °C', 'funnel collar', 'satin ripstop', '420 g', 'Prague', 'M1 / 78C', 'no restock', 'cell 41', 'why cold?', 'after dark', '2 am', 'offset zip', 'RDS down'];
-const IMAGES = ['look-01-sm.webp', 'look-02-sm.webp', 'look-04-sm.webp', 'look-06-sm.webp', 'm1-d-collar-sm.webp', 'm1-d-print-sm.webp', 'm1-d-zip-sm.webp', 'm1-d-sleeve-sm.webp'];
+const IMAGES = ['m1-acid-rain-sm.webp', 'm1-hand-sm.webp', 'm1-goggles-sm.webp', 'm1-zip-sm.webp', 'arctic-front-sm.webp', 'arctic-back-sm.webp', 'm1-chest-sm.webp', 'm1-d-collar-sm.webp'];
 const GLYPHS = 'ABCDEFGHKLMNPRSTUVXYZ0123456789#%/+−';
 
 const rnd = (a, b) => a + Math.random() * (b - a);

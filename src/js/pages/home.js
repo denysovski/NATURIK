@@ -47,15 +47,15 @@ export function mount(root = document) {
      IMAGE STAGE — one glass-framed photo that travels with the story
      ========================================================= */
   const stage = $('[data-stage]'), frame = $('[data-stage-frame]');
-  const stageImgs = $$('[data-stage-img]');
-  const S = { x: 0, y: vp.mobile ? 0.12 : 0.07, scale: vp.mobile ? 0.8 : 0.96, rotY: 0, rotZ: 0, img: 0, zoom: 1.06, pan: 0, opacity: 1 };
+  const stageImgs = $$('[data-stage-img]'), dimEl = $('[data-stage-dim]'), chipEl = $('.stage__chip');
+  const S = { x: 0, y: vp.mobile ? 0.12 : 0.07, scale: vp.mobile ? 0.8 : 0.96, rotY: 0, rotZ: 0, img: 0, zoom: 1.06, pan: 0, opacity: 1, dim: 0 };
   let lastImg = -1, hidden = false, lastKey = '';
 
   // Writes only when the scroll-driven state actually changed: zero work while idle.
   tick(() => {
     if (S.opacity < 0.01) { if (!hidden) { stage.style.visibility = 'hidden'; stage.style.opacity = '0'; hidden = true; lastKey = ''; } return; }
     if (hidden) { stage.style.visibility = 'visible'; hidden = false; }
-    const key = `${S.x.toFixed(4)}|${S.y.toFixed(4)}|${S.scale.toFixed(4)}|${S.rotY.toFixed(2)}|${S.rotZ.toFixed(2)}|${S.img.toFixed(3)}|${S.zoom.toFixed(4)}|${S.pan.toFixed(4)}|${S.opacity.toFixed(3)}|${vp.w}|${vp.h}`;
+    const key = `${S.x.toFixed(4)}|${S.y.toFixed(4)}|${S.scale.toFixed(4)}|${S.rotY.toFixed(2)}|${S.rotZ.toFixed(2)}|${S.img.toFixed(3)}|${S.zoom.toFixed(4)}|${S.pan.toFixed(4)}|${S.opacity.toFixed(3)}|${S.dim.toFixed(3)}|${vp.w}|${vp.h}`;
     if (key === lastKey) return;
     lastKey = key;
     const tx = S.x * vp.w, ty = S.y * vp.h;
@@ -68,9 +68,9 @@ export function mount(root = document) {
     });
     const cur = Math.round(S.img);
     stage.style.opacity = S.opacity.toFixed(3);
-    // dissolve: the card softens as it fades out in The Drop
-    const bl = S.opacity < 0.985 ? (1 - S.opacity) * 16 : 0;
-    frame.style.filter = bl ? `blur(${bl.toFixed(1)}px)` : '';
+    // pushed back: a pale wash over the photo once the count takes over
+    dimEl.style.opacity = (S.dim * 0.55).toFixed(3);
+    chipEl.style.opacity = (1 - S.dim).toFixed(3);
   });
 
   // hover over the travelling photo (it sits behind the content, so hit-test it ourselves)
@@ -188,15 +188,21 @@ export function mount(root = document) {
     const mm = gsap.matchMedia();
     mm.add({ desk: '(min-width: 820px)', mob: '(max-width: 819px)' }, (c) => {
       const d = c.conditions.desk;
-      const step = (trigger, to, st = {}) => gsap.to(S, { ...to, ease: 'none', immediateRender: false, scrollTrigger: { trigger, start: 'top bottom', end: 'top top', scrub: true, ...st } });
-      step('#spec', { x: d ? -0.22 : 0, y: d ? 0 : -0.17, scale: d ? 1.1 : 0.72, rotY: 0, rotZ: 0, img: 1, zoom: 1.12, pan: 0 });
-      // The Drop: the card slides right, then dissolves — the giant count is revealed where it was
-      gsap.timeline({ scrollTrigger: { trigger: '#drop', start: 'top bottom', end: 'top 30%', scrub: true } })
-        .to(S, { x: d ? 0.22 : 0, y: d ? 0 : -0.19, scale: d ? 0.66 : 0.5, img: 2, zoom: 1.08, pan: 0, ease: 'none', duration: 0.55 })
-        .to(S, { scale: d ? 0.5 : 0.4, zoom: 1.2, opacity: 0, ease: 'power1.in', duration: 0.45 });
-      // the giant count surfaces as the photo dissolves
-      gsap.fromTo('.drop-last', { opacity: 0, scale: 0.88 }, { opacity: 1, scale: 1, ease: 'none', immediateRender: true,
-        scrollTrigger: { trigger: '#drop', start: d ? 'top 34%' : 'top 30%', end: 'top 2%', scrub: true } });
+      // Deterministic keyframes: every range is a fromTo between fixed states, so fast scrolling
+      // (or jumping) can never leave the card half-way or make it blink in and out.
+      const HERO = { x: 0, y: d ? 0.07 : 0.12, scale: d ? 0.96 : 0.8, img: 0, zoom: 1.06, pan: 0, opacity: 1, dim: 0 };
+      const SPEC = { x: d ? -0.22 : 0, y: d ? 0 : -0.17, scale: d ? 1.1 : 0.72, img: 1, zoom: 1.12, pan: 0, opacity: 1, dim: 0 };
+      // The Drop: the card slides under the giant 21, shrinks and fades back — the count takes the focus
+      const DROP = { x: d ? 0.24 : 0, y: d ? -0.02 : 0.1, scale: d ? 0.6 : 0.48, img: 2, zoom: 1.08, pan: 0, opacity: 0.55, dim: 1 };
+      const GONE = { ...DROP, scale: d ? 0.52 : 0.42, opacity: 0 };
+      const range = (trigger, from, to, start, end) => gsap.fromTo(S, { ...from }, { ...to, ease: 'none', immediateRender: false,
+        scrollTrigger: { trigger, start, end, scrub: 0.4 } });
+      range('#spec', HERO, SPEC, 'top bottom', 'top top');
+      range('#drop', SPEC, DROP, 'top bottom', 'top 20%');
+      range('#signal', DROP, GONE, 'top bottom', 'top 45%');
+      // the giant count surfaces as the photo sinks under it
+      gsap.fromTo('.drop-last', { opacity: 0, scale: 0.9 }, { opacity: 1, scale: 1, ease: 'none', immediateRender: true,
+        scrollTrigger: { trigger: '#drop', start: 'top 70%', end: 'top 15%', scrub: 0.4 } });
       detailsST = gsap.to(Z, { step: STEPS.length - 1, ease: 'none', scrollTrigger: { trigger: '#details', start: 'top top', end: d ? '+=460%' : '+=340%', pin: '[data-details-pin]', scrub: true } }).scrollTrigger;
     });
     ScrollTrigger.create({ trigger: '#details', start: 'top bottom', end: 'bottom top', onToggle: (s) => { Z.active = s.isActive; Z.dirty = true; media.style.visibility = s.isActive ? 'visible' : 'hidden'; } });

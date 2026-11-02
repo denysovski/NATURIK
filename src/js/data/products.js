@@ -18,6 +18,15 @@ const ALT = {
   'm1-detail-open': 'Jacket opened showing the inner lining',
   'm1-editorial-back': 'Back of the M1 Puffer showing collar and baffles',
   'm1-editorial-sleeve': 'Shoulder and sleeve of the M1 Puffer with chest print',
+  'm1-chest': 'Black M1 chest print and sleeve wordmark, close',
+  'm1-acid-rain': 'Black puffer splashed with green paint in the rain',
+  'm1-goggles': 'Green goggles over a knit balaclava and the black collar',
+  'm1-hand': 'Green hand print on the wet black chest panel',
+  'm1-zip': 'Offset two-way zip on the black shell',
+  'arctic-front': 'Arctic white puffer, three-quarter front view',
+  'arctic-back': 'Arctic white puffer from behind, collar up',
+  'arctic-shoulder': 'Arctic white shoulder with reflective wordmark',
+  'arctic-full': 'Arctic white puffer, front view with green goggles',
 };
 
 export const SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
@@ -70,12 +79,13 @@ function make(model, cw, stock, imgs, extra = {}) {
 }
 
 export const PRODUCTS = [
-  make('m1', 'obsidian', { XS: 2, S: 4, M: 6, L: 5, XL: 3, XXL: 1 }, ['m1-editorial-hero', 'm1-front', 'm1-three', 'm1-side', 'm1-back', 'm1-editorial-sleeve', 'm1-editorial-back', 'm1-detail-print', 'm1-detail-collar', 'm1-detail-zip'], { hero: true }),
-  make('m1', 'arctic', { XS: 1, S: 3, M: 5, L: 4, XL: 2, XXL: 0 }, ['m1-three', 3, 8, 'm1-detail-hood', 5]),
-  make('c3', 'obsidian', { XS: 4, S: 7, M: 9, L: 8, XL: 4, XXL: 2 }, [2, 'm1-editorial-sleeve', 7, 4]),
-  make('c3', 'arctic', { XS: 3, S: 6, M: 0, L: 6, XL: 3, XXL: 2 }, [6, 8, 'm1-back-three', 2]),
-  make('l7', 'obsidian', { XS: 1, S: 2, M: 3, L: 2, XL: 1, XXL: 1 }, [1, 'm1-editorial-back', 6, 3]),
-  make('l7', 'arctic', { XS: 0, S: 1, M: 2, L: 2, XL: 1, XXL: 0 }, [5, 4, 'm1-detail-open', 8]),
+  // black first, then white — the home row reads three Obsidian, three Arctic
+  make('m1', 'obsidian', { XS: 2, S: 4, M: 6, L: 5, XL: 3, XXL: 1 }, ['m1-editorial-hero', 'm1-front', 'm1-chest', 'm1-three', 'm1-side', 'm1-back', 'm1-editorial-sleeve', 'm1-editorial-back', 'm1-detail-print', 'm1-zip'], { hero: true }),
+  make('c3', 'obsidian', { XS: 4, S: 7, M: 9, L: 8, XL: 4, XXL: 2 }, ['m1-acid-rain', 'm1-hand', 'm1-goggles', 'm1-editorial-sleeve']),
+  make('l7', 'obsidian', { XS: 1, S: 2, M: 3, L: 2, XL: 1, XXL: 1 }, ['m1-goggles', 'm1-zip', 'm1-editorial-back', 'm1-chest']),
+  make('m1', 'arctic', { XS: 1, S: 3, M: 5, L: 4, XL: 2, XXL: 0 }, ['arctic-front', 'arctic-back', 'arctic-full', 'arctic-shoulder']),
+  make('c3', 'arctic', { XS: 3, S: 6, M: 0, L: 6, XL: 3, XXL: 2 }, ['arctic-shoulder', 'arctic-front', 'arctic-back']),
+  make('l7', 'arctic', { XS: 0, S: 1, M: 2, L: 2, XL: 1, XXL: 0 }, ['arctic-full', 'arctic-back', 'arctic-shoulder', 'arctic-front']),
 ];
 
 export const bySlug = (s) => PRODUCTS.find((p) => p.slug === s);
