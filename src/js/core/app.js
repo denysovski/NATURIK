@@ -13,6 +13,7 @@ import { bySlug } from '../data/products.js';
 import { toast } from '../components/toast.js';
 import { initLightbox } from '../components/lightbox.js';
 import { initSocialFab } from '../components/socialFab.js';
+import { initPromo } from '../components/promo.js';
 
 export function initApp() {
   initScroll();
@@ -22,6 +23,7 @@ export function initApp() {
   initUI();
   initLightbox();
   initSocialFab();
+  initPromo();
   // quick-add buttons on any product card
   document.addEventListener('click', (e) => {
     const b = e.target.closest('[data-quick-add]'); if (!b) return;

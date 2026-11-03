@@ -1306,3 +1306,42 @@ html.is-routing .mobile-menu, html.is-routing [data-cart] { pointer-events: none
 .fab.is-open .fab__menu li:nth-child(1) a { transition-delay: 0.15s; }
 html.is-routing .fab { opacity: 0; pointer-events: none; transition: opacity 0.3s; }
 @media (max-width: 819px) { .fab { left: 14px; bottom: 14px; } .fab__btn { width: 50px; height: 50px; } }
+
+/* first-visit promo popup */
+.promo { position: fixed; inset: 0; z-index: 140; display: grid; place-items: center; padding: 20px; }
+.promo[hidden] { display: none; }
+.promo__backdrop { position: absolute; inset: 0; background: rgba(5,5,6,0.55); backdrop-filter: blur(14px) saturate(1.1); -webkit-backdrop-filter: blur(14px) saturate(1.1); }
+.promo__card { position: relative; width: min(920px, 100%); display: grid; grid-template-columns: 0.9fr 1.1fr; border-radius: 26px; overflow: hidden; background: #f1f1ef; color: var(--c-ink);
+  box-shadow: 0 50px 120px -30px rgba(0,0,0,0.75); }
+.promo__media { position: relative; min-height: 440px; background: #111; }
+.promo__media img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.promo__badge { position: absolute; left: 18px; bottom: 18px; display: grid; place-items: center; width: 108px; height: 108px; border-radius: 50%; background: var(--c-acid); color: #000;
+  font: 700 2rem/1 var(--f-display); letter-spacing: -0.05em; box-shadow: 0 14px 34px -10px rgba(0,0,0,0.6); }
+.promo__body { display: grid; align-content: center; gap: 16px; padding: clamp(26px, 4vw, 48px); }
+.promo__kicker { margin: 0; font: 500 0.95rem/1 var(--f-display); letter-spacing: -0.01em; color: #55555b; }
+.promo__title { margin: 0; font: 500 clamp(2.2rem, 4vw, 3.4rem)/0.95 var(--f-display); letter-spacing: -0.055em; }
+.promo__title em { font-family: var(--f-art); font-style: normal; font-weight: 400; color: var(--c-cobalt); letter-spacing: 0; }
+.promo__text { margin: 0; max-width: 38ch; font: 500 1.05rem/1.3 var(--f-display); letter-spacing: -0.02em; color: #3a3a3f; }
+.promo__form { display: grid; grid-template-columns: 1fr auto; gap: 8px; margin-top: 6px; }
+.promo__input { height: 54px; padding: 0 18px; border-radius: 14px; border: 1px solid rgba(0,0,0,0.22); background: rgba(255,255,255,0.7); font: 500 1rem var(--f-display); color: var(--c-ink); }
+.promo__input:focus { outline: 2px solid var(--c-cobalt); outline-offset: 1px; }
+.promo__btn { display: inline-flex; align-items: center; gap: 10px; height: 54px; padding: 0 22px; border-radius: 14px; background: var(--c-acid); color: #000; font: 600 1rem var(--f-display); letter-spacing: -0.01em; transition: background-color 0.25s; }
+.promo__btn:hover { background: #8fd400; }
+.promo__btn svg { width: 18px; height: 18px; }
+.promo__err { grid-column: 1 / -1; margin: 0; min-height: 1em; font: 500 0.9rem var(--f-display); color: #c4002f; }
+.promo__done { display: grid; gap: 12px; }
+.promo__code { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 10px 10px 22px; border-radius: 16px; border: 1.5px dashed var(--c-ink); background: #fff; }
+.promo__code span { font: 700 2rem/1 var(--f-display); letter-spacing: 0.04em; }
+.promo__code button { height: 44px; padding: 0 18px; border-radius: 12px; background: var(--c-ink); color: var(--c-bone); font: 600 0.95rem var(--f-display); }
+.promo__fine { margin: 0; font: 500 0.8rem var(--f-display); color: #7a7a80; }
+.promo__x { position: absolute; z-index: 2; right: 14px; top: 14px; width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; background: rgba(255,255,255,0.9); color: #000; box-shadow: 0 6px 18px -6px rgba(0,0,0,0.4); }
+.promo__x svg { width: 18px; height: 18px; }
+.promo__x:hover { background: #000; color: #fff; }
+@media (max-width: 760px) {
+  .promo { align-items: end; padding: 10px; }
+  .promo__card { grid-template-columns: 1fr; border-radius: 22px; }
+  .promo__media { min-height: 170px; }
+  .promo__badge { width: 78px; height: 78px; font-size: 1.4rem; }
+  .promo__form { grid-template-columns: 1fr; }
+  .promo__btn { justify-content: center; }
+}
