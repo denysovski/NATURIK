@@ -242,6 +242,26 @@ export function mount(root = document) {
     initReveals(root);
   }, root === document ? undefined : root);
 
+  /* ---------- live-now line under "Live count" (demo: simulated numbers that drift up and down) ---------- */
+  {
+    const vEl = $('[data-live-view]'), bEl = $('[data-live-bag]');
+    if (vEl && bEl) {
+      const st = { v: 30 + ((Math.random() * 14) | 0), b: 5 + ((Math.random() * 5) | 0) };
+      vEl.textContent = st.v; bEl.textContent = st.b;
+      const roll = (el, to) => { const o = { n: +el.textContent }; gsap.to(o, { n: to, duration: 0.9, ease: 'power2.out', onUpdate: () => (el.textContent = Math.round(o.n)) });
+        el.classList.remove('is-bump'); void el.offsetWidth; el.classList.add('is-bump'); };
+      let tid = 0;
+      const step = () => {
+        const nv = Math.max(18, Math.min(64, st.v + ((Math.random() * 9) | 0) - 4));
+        const nb = Math.max(2, Math.min(Math.round(nv / 3), st.b + ((Math.random() * 5) | 0) - 2));
+        if (nv !== st.v) roll(vEl, nv); if (nb !== st.b) roll(bEl, nb);
+        st.v = nv; st.b = nb;
+        tid = setTimeout(step, 2600 + Math.random() * 2600);
+      };
+      tid = setTimeout(step, 2200);
+      cleanups.push(() => clearTimeout(tid));
+    }
+  }
   cleanups.push(mountSignal(root), mountBlob(root), mountLookOrbs(root), mountWho3d(root), mountPartners(root));
   measure();
   on(window, 'resize', measure);
