@@ -213,7 +213,7 @@ export function mount(root = document) {
       const range = (trigger, from, to, start, end, scrub = 0.4) => gsap.fromTo(S, { ...from }, { ...to, ease: 'none', immediateRender: false,
         scrollTrigger: { trigger, start, end, scrub } });
       range('#spec', HERO, SPEC, 'top bottom', 'top top');
-      range(root.querySelector('#spec').nextElementSibling, SPEC, OUT, 'top bottom', 'top top', true);   // gone before the next section settles
+      range(root.querySelector('#spec').nextElementSibling, SPEC, OUT, 'top bottom', 'top top');   // gone before the next section settles
       // the giant count surfaces as the photo sinks under it
       gsap.fromTo('.drop-last', { opacity: 0, scale: 0.9 }, { opacity: 1, scale: 1, ease: 'none', immediateRender: true,
         scrollTrigger: { trigger: '#drop', start: 'top 70%', end: 'top 15%', scrub: 0.4 } });
