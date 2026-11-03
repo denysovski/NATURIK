@@ -1282,3 +1282,27 @@ html.is-routing .mobile-menu, html.is-routing [data-cart] { pointer-events: none
 .curtain__meta [data-curtain-label] { font-weight: 700; color: #000; }
 .curtain__track { stroke: rgba(0,0,0,0.12) !important; }
 .curtain__arc { stroke: var(--c-acid) !important; }
+
+/* floating social button (bottom-left) */
+.fab { position: fixed; left: 20px; bottom: 20px; z-index: 90; display: grid; justify-items: start; gap: 10px; }
+.fab__btn { position: relative; width: 56px; height: 56px; border-radius: 50%; background: var(--c-acid); color: #000; box-shadow: 0 14px 34px -10px rgba(0,0,0,0.55); transition: transform 0.5s var(--ease-out), background-color 0.3s; }
+.fab__btn:hover { transform: scale(1.06); }
+.fab__btn i { position: absolute; left: 50%; top: 50%; width: 20px; height: 2px; margin: -1px 0 0 -10px; border-radius: 2px; background: currentColor; transition: transform 0.5s var(--ease-out); }
+.fab__btn i:last-child { transform: rotate(90deg); }
+.fab.is-open .fab__btn { background: #fff; }
+.fab.is-open .fab__btn i:first-child { transform: rotate(45deg); }
+.fab.is-open .fab__btn i:last-child { transform: rotate(135deg); }
+.fab__menu { order: -1; display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; pointer-events: none; }
+.fab__menu a { display: inline-flex; align-items: center; gap: 10px; height: 48px; padding: 0 18px 0 6px; border-radius: 999px; background: rgba(12,12,14,0.92); color: #fff; text-decoration: none;
+  font: 500 1rem/1 var(--f-display); letter-spacing: -0.02em; box-shadow: 0 12px 30px -12px rgba(0,0,0,0.6);
+  opacity: 0; transform: translateY(16px) scale(0.85); transform-origin: 28px 50%; transition: opacity 0.35s, transform 0.5s var(--ease-out), background-color 0.25s; }
+.fab__menu a svg { width: 36px; height: 36px; padding: 9px; border-radius: 50%; background: var(--c-acid); color: #000; }
+.fab__menu a:hover { background: #fff; color: #000; }
+.fab.is-open .fab__menu { pointer-events: auto; }
+.fab.is-open .fab__menu a { opacity: 1; transform: none; }
+.fab.is-open .fab__menu li:nth-child(4) a { transition-delay: 0s; }
+.fab.is-open .fab__menu li:nth-child(3) a { transition-delay: 0.05s; }
+.fab.is-open .fab__menu li:nth-child(2) a { transition-delay: 0.1s; }
+.fab.is-open .fab__menu li:nth-child(1) a { transition-delay: 0.15s; }
+html.is-routing .fab { opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+@media (max-width: 819px) { .fab { left: 14px; bottom: 14px; } .fab__btn { width: 50px; height: 50px; } }
