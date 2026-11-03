@@ -16,7 +16,8 @@ Built as a fast, animated single-page experience with a full (simulated) shop an
 | **Pages** | Home, Shop (with product detail), Contact — switched without reloads |
 | **Shop** | Filters, sorting, 2/3-column view, product gallery, size finder, waitlist for sold-out sizes |
 | **Cart & checkout** | Slide-in bag, discount codes, 4-step checkout with card validation (demo only, no payments) |
-| **Motion** | Scroll-driven photo stage, pinned zoom section, page transitions, counters, glitch / tracker effects |
+| **Motion** | Scroll-driven photo stage, zoom-in sections, page transitions with a tracker/terminal overlay, counters, glitch effects |
+| **Extras** | First-visit 10% popup with newsletter sign-up, live "people looking now" line, floating social button |
 | **3D** | A green blob and three small glossy objects, rendered with three.js only when on screen |
 | **SEO** | Meta + Open Graph, JSON-LD (Product, ItemList, FAQ, Organization), sitemap, robots, 404 |
 
@@ -24,11 +25,16 @@ Built as a fast, animated single-page experience with a full (simulated) shop an
 
 | | |
 |---|---|
-| ![Warmth](docs/screens/02-warmth.jpg) **Portable summer** — the photo card travels with the story, specs count up as they scroll in. | ![Partners](docs/screens/03-partners.jpg) **Partners** — a 7×2 grid that slides shut over "Our partners"; tracker cells glitch and stay connected. |
-| ![Live count](docs/screens/04-live-count.jpg) **Live count** — stock per size, pick a size and add straight to the bag. | ![Signal](docs/screens/05-signal.jpg) **Signal** — flashing phrases, each one a link to a part of the site. |
+| ![Warmth](docs/screens/02-warmth.jpg) **Portable summer** — the photo card travels with the story, specs count up as they scroll in. | ![Our partners](docs/screens/03b-our-partners.jpg) **Our partners** — the section zooms in to fill the screen before the grid closes. |
+| ![Partners](docs/screens/03-partners.jpg) **Partners grid** — 7×2, one partner per column, info cards and connected tracker cells. Open a partner for details. | ![Live count](docs/screens/04-live-count.jpg) **Live count** — who's looking right now, stock per size, add straight to the bag. |
+| ![Signal](docs/screens/05-signal.jpg) **Signal** — flashing phrases, each one a link to a part of the site. | ![Promo](docs/screens/15-promo.jpg) **First visit** — leave an email, get the 10% code instantly. |
 | ![Who we are](docs/screens/06-who-we-are.jpg) **Who we are** — a soft 3D blob that swells on hover. | ![Closer](docs/screens/07-closer.jpg) **Closer** — pinned zoom into six details, with a green crosshair and a clickable index. |
 | ![Who it's for](docs/screens/08-who-its-for.jpg) **Who it's for** — one 3D object per type of wearer. | ![Lookbook](docs/screens/09-lookbook.jpg) **Lookbook** — horizontal scroll, mixed frame sizes, drifting light. |
 | ![Drop row](docs/screens/10-drop-row.jpg) **Drop 01 — six pieces** — Obsidian on top, Arctic below, photo swap on hover. | ![Contact](docs/screens/13-contact.jpg) **Contact** — form, studio details, socials. |
+
+## Floating social menu
+
+![Social menu](docs/screens/14-social.jpg)
 
 ## Shop
 
@@ -51,6 +57,7 @@ Built as a fast, animated single-page experience with a full (simulated) shop an
 - Card number **4242 4242 4242 4242**, any future date, any CVC
 - Discount codes **DROP01** (−10 %) and **CELL78** (−7.8 %)
 - Nothing is charged and no order is sent — the bag lives in your browser
+- The "people looking right now" numbers are simulated for the demo
 
 ## Tech
 
