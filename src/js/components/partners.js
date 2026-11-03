@@ -140,18 +140,33 @@ export function mountPartners(root) {
     const cells = [...grid.querySelectorAll('.pcell')], half = cols / 2;
     const left = cells.filter((_, k) => (k % cols) < Math.floor(half)), right = cells.filter((_, k) => (k % cols) >= Math.ceil(half)), mid = cells.filter((_, k) => cols % 2 && (k % cols) === Math.floor(half));
     const intro = sec.querySelector('[data-partners-intro]');
+    // wrap everything in a frame so the section can "zoom" into the window like Closer does
+    let frame = sec.querySelector('.partners__frame');
+    if (!frame) { frame = document.createElement('div'); frame.className = 'partners__frame'; while (sec.firstChild) frame.appendChild(sec.firstChild); sec.appendChild(frame); }
+    const sts = [];
+    // 1) approach: a rounded, smaller card grows to fill the screen
+    sts.push(gsap.fromTo(frame, { scale: 0.82, borderRadius: 32 }, { scale: 1, borderRadius: 0, ease: 'none', immediateRender: true,
+      scrollTrigger: { trigger: sec, start: 'top bottom', end: 'top top', scrub: 0.8 } }).scrollTrigger);
+    // 2) held on screen: "Our partners" breathes for a moment, the halves close, then it rests before letting go
     const tl = gsap.timeline({ scrollTrigger: mobile
-      ? { trigger: sec, start: 'top 85%', end: 'top 10%', scrub: 0.5 }
-      : { trigger: sec, start: 'top top', end: () => `+=${innerHeight * 0.9}`, pin: true, scrub: 0.5, refreshPriority: 1, anticipatePin: 1 } });
-    tl.fromTo(left, { xPercent: -100 * Math.ceil(half) }, { xPercent: 0, ease: 'power2.inOut', duration: 1 }, 0)
-      .fromTo(right, { xPercent: 100 * Math.ceil(half) }, { xPercent: 0, ease: 'power2.inOut', duration: 1 }, 0)
-      .fromTo(mid, { opacity: 0, scaleY: 0.2 }, { opacity: 1, scaleY: 1, ease: 'power2.out', duration: 0.35 }, 0.65)
-      .fromTo(intro, { scale: 1, opacity: 1 }, { scale: 0.86, opacity: 0, ease: 'power1.in', duration: 0.35 }, 0.62)
-      .fromTo(svg, { opacity: 0 }, { opacity: 1, ease: 'none', duration: 0.15 }, 0.85);
+      ? { trigger: sec, start: 'top 80%', end: 'top 5%', scrub: 0.8 }
+      : { trigger: sec, start: 'top top', end: () => `+=${innerHeight * 1.5}`, pin: true, scrub: 1, refreshPriority: 1, anticipatePin: 1 } });
+    tl.to({}, { duration: 0.2 })
+      .fromTo(left, { xPercent: -100 * Math.ceil(half) }, { xPercent: 0, ease: 'power3.inOut', duration: 1 }, 0.2)
+      .fromTo(right, { xPercent: 100 * Math.ceil(half) }, { xPercent: 0, ease: 'power3.inOut', duration: 1 }, 0.2)
+      .fromTo(mid, { opacity: 0, scaleY: 0.2 }, { opacity: 1, scaleY: 1, ease: 'power2.out', duration: 0.35 }, 0.85)
+      .fromTo(intro, { scale: 1, opacity: 1 }, { scale: 0.9, opacity: 0, ease: 'power1.in', duration: 0.35 }, 0.82)
+      .fromTo(svg, { opacity: 0 }, { opacity: 1, ease: 'none', duration: 0.15 }, 1.05)
+      .to({}, { duration: mobile ? 0.05 : 0.5 });                       // hold the finished grid
+    // 3) leaving: the grid eases back into a card as Live count slides up
+    const next = sec.nextElementSibling;
+    if (next) sts.push(gsap.fromTo(frame, { scale: 1, borderRadius: 0 }, { scale: 0.9, borderRadius: 32, ease: 'none', immediateRender: false,
+      scrollTrigger: { trigger: next, start: 'top bottom', end: 'top 35%', scrub: 0.8 } }).scrollTrigger);
+    sec._sts = sts;
     st = tl.scrollTrigger;
   }
   let timer = 0;
   const io = new IntersectionObserver(([e]) => { clearInterval(timer); if (e.isIntersecting) timer = setInterval(glitchStep, 160); });
   io.observe(sec);
-  return () => { st?.kill(true); clearInterval(timer); io.disconnect(); sec.removeEventListener('click', click); };
+  return () => { st?.kill(true); sec._sts?.forEach((t) => t.kill(true)); clearInterval(timer); io.disconnect(); sec.removeEventListener('click', click); };
 }

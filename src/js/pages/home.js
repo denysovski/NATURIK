@@ -209,11 +209,11 @@ export function mount(root = document) {
       const HERO = { x: 0, y: d ? 0.07 : 0.12, scale: d ? 0.96 : 0.8, img: 0, zoom: 1.06, pan: 0, opacity: 1, dim: 0 };
       const SPEC = { x: d ? -0.22 : 0, y: d ? 0 : -0.17, scale: d ? 1.1 : 0.72, img: 1, zoom: 1.12, pan: 0, opacity: 1, dim: 0 };
       // after Warmth the card simply leaves with the section (moves up 1:1 with the scroll) — no fade, no travel
-      const OUT = { ...SPEC, y: SPEC.y - 1.15 };
+      const OUT = { ...SPEC, y: SPEC.y - 1.05 };
       const range = (trigger, from, to, start, end, scrub = 0.4) => gsap.fromTo(S, { ...from }, { ...to, ease: 'none', immediateRender: false,
         scrollTrigger: { trigger, start, end, scrub } });
       range('#spec', HERO, SPEC, 'top bottom', 'top top');
-      range(root.querySelector('#spec').nextElementSibling, SPEC, OUT, 'top bottom', 'top -15%', true);
+      range(root.querySelector('#spec').nextElementSibling, SPEC, OUT, 'top bottom', 'top top', true);   // gone before the next section settles
       // the giant count surfaces as the photo sinks under it
       gsap.fromTo('.drop-last', { opacity: 0, scale: 0.9 }, { opacity: 1, scale: 1, ease: 'none', immediateRender: true,
         scrollTrigger: { trigger: '#drop', start: 'top 70%', end: 'top 15%', scrub: 0.4 } });

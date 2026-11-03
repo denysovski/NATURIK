@@ -1357,3 +1357,15 @@ html.is-routing .fab { opacity: 0; pointer-events: none; transition: opacity 0.3
 @keyframes live-ping { from { transform: scale(0.5); opacity: 0.9; } to { transform: scale(1.6); opacity: 0; } }
 .live-now__sep { width: 1px; height: 16px; background: rgba(0,0,0,0.2); }
 @media (max-width: 819px) { .live-now { font-size: 0.9rem; border-radius: 16px; } .live-now__sep { display: none; } }
+
+/* partners: zoom frame, calmer background, green stars, no glitch on the title */
+.partners { overflow: visible !important; background: transparent !important; }
+.partners__frame { position: relative; overflow: hidden; background: #050506; transform-origin: 50% 50%; will-change: transform; }
+.partners__noise { opacity: 0.07 !important; animation-duration: 1.6s !important; }
+.partners__scan { background: repeating-linear-gradient(0deg, rgba(255,255,255,0.018) 0 1px, transparent 1px 5px), radial-gradient(closest-side, transparent 62%, rgba(0,0,0,0.6)) !important; }
+.pstar { fill: var(--c-acid) !important; filter: drop-shadow(0 0 8px rgba(182,255,46,0.75)) drop-shadow(0 0 18px rgba(182,255,46,0.35)) !important; }
+.pword { display: inline-block; text-shadow: 0 0 60px rgba(182,255,46,0.25); }
+.pcell--glitch.is-jolt .gl__txt { transform: none !important; }
+.pcell--glitch.is-jolt::after { opacity: 0.5; }
+/* light surround so the partners card visibly zooms in and out (like Closer) */
+.partners { background: #d6d6d5 !important; }
