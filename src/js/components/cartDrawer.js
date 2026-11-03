@@ -85,7 +85,8 @@ export function initCart() {
           <div>
             <p class="line-item__name">${i.product.name}</p>
             <p class="line-item__meta">${i.product.colorName} · Size ${i.size}</p>
-            <p class="line-item__meta">${i.product.stock[i.size] <= 2 ? `<span class="low-note">Only ${i.product.stock[i.size]} left in ${i.size}</span>` : 'In stock · ships in 24 h'}</p>
+            <p class="line-item__meta">${i.product.stock[i.size] <= 2 ? `<span class="low-note">Only ${i.product.stock[i.size]} left in ${i.size}</span>` : 'In stock'}</p>
+            <p class="line-item__meta line-item__ship">Ships in 24 h</p>
             <div class="line-item__row">
               <div class="qty" role="group" aria-label="Quantity"><button type="button" data-dec aria-label="Decrease quantity">−</button><output>${i.qty}</output><button type="button" data-inc aria-label="Increase quantity">+</button></div>
               <button class="line-item__remove" type="button" data-remove>Remove</button>

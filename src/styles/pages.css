@@ -1267,3 +1267,8 @@ body.is-locked { overflow: visible; }
 /* hero 21/78: clear space between the count and the slash */
 .hero__stock-num { display: inline-flex; align-items: baseline; gap: 0.12em; }
 .hero__stock-num [data-m1-left] { margin-right: 0.04em; }
+
+/* bag: wider blue free-shipping meter, bold dispatch line */
+.ship-meter .stock__bar { height: 8px !important; border-radius: 999px; overflow: hidden; }
+.ship-meter .stock__fill { background: var(--c-cobalt) !important; border-radius: 999px; }
+.line-item__ship { margin-top: 2px; font-weight: 600; color: var(--c-ink) !important; }
