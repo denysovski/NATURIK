@@ -104,25 +104,26 @@ function cover(dest) {
   const label = $c('[data-curtain-label]'); if (label) label.textContent = LABEL[dest] || 'Loading';
   const ch = chars();
   fxStart(dest);
+  document.documentElement.classList.add('is-routing');           // nav slides away and can't be clicked
   // never let a paused animation (background tab) block navigation
   return new Promise((r) => { setTimeout(r, 1400); gsap.timeline({ onComplete: r })
     .set(panel, { visibility: 'visible', yPercent: 100 })
     .set(ch, { yPercent: 110 })
-    .set('.curtain__meta', { opacity: 0, y: 12 })
+    .set('.curtain__meta', { opacity: 0, y: 12, scale: 0.92 })
     .to(panel, { yPercent: 0, duration: 0.6, ease: 'expo.inOut' })
     .to('main', { opacity: 0.5, duration: 0.6, ease: 'expo.inOut' }, 0)
     .to(ch, { yPercent: 0, duration: 0.6, ease: 'expo.out', stagger: 0.035 }, 0.3)
-    .to('.curtain__meta', { opacity: 1, y: 0, duration: 0.4, ease: 'power2.out' }, 0.4); });
+    .to('.curtain__meta', { opacity: 1, y: 0, scale: 1, duration: 0.5, ease: 'expo.out' }, 0.4); });
 }
 function reveal() {
   const panel = $c('[data-curtain-panel]');
-  if (reduceMotion || !panel) { gsap.set('main', { clearProps: 'opacity' }); return; }
+  if (reduceMotion || !panel) { gsap.set('main', { clearProps: 'opacity' }); document.documentElement.classList.remove('is-routing'); return; }
   gsap.timeline({ delay: 0.15 })
     .to('.curtain__ch', { yPercent: -110, duration: 0.45, ease: 'expo.in', stagger: 0.02 }, 0)
-    .to('.curtain__meta', { opacity: 0, duration: 0.25 }, 0)
+    .to('.curtain__meta', { opacity: 0, y: -8, scale: 0.94, duration: 0.35, ease: 'power2.in' }, 0)
     .to(panel, { yPercent: -100, duration: 0.75, ease: 'expo.inOut' }, 0.2)
     .fromTo('main', { opacity: 0.5 }, { opacity: 1, duration: 0.6, ease: 'power2.out', clearProps: 'opacity' }, 0.35)
-    .set(panel, { visibility: 'hidden', yPercent: 100, onComplete: fxStop });
+    .set(panel, { visibility: 'hidden', yPercent: 100, onComplete: () => { fxStop(); document.documentElement.classList.remove('is-routing'); } });
 }
 
 async function go(href, { push = true } = {}) {
@@ -163,6 +164,7 @@ async function go(href, { push = true } = {}) {
   } catch {
     location.href = url.href;                      // graceful fallback: real navigation
   } finally {
+    setTimeout(() => document.documentElement.classList.remove('is-routing'), 2600);   // never leave the nav hidden
     window.removeEventListener('wheel', swallow); window.removeEventListener('touchmove', swallow);
     lenis?.start();
     busy = false;
