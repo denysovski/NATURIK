@@ -1369,3 +1369,11 @@ html.is-routing .fab { opacity: 0; pointer-events: none; transition: opacity 0.3
 .pcell--glitch.is-jolt::after { opacity: 0.5; }
 /* light surround so the partners card visibly zooms in and out (like Closer) */
 .partners { background: #d6d6d5 !important; }
+
+/* signal: cheaper flash (no full-screen wash), boxes on their own layers, lighter glow */
+.signal.is-flash::after, .signal.is-flash-b::after { content: none !important; }
+.signal.is-flash-b .signal__link { animation: sig-flash-b 0.24s steps(2, end) 1; }
+@keyframes sig-flash-b { 0% { background: var(--c-acid); color: #000; } 50% { background: var(--c-cobalt); color: var(--c-acid); } 100% { background: transparent; } }
+.trk { will-change: transform; box-shadow: 0 0 8px rgba(182,255,46,0.3) !important; }
+.trk--blue { box-shadow: 0 0 8px rgba(22,56,255,0.45) !important; }
+.signal__lines { will-change: contents; }

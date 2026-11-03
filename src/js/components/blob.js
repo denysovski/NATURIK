@@ -134,7 +134,13 @@ export function mountBlob(root) {
       mesh.geometry.dispose(); mesh.material.dispose(); renderer.dispose(); renderer.domElement.remove(); };
   };
 
-  const near = new IntersectionObserver(([e]) => { if (e.isIntersecting) { near.disconnect(); boot(); } }, { rootMargin: '800px 0px' });
+  // heavy setup (module load, environment, shader compile) runs in idle time soon after the page loads,
+  // not while the visitor is scrolling past nearby sections; drawing still happens only on screen.
+  let started = false;
+  const go = () => { if (started || dead) return; started = true; boot(); };
+  const idleStart = () => (window.requestIdleCallback ? requestIdleCallback(go, { timeout: 5000 }) : setTimeout(go, 1500));
+  const kick = setTimeout(idleStart, 2600);
+  const near = new IntersectionObserver(([e]) => { if (e.isIntersecting) { near.disconnect(); go(); } }, { rootMargin: '600px 0px' });
   near.observe(host);
-  return () => { dead = true; near.disconnect(); cleanup(); };
+  return () => { dead = true; clearTimeout(kick); near.disconnect(); cleanup(); };
 }

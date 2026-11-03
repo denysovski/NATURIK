@@ -125,7 +125,13 @@ export function mountWho3d(root) {
       env.dispose(); renderer.dispose(); canvas.remove(); };
   };
   // start early (well before the section) so nothing is compiled while you scroll into it
-  const near = new IntersectionObserver(([e]) => { if (e.isIntersecting) { near.disconnect(); boot(); } }, { rootMargin: '2200px 0px' });
+  // heavy setup (module load, environment, shader compile) runs in idle time soon after the page loads,
+  // not while the visitor is scrolling past nearby sections; drawing still happens only on screen.
+  let started = false;
+  const go = () => { if (started || dead) return; started = true; boot(); };
+  const idleStart = () => (window.requestIdleCallback ? requestIdleCallback(go, { timeout: 5000 }) : setTimeout(go, 1500));
+  const kick = setTimeout(idleStart, 3400);
+  const near = new IntersectionObserver(([e]) => { if (e.isIntersecting) { near.disconnect(); go(); } }, { rootMargin: '600px 0px' });
   near.observe(grid);
-  return () => { dead = true; near.disconnect(); cleanup(); };
+  return () => { dead = true; clearTimeout(kick); near.disconnect(); cleanup(); };
 }

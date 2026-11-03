@@ -61,13 +61,20 @@ export function mountSignal(root) {
     b.img.style.backgroundPosition = `${rnd(0, 100)}% ${rnd(0, 100)}%`;
     b.el.classList.toggle('has-img', showImg);
     b.lab.textContent = Math.random() < 0.6 ? `X${pad3((x / W) * 160)}Y${pad3((y / H) * 160)}` : pick(WORDS);
-    const to = { x, y, w, h };
-    if (instant) { Object.assign(b, to); apply(b); return; }
-    gsap.to(b, { ...to, duration: 0.32, ease: 'expo.out', onUpdate: () => apply(b) });
+    // size snaps (one layout per move), position glides on the compositor (transform only)
+    b.w = w; b.h = h; b.el.style.width = `${w | 0}px`; b.el.style.height = `${h | 0}px`;
+    if (instant) { b.x = x; b.y = y; b.el.style.transform = `translate3d(${x | 0}px, ${y | 0}px, 0)`; return; }
+    b.fx = b.x; b.fy = b.y; b.tx = x; b.ty = y; moving.add(b);
   };
-  const apply = (b) => {
-    b.el.style.transform = `translate3d(${b.x.toFixed(1)}px, ${b.y.toFixed(1)}px, 0)`;
-    b.el.style.width = `${b.w.toFixed(1)}px`; b.el.style.height = `${b.h.toFixed(1)}px`;
+  const moving = new Set();
+  const glide = () => {
+    if (!moving.size) return;
+    const list = [...moving]; moving.clear();
+    const o = { t: 0 };
+    gsap.to(o, { t: 1, duration: 0.32, ease: 'expo.out', onUpdate: () => {
+      list.forEach((b) => { b.x = b.fx + (b.tx - b.fx) * o.t; b.y = b.fy + (b.ty - b.fy) * o.t; b.el.style.transform = `translate3d(${b.x.toFixed(1)}px, ${b.y.toFixed(1)}px, 0)`; });
+      draw();                                   // lines are redrawn only while something moves
+    } });
   };
 
   // dashed curves: each box to the next, plus the hub to the phrase
@@ -84,7 +91,7 @@ export function mountSignal(root) {
   };
 
   // phrase flip: scramble then settle, with a flash
-  let pi = 0, hold = false;
+  let pi = 0, hold = false, flip = false;
   const setPhrase = (i) => {
     const p = PHRASES[i];
     link.href = p.href;
@@ -92,7 +99,8 @@ export function mountSignal(root) {
     idxEl.textContent = String(i + 1).padStart(2, '0');
     const final = p.t;
     if (reduceMotion) { text.textContent = final; return; }
-    sec.classList.remove('is-flash'); void sec.offsetWidth; sec.classList.add('is-flash');
+    // restart the flash without forcing a layout: alternate between two identical animations
+    flip = !flip; sec.classList.toggle('is-flash', flip); sec.classList.toggle('is-flash-b', !flip);
     const o = { k: 0 };
     gsap.to(o, { k: 1, duration: 0.28, ease: 'none', onUpdate: () => {
       const n = Math.floor(o.k * final.length);
@@ -104,12 +112,12 @@ export function mountSignal(root) {
   const step = () => {
     if (!hold) { pi = (pi + 1) % PHRASES.length; setPhrase(pi); }
     // move a handful of boxes each beat, reshuffle the links now and then
-    for (let k = 0; k < (mobile ? 3 : 5); k++) place(pick(boxes));
+    for (let k = 0; k < (mobile ? 2 : 4); k++) place(pick(boxes));
     if (++beat % 3 === 0) order = order.sort(() => Math.random() - 0.5);
+    glide();
   };
-  const loop = () => { draw(); };
-  const start = () => { if (running || reduceMotion) return; running = true; gsap.ticker.add(loop); timer = setInterval(step, 780); };
-  const stop = () => { running = false; gsap.ticker.remove(loop); clearInterval(timer); };
+  const start = () => { if (running || reduceMotion) return; running = true; timer = setInterval(step, 820); };
+  const stop = () => { running = false; clearInterval(timer); };
 
   size(); boxes.forEach((b) => place(b, true)); draw(); setPhrase(0);
   const io = new IntersectionObserver(([e]) => (e.isIntersecting ? start() : stop()), { rootMargin: '100px' });
