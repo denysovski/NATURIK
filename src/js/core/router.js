@@ -38,7 +38,7 @@ function syncNav(page) {
 // Transition: a black panel with the wordmark and a loading ring rises over the page,
 // the next page is swapped behind it, then the panel lifts away.
 const $c = (sel) => document.querySelector(sel);
-const LABEL = { home: 'Home', shop: 'Shop', contact: 'Contact' };
+const LABEL = { home: 'Home', shop: 'Shop', contact: 'Contact', privacy: 'Privacy', terms: 'Terms' };
 let wordSplit = false;
 function chars() {
   const w = $c('[data-curtain-word]');

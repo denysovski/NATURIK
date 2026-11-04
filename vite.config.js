@@ -4,12 +4,16 @@ import { readFileSync } from 'node:fs';
 import { PRODUCTS, totalStock, SITE_URL } from './src/js/data/products.js';
 import { productCard } from './src/js/components/productCard.js';
 import { FAQ } from './src/js/data/faq.js';
+import { LEGAL } from './src/js/data/legal.js';
 
 const esc = (t) => t.replace(/&/g, '&amp;').replace(/</g, '&lt;');
 const accordionHTML = (items) => `<div class="acc" data-acc-single>${items.map(([q, a], i) => `<div class="acc__item"><button class="acc__btn" type="button" aria-expanded="${i === 0}" aria-controls="faq-${i}"><span>${esc(q)}</span><span class="acc__icon" aria-hidden="true"></span></button><div class="acc__panel" id="faq-${i}" role="region"><div><div class="acc__body">${esc(a)}</div></div></div></div>`).join('')}</div>`;
 
 // Build-time content so crawlers (and first paint) get real product markup, not an empty grid.
+const legalPage = (...keys) => keys.map((k) => `<section class="legal-block" id="${k}"><h2>${LEGAL[k].t}</h2>${LEGAL[k].b}</section>`).join('');
 const PRERENDER = {
+  'legal-privacy': () => legalPage('privacy', 'cookies', 'imprint'),
+  'legal-terms': () => legalPage('terms', 'withdrawal', 'shipping', 'returns', 'care'),
   faq: () => accordionHTML(FAQ),
   'ld-faq': () => `<script type="application/ld+json">${JSON.stringify({ '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: FAQ.map(([q, a]) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a } })) })}</script>`,
   products: () => PRODUCTS.map((p, i) => productCard(p, { eager: i < 3, index: i })).join(''),
@@ -50,6 +54,8 @@ export default defineConfig({
         home: resolve(__dirname, 'index.html'),
         shop: resolve(__dirname, 'shop.html'),
         contact: resolve(__dirname, 'contact.html'),
+        privacy: resolve(__dirname, 'privacy.html'),
+        terms: resolve(__dirname, 'terms.html'),
       },
     },
     chunkSizeWarningLimit: 900,
