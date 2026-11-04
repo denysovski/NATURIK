@@ -1,4 +1,5 @@
 // Boot sequence shared by every page.
+import { initAnalytics } from './analytics.js';
 import '../../styles/tokens.css';
 import '../../styles/base.css';
 import '../../styles/components.css';
@@ -24,6 +25,7 @@ export function initApp() {
   initLightbox();
   initSocialFab();
   initPromo();
+  initAnalytics();
   // quick-add buttons on any product card
   document.addEventListener('click', (e) => {
     const b = e.target.closest('[data-quick-add]'); if (!b) return;
