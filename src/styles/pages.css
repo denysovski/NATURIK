@@ -1607,3 +1607,10 @@ html.is-routing .fab { opacity: 0; pointer-events: none; transition: opacity 0.3
   -webkit-mask-image: linear-gradient(transparent 0, #000 7%, #000 93%, transparent 100%); mask-image: linear-gradient(transparent 0, #000 7%, #000 93%, transparent 100%); padding: 0 0.005em; }
 .roll__col { display: flex; flex-direction: column; will-change: transform; }
 .roll__col > span { display: block; height: 1em; line-height: 1; text-align: center; }
+/* rolling digits: taller windows so commas and round tops are never clipped; columns don't shift */
+.roll__c { height: 1.18em; margin: -0.09em 0; -webkit-mask-image: linear-gradient(transparent 0, #000 9%, #000 91%, transparent 100%); mask-image: linear-gradient(transparent 0, #000 9%, #000 91%, transparent 100%); }
+.roll__col > span { height: 1.18em; line-height: 1.18; }
+.clock-stats dd { font-variant-numeric: tabular-nums; min-width: 2.4ch; }
+/* brand shape fades out towards the clock (right on desktop, bottom on phones) */
+.clock-sec__bg { opacity: 0.05; -webkit-mask-image: linear-gradient(90deg, #000 0%, #000 34%, rgba(0,0,0,0.25) 52%, transparent 70%); mask-image: linear-gradient(90deg, #000 0%, #000 34%, rgba(0,0,0,0.25) 52%, transparent 70%); }
+@media (max-width: 900px) { .clock-sec__bg { -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 30%, transparent 62%); mask-image: linear-gradient(180deg, #000 0%, #000 30%, transparent 62%); } }

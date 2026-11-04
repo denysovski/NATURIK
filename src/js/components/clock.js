@@ -43,7 +43,7 @@ function roll(el, str, { spin = 0, delay = 0 } = {}) {
     seq.push(to);
     col.innerHTML = seq.map((c) => `<span>${c === ' ' ? '&nbsp;' : c}</span>`).join('');
     const order = chars.length - 1 - i;                        // the last digit moves first, like a counter
-    gsap.fromTo(col, { yPercent: 0 }, { yPercent: -100 * (seq.length - 1) / seq.length, duration: spin ? 1.1 + order * 0.12 : 0.55,
+    gsap.fromTo(col, { yPercent: 0 }, { yPercent: -100 * (seq.length - 1) / seq.length, duration: spin ? 1.1 + order * 0.12 : 0.8,
       ease: spin ? 'expo.out' : 'power3.inOut', delay: delay + (spin ? order * 0.04 : order * 0.06 + k++ * 0.02),
       onComplete: () => { col.innerHTML = `<span>${to}</span>`; gsap.set(col, { yPercent: 0 }); } });
   });
@@ -87,7 +87,7 @@ export function mountClock(root) {
     if (h < cur || real) return hours[h];
     return Math.max(1, Math.round(hours[h] * ((d.getMinutes() * 60 + d.getSeconds()) / 3600)));   // current hour fills up
   };
-  const bumpLive = () => { if (real) return; const target = Math.max(3, Math.round(hours[now().getHours()] / 9)); live = live ? Math.round(live + (target - live) * 0.3 + (Math.random() * 4 - 2)) : target; };
+  const bumpLive = () => { if (real) return; const target = Math.max(3, Math.round(hours[now().getHours()] / 9)); live = live ? Math.round(live + Math.sign(target - live) * (Math.random() < 0.5 ? 1 : 0) + (Math.random() < 0.3 ? (Math.random() < 0.5 ? -1 : 1) : 0)) : target; };
   bumpLive();
   let grow = reduceMotion ? 1 : 0, spinNext = false;           // 0 → 1 as the section comes in
   const drawStats = () => {
@@ -143,7 +143,9 @@ export function mountClock(root) {
   setHands(); drawStats();
 
   // live counter wobbles a little every few seconds (sample mode)
-  const wob = setInterval(() => { if (raf) { bumpLive(); drawStats(); } }, 4000);
+  let wob = 0;
+  const tickLive = () => { wob = setTimeout(() => { if (raf) { bumpLive(); drawStats(); } tickLive(); }, 7000 + Math.random() * 6000); };
+  tickLive();
 
   if (STATS_URL) fetch(STATS_URL).then((r) => r.json()).then((j) => {
     if (Array.isArray(j.hours) && j.hours.length === 24) { hours = j.hours; real = true; live = j.now ?? live; drawStats(); }
@@ -163,5 +165,5 @@ export function mountClock(root) {
     } }));
   } else el.classList.add('is-on');
 
-  return () => { pause(); io.disconnect(); clearInterval(wob); sts.forEach((t) => t.kill()); gsap.set(el, { clearProps: 'all' }); };
+  return () => { pause(); io.disconnect(); clearTimeout(wob); sts.forEach((t) => t.kill()); gsap.set(el, { clearProps: 'all' }); };
 }
