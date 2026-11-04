@@ -144,24 +144,32 @@ export function mountPartners(root) {
     let frame = sec.querySelector('.partners__frame');
     if (!frame) { frame = document.createElement('div'); frame.className = 'partners__frame'; while (sec.firstChild) frame.appendChild(sec.firstChild); sec.appendChild(frame); }
     const sts = [];
-    // 1) approach: a rounded, smaller card grows to fill the screen
-    sts.push(gsap.fromTo(frame, { scale: 0.82, borderRadius: 32 }, { scale: 1, borderRadius: 0, ease: 'none', immediateRender: true,
-      scrollTrigger: { trigger: sec, start: 'top bottom', end: 'top top', scrub: 0.8 } }).scrollTrigger);
-    // 2) held on screen: "Our partners" breathes for a moment, the halves close, then it rests before letting go
+    // The zoom never stops dead at the pin edges: the card is still growing (and slowing down) for the
+    // first part of the pin, and starts shrinking (speeding up) before the pin lets go, so arriving and
+    // leaving feel like one continuous, eased move instead of a "snap" onto the section.
+    // All frame tweens share one scrub value so jumping around never leaves them fighting each other.
+    const SCRUB = 1.2, o = { overwrite: false };
+    // 1) approach: a rounded, smaller card rises and grows
+    sts.push(gsap.fromTo(frame, { scale: 0.76, borderRadius: 36 }, { scale: mobile ? 1 : 0.9, borderRadius: mobile ? 0 : 22, ease: 'none', immediateRender: true, ...o,
+      scrollTrigger: { trigger: sec, start: 'top bottom', end: 'top top', scrub: SCRUB } }).scrollTrigger);
+    // 2) held on screen: the card settles to full screen, "Our partners" breathes, the halves close,
+    //    the grid rests, then the card starts easing away before the pin releases
     const tl = gsap.timeline({ scrollTrigger: mobile
-      ? { trigger: sec, start: 'top 80%', end: 'top 5%', scrub: 0.8 }
-      : { trigger: sec, start: 'top top', end: () => `+=${innerHeight * 1.5}`, pin: true, scrub: 1, refreshPriority: 1, anticipatePin: 1 } });
-    tl.to({}, { duration: 0.2 })
-      .fromTo(left, { xPercent: -100 * Math.ceil(half) }, { xPercent: 0, ease: 'power3.inOut', duration: 1 }, 0.2)
-      .fromTo(right, { xPercent: 100 * Math.ceil(half) }, { xPercent: 0, ease: 'power3.inOut', duration: 1 }, 0.2)
-      .fromTo(mid, { opacity: 0, scaleY: 0.2 }, { opacity: 1, scaleY: 1, ease: 'power2.out', duration: 0.35 }, 0.85)
-      .fromTo(intro, { scale: 1, opacity: 1 }, { scale: 0.9, opacity: 0, ease: 'power1.in', duration: 0.35 }, 0.82)
-      .fromTo(svg, { opacity: 0 }, { opacity: 1, ease: 'none', duration: 0.15 }, 1.05)
-      .to({}, { duration: mobile ? 0.05 : 0.5 });                       // hold the finished grid
-    // 3) leaving: the grid eases back into a card as Live count slides up
-    const next = sec.nextElementSibling;
-    if (next) sts.push(gsap.fromTo(frame, { scale: 1, borderRadius: 0 }, { scale: 0.9, borderRadius: 32, ease: 'none', immediateRender: false,
-      scrollTrigger: { trigger: next, start: 'top bottom', end: 'top 35%', scrub: 0.8 } }).scrollTrigger);
+      ? { trigger: sec, start: 'top 80%', end: 'top 5%', scrub: SCRUB }
+      : { trigger: sec, start: 'top top', end: () => `+=${innerHeight * 2.2}`, pin: true, scrub: SCRUB, refreshPriority: 1 } });
+    if (!mobile) tl.fromTo(frame, { scale: 0.9, borderRadius: 22 }, { scale: 1, borderRadius: 0, ease: 'sine.out', duration: 0.45, immediateRender: false, ...o }, 0);
+    const c0 = mobile ? 0.1 : 0.45;
+    tl.fromTo(left, { xPercent: -100 * Math.ceil(half) }, { xPercent: 0, ease: 'power3.inOut', duration: 1 }, c0)
+      .fromTo(right, { xPercent: 100 * Math.ceil(half) }, { xPercent: 0, ease: 'power3.inOut', duration: 1 }, c0)
+      .fromTo(mid, { opacity: 0, scaleY: 0.2 }, { opacity: 1, scaleY: 1, ease: 'power2.out', duration: 0.35 }, c0 + 0.65)
+      .fromTo(intro, { scale: 1, opacity: 1 }, { scale: 0.9, opacity: 0, ease: 'power1.in', duration: 0.35 }, c0 + 0.62)
+      .fromTo(svg, { opacity: 0 }, { opacity: 1, ease: 'none', duration: 0.15 }, c0 + 0.85);
+    if (!mobile) tl.to({}, { duration: 0.55 })                           // hold the finished grid
+      .fromTo(frame, { scale: 1, borderRadius: 0 }, { scale: 0.95, borderRadius: 18, ease: 'sine.in', duration: 0.4, immediateRender: false, ...o });
+    // 3) leaving: the card keeps shrinking at the same pace as Live count slides up
+    const next = (sec.parentElement?.classList.contains('pin-spacer') ? sec.parentElement : sec).nextElementSibling;
+    if (next) sts.push(gsap.fromTo(frame, mobile ? { scale: 1, borderRadius: 0 } : { scale: 0.95, borderRadius: 18 }, { scale: 0.86, borderRadius: 32, ease: 'none', immediateRender: false, ...o,
+      scrollTrigger: { trigger: next, start: 'top bottom', end: 'top 30%', scrub: SCRUB } }).scrollTrigger);
     sec._sts = sts;
     st = tl.scrollTrigger;
   }
