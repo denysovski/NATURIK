@@ -51,7 +51,7 @@ function summary() {
     <div class="totals">
       <div class="totals__row"><span>Subtotal</span><span>${formatPrice(t.subtotal)}</span></div>
       ${t.discount ? `<div class="totals__row"><span>Discount</span><span>−${formatPrice(t.discount)}</span></div>` : ''}
-      <div class="totals__row"><span>Shipping</span><span>${t.shipping ? formatPrice(t.shipping) : 'Free'}</span></div>
+      <div class="totals__row"><span>Shipping</span><span>${t.shipping ? formatPrice(t.shipping) : '<span class="is-free">Free</span>'}</span></div>
       <div class="totals__row totals__row--grand"><span>Total</span><span>${formatPrice(t.total)}</span></div>
       <div class="totals__row t-muted"><span>incl. VAT 21%</span><span>${formatPrice(t.vat)}</span></div>
     </div>
@@ -92,7 +92,7 @@ function stepView() {
         ${Object.entries(SHIPPING).map(([k, m]) => {
           const t = bag.totals(k);
           const eta = m.days[0] === m.days[1] ? fmtDate(addBusinessDays(now, m.days[0])) : `${fmtDate(addBusinessDays(now, m.days[0]))} – ${fmtDate(addBusinessDays(now, m.days[1]))}`;
-          return `<label class="choice"><input type="radio" name="ship" value="${k}" ${d.ship === k ? 'checked' : ''}><span>${m.label}<span class="choice__sub">${m.sub} · arrives ${eta}</span></span><b>${t.shipping ? formatPrice(t.shipping) : 'Free'}</b></label>`;
+          return `<label class="choice"><input type="radio" name="ship" value="${k}" ${d.ship === k ? 'checked' : ''}><span>${m.label}<span class="choice__sub">${m.sub} · arrives ${eta}</span></span><b>${t.shipping ? formatPrice(t.shipping) : '<span class="is-free">Free</span>'}</b></label>`;
         }).join('')}
       </fieldset>
     </div>`;

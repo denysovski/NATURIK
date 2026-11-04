@@ -1584,3 +1584,11 @@ html.is-routing .fab { opacity: 0; pointer-events: none; transition: opacity 0.3
   .clock__lab-n { font-size: 46px; } .clock__lab-h { font-size: 28px; }
 }
 @media (max-width: 600px) { .clock-stats { gap: 12px 14px; } .clock-stats dd { font-size: 1.3rem; } .clock-stats dt { font-size: 0.8rem; } }
+/* "Free" shipping in green (on light surfaces the brighter acid needs a darker step to read) */
+.is-free { color: #5f9c00; font-weight: inherit; }
+.theme-dark .is-free, .co-summary--dark .is-free { color: var(--c-acid); }
+/* contact hero: "to us." sits 40px closer to "Talk" */
+.contact-hero__title br { display: none; }
+.contact-hero__title .fit-line { display: table; }
+.contact-hero__title .fit-line + br + .fit-line { margin-top: -0.172em; }   /* = 40px at desktop size, scales down on phones */
+.hours__days .hours__off { color: var(--c-acid); }

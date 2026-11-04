@@ -98,7 +98,7 @@ export function initCart() {
       <div class="totals">
         <div class="totals__row"><span>Subtotal</span><span>${formatPrice(t.subtotal)}</span></div>
         ${t.discount ? `<div class="totals__row"><span>${t.discountLabel}</span><span>−${formatPrice(t.discount)}</span></div>` : ''}
-        <div class="totals__row"><span>Shipping</span><span>${t.shipping ? 'From ' + formatPrice(t.shipping) : 'Free'}</span></div>
+        <div class="totals__row"><span>Shipping</span><span>${t.shipping ? 'From ' + formatPrice(t.shipping) : '<span class="is-free">Free</span>'}</span></div>
         <div class="totals__row totals__row--grand"><span>Total <span class="t-mono t-muted">incl. VAT</span></span><span>${formatPrice(t.total)}</span></div>
       </div>
       <button class="btn btn--dark btn--block" type="button" data-checkout-start><svg class="btn__icon" style="width:16px"><use href="#i-lock"/></svg><span class="btn__label">Secure checkout</span></button>
