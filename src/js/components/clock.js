@@ -80,7 +80,7 @@ export function mountClock(root) {
     const sofar = hours.slice(0, d.getHours() + 1).map((_, h) => valueFor(h, d) || 0);
     const peakH = sofar.reduce((bi, v, i, arr) => (v > arr[bi] ? i : bi), 0);
     $('[data-clock-today]').textContent = fmt(today);
-    $('[data-clock-peak]').textContent = `${String(peakH).padStart(2, '0')}:00 · ${fmt(sofar[peakH])}`;
+    $('[data-clock-peak]').textContent = `${String(peakH).padStart(2, '0')}:00`;
     $('[data-clock-now]').textContent = fmt(Math.max(1, live));
     svg.querySelector('[data-clock-desc]').textContent = `Clock showing ${d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}. ${fmt(today)} visitors so far today.`;
   };
@@ -113,7 +113,7 @@ export function mountClock(root) {
   const wob = setInterval(() => { if (raf) { bumpLive(); drawStats(); } }, 4000);
 
   if (STATS_URL) fetch(STATS_URL).then((r) => r.json()).then((j) => {
-    if (Array.isArray(j.hours) && j.hours.length === 24) { hours = j.hours; real = true; live = j.now ?? live; $('[data-clock-note]').hidden = true; drawStats(); }
+    if (Array.isArray(j.hours) && j.hours.length === 24) { hours = j.hours; real = true; live = j.now ?? live; drawStats(); }
   }).catch(() => {});
 
   // entry: the clock scales up with the scroll, then the hands sweep in and the stat lines grow
