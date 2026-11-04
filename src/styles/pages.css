@@ -1441,3 +1441,20 @@ html.is-routing .fab { opacity: 0; pointer-events: none; transition: opacity 0.3
 .legal-block .cookie__actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
 .legal-block ul { list-style: disc; } .legal-block li::marker { color: var(--c-cobalt); }
 @media (min-width: 821px) { .stage__frame { width: min(34vw, 470px, 58vh); } }
+
+/* nav: drop counter — rocket + green count in a rounded chip */
+.site-header .drop-status { gap: 8px; height: 34px; padding: 0 15px 0 12px; color: var(--c-acid); background: rgba(5,5,6,0.88);
+  border: 1px solid rgba(182,255,46,0.35); font-weight: 400 !important; font-size: 0.92rem !important; letter-spacing: 0 !important; }
+.site-header .drop-status b, .site-header .drop-status [data-stock-total] { font-weight: 400; font-variant-numeric: tabular-nums; }
+.drop-status__ico { flex: none; display: block; transform: rotate(0deg); }
+
+/* blob shadow: no live blur filter (re-rasterised every frame); the gradient is soft on its own */
+.blob__shadow { filter: none !important; will-change: transform, opacity; background: radial-gradient(closest-side, rgba(20,40,0,0.38), rgba(20,40,0,0.12) 55%, rgba(20,40,0,0.03) 80%, transparent) !important; }
+.blob canvas { will-change: transform; }
+/* glow layers pause while the section is off screen */
+.manifesto:not(.is-live) .manifesto__glow::before, .manifesto:not(.is-live) .manifesto__glow::after { animation-play-state: paused !important; }
+/* glow: the two pulsing layers are rasterised at quarter size and scaled up on the GPU
+   (a soft gradient looks identical, but the layers cost 4× less memory/fill next to the WebGL blob) */
+.manifesto__glow::before, .manifesto__glow::after { inset: auto !important; left: 25% !important; top: 25% !important; width: 50% !important; height: 50% !important; }
+@keyframes glow-pulse-a { 0%, 100% { transform: translate3d(0, 0, 0) scale(1.8); opacity: 0.45; } 50% { transform: translate3d(2vw, -2vh, 0) scale(2.16); opacity: 1; } }
+@keyframes glow-pulse-b { 0%, 100% { transform: translate3d(1vw, 3vh, 0) scale(2.1); opacity: 0.9; } 50% { transform: translate3d(-2vw, -1vh, 0) scale(1.76); opacity: 0.35; } }

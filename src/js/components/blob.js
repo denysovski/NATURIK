@@ -31,7 +31,6 @@ float snoise(vec3 v){
 }
 vec3 displace(vec3 p){
   float n = snoise(p * uFreq + vec3(uTime * .22, uTime * .17, -uTime * .12));
-  n += .18 * snoise(p * uFreq * 1.9 - vec3(uTime * .3));
   return p * (1. + uAmp * n);
 }
 void main(){
@@ -78,8 +77,11 @@ export function mountBlob(root) {
   const boot = async () => {
     const THREE = await import('./blob-three.js');
     if (dead) return;
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
-    renderer.setPixelRatio(Math.min(devicePixelRatio, 1.5));
+    const small = innerWidth < 820 || (navigator.hardwareConcurrency || 8) <= 4;
+    const renderer = new THREE.WebGLRenderer({ antialias: !small, alpha: true, powerPreference: 'high-performance' });
+    // the blob is soft and blurry-edged, so it doesn't need retina pixels: this alone cuts fill cost ~2-3×
+    let pr = Math.min(devicePixelRatio, small ? 1 : 1.25);
+    renderer.setPixelRatio(pr);
     renderer.setClearColor(0x000000, 0);
     host.appendChild(renderer.domElement);
     const scene = new THREE.Scene();
@@ -87,19 +89,26 @@ export function mountBlob(root) {
     camera.position.set(0, 0, 6.2);
     const uni = { uTime: { value: 0 }, uAmp: { value: 0.13 }, uFreq: { value: 0.95 },
       uBase: { value: new THREE.Color('#b6ff2e') }, uDeep: { value: new THREE.Color('#1d3a00') } };
-    const mesh = new THREE.Mesh(new THREE.IcosahedronGeometry(1, innerWidth < 820 ? 28 : 48),
+    const mesh = new THREE.Mesh(new THREE.IcosahedronGeometry(1, small ? 20 : 32),
       new THREE.ShaderMaterial({ vertexShader: VERT, fragmentShader: FRAG, uniforms: uni }));
     scene.add(mesh);
 
     const resize = () => { const w = host.clientWidth, h = host.clientHeight; renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); };
     resize();
+    // compile the shader and draw one frame now (idle time), so the first visible frame isn't a hitch
+    renderer.compile(scene, camera); renderer.render(scene, camera);
 
     // springs: scale (hover expand) and tilt (follows the pointer with inertia)
     const sp = { s: 1, v: 0, target: 1 }, tilt = { x: 0, y: 0, tx: 0, ty: 0 };
     let amp = 0.13, ampT = 0.13, visible = false, raf = 0, last = performance.now(), t = 0;
+    let slow = 0, seen = 0;                          // adaptive quality: drop resolution if frames run long
+    let shS = '', shO = '';
     const frame = (now) => {
       raf = requestAnimationFrame(frame);
-      const dt = Math.min(0.05, (now - last) / 1000); last = now; t += dt;
+      const raw = now - last;
+      const dt = Math.min(0.05, raw / 1000); last = now; t += dt;
+      if (++seen > 20) { slow = raw > 22 ? slow + 1 : Math.max(0, slow - 1);
+        if (slow > 24 && pr > 0.6) { pr = Math.max(0.6, pr - 0.2); renderer.setPixelRatio(pr); resize(); slow = 0; } }
       const k = 140, c = 11;                       // stiffness / damping → a little overshoot
       sp.v += (-(sp.s - sp.target) * k - sp.v * c) * dt; sp.s += sp.v * dt;
       tilt.x += (tilt.tx - tilt.x) * Math.min(1, dt * 4); tilt.y += (tilt.ty - tilt.y) * Math.min(1, dt * 4);
@@ -110,14 +119,17 @@ export function mountBlob(root) {
       mesh.scale.setScalar(sp.s);
       mesh.rotation.set(tilt.x + t * 0.05, tilt.y + t * 0.08, 0);
       renderer.render(scene, camera);
-      if (shadow) shadow.style.transform = `translateX(-50%) scale(${(sp.s * (1 - bob * 1.4)).toFixed(3)})`;
-      if (shadow) shadow.style.opacity = (0.55 - bob * 1.2).toFixed(3);
+      if (shadow) {                                  // only touch the DOM when the value actually changes
+        const ts = `translateX(-50%) scale(${(sp.s * (1 - bob * 1.4)).toFixed(2)})`, os = (0.55 - bob * 1.2).toFixed(2);
+        if (ts !== shS) shadow.style.transform = shS = ts;
+        if (os !== shO) shadow.style.opacity = shO = os;
+      }
     };
-    const play = () => { if (!raf && !reduceMotion) { last = performance.now(); raf = requestAnimationFrame(frame); } };
+    const play = () => { if (!raf && !reduceMotion) { last = performance.now(); seen = 0; raf = requestAnimationFrame(frame); } };
     const pause = () => { cancelAnimationFrame(raf); raf = 0; };
     if (reduceMotion) renderer.render(scene, camera);
 
-    const io = new IntersectionObserver(([e]) => { visible = e.isIntersecting; visible ? play() : pause(); });
+    const io = new IntersectionObserver(([e]) => { visible = e.isIntersecting; visible ? play() : pause(); }, { rootMargin: '45% 0px' }); // start a beat before it's on screen
     io.observe(host);
     const sec = host.parentElement;
     const move = (e) => {
@@ -129,18 +141,21 @@ export function mountBlob(root) {
     };
     const leave = () => { tilt.tx = tilt.ty = 0; host.classList.remove('is-over'); sp.target = 1; ampT = 0.13; };
     sec.addEventListener('pointermove', move); sec.addEventListener('pointerleave', leave);
-    addEventListener('resize', resize);
-    cleanup = () => { pause(); io.disconnect(); sec.removeEventListener('pointermove', move); sec.removeEventListener('pointerleave', leave); removeEventListener('resize', resize);
+    const onResize = () => resize(); addEventListener('resize', onResize);
+    cleanup = () => { pause(); io.disconnect(); sec.removeEventListener('pointermove', move); sec.removeEventListener('pointerleave', leave); removeEventListener('resize', onResize);
       mesh.geometry.dispose(); mesh.material.dispose(); renderer.dispose(); renderer.domElement.remove(); };
   };
 
   // heavy setup (module load, environment, shader compile) runs in idle time soon after the page loads,
   // not while the visitor is scrolling past nearby sections; drawing still happens only on screen.
+  const sec0 = host.closest('.manifesto');
+  const live = sec0 && new IntersectionObserver(([e]) => sec0.classList.toggle('is-live', e.isIntersecting), { rootMargin: '45% 0px' });
+  live?.observe(sec0);
   let started = false;
   const go = () => { if (started || dead) return; started = true; boot(); };
   const idleStart = () => (window.requestIdleCallback ? requestIdleCallback(go, { timeout: 5000 }) : setTimeout(go, 1500));
   const kick = setTimeout(idleStart, 2600);
   const near = new IntersectionObserver(([e]) => { if (e.isIntersecting) { near.disconnect(); go(); } }, { rootMargin: '600px 0px' });
   near.observe(host);
-  return () => { dead = true; clearTimeout(kick); near.disconnect(); cleanup(); };
+  return () => { dead = true; clearTimeout(kick); near.disconnect(); live?.disconnect(); cleanup(); };
 }

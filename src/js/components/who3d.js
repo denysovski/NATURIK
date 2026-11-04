@@ -55,7 +55,7 @@ export function mountWho3d(root) {
     canvas.className = 'who3d-canvas'; canvas.setAttribute('aria-hidden', 'true');
     grid.appendChild(canvas);
     const renderer = new T.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'high-performance' });
-    renderer.setPixelRatio(Math.min(devicePixelRatio, 1.25));
+    renderer.setPixelRatio(Math.min(devicePixelRatio, innerWidth < 820 ? 1 : 1.25));
     renderer.toneMapping = T.ACESFilmicToneMapping; renderer.outputColorSpace = T.SRGBColorSpace;
     renderer.autoClear = false; renderer.setScissorTest(true);
     // environment map: built once, in an idle slot, shared by all three scenes
