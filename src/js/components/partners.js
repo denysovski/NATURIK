@@ -112,26 +112,45 @@ export function mountPartners(root) {
   glitchStep();
 
   let open = null;
+  const inner = panel.parentElement;
+  const close = () => {
+    if (!open) return;
+    open = null;
+    grid.querySelectorAll('[data-partner]').forEach((b) => b.setAttribute('aria-expanded', 'false'));
+    const card = panel.querySelector('.pp');
+    const done = () => { if (!open) { panel.hidden = true; panel.innerHTML = ''; } };
+    card?.animate ? card.animate([{ opacity: 1, transform: 'none' }, { opacity: 0, transform: 'translateY(8px) scale(0.97)' }], { duration: 220, easing: 'cubic-bezier(.4,0,1,1)', fill: 'forwards' }).finished.then(done) : done();
+    panel.classList.remove('is-on');
+  };
   const show = (id) => {
-    const btns = grid.querySelectorAll('[data-partner]');
-    if (open === id) { open = null; panel.hidden = true; btns.forEach((b) => b.setAttribute('aria-expanded', 'false')); return; }
+    if (open === id) return close();
     open = id;
     const p = PARTNERS.find((x) => x.id === id);
-    btns.forEach((b) => b.setAttribute('aria-expanded', String(b.dataset.partner === id)));
-    panel.innerHTML = `<div class="pp">
+    grid.querySelectorAll('[data-partner]').forEach((b) => b.setAttribute('aria-expanded', String(b.dataset.partner === id)));
+    panel.innerHTML = `<div class="pp" tabindex="-1" role="dialog" aria-modal="false" aria-labelledby="pp-name">
       <div class="pp__top"><span class="pp__logo partner--${p.c}" aria-hidden="true">${LOGOS[p.id]}</span>
-        <div><h3 class="pp__name">${p.name}</h3><p class="pp__meta">${p.role} · ${p.city}</p></div>
+        <div><h3 class="pp__name" id="pp-name">${p.name}</h3><p class="pp__meta">${p.role} · ${p.city}</p></div>
         <button class="pp__close" type="button" aria-label="Close" data-pp-close>×</button></div>
       <p class="pp__text">${p.what}</p>
-      <div class="pp__chips"><span class="size-chip pp__chip is-on">Since ${p.since}</span>${p.how.map((h) => `<span class="size-chip pp__chip">${h}</span>`).join('')}</div>
+      <div class="pp__foot"><span class="pp__since">Since ${p.since}</span><a class="pp__more" href="./" data-pp-more>Learn more about this company</a></div>
     </div>`;
-    panel.hidden = false;
-    panel.animate?.([{ opacity: 0, transform: 'translateY(-10px)' }, { opacity: 1, transform: 'none' }], { duration: 380, easing: 'cubic-bezier(.16,1,.3,1)' });
+    // centre of what you can actually see of the section (on desktop the section is pinned, so that's the screen centre)
+    const r = inner.getBoundingClientRect(), k = r.height / inner.offsetHeight || 1;
+    const vis = (Math.max(r.top, 0) + Math.min(r.bottom, innerHeight)) / 2;
+    panel.style.setProperty('--pp-y', `${((vis - r.top) / k).toFixed(0)}px`);
+    panel.hidden = false; panel.classList.add('is-on');
+    // the card animates on its own element, so the panel's centring transform is never overridden
+    panel.querySelector('.pp').animate?.([{ opacity: 0, transform: 'translateY(14px) scale(0.96)' }, { opacity: 1, transform: 'none' }], { duration: 460, easing: 'cubic-bezier(.16,1,.3,1)' });
+    panel.querySelector('.pp').focus({ preventScroll: true });
   };
   const click = (e) => {
     const b = e.target.closest('[data-partner]'); if (b) return show(b.dataset.partner);
-    if (e.target.closest('[data-pp-close]')) show(open);
+    if (e.target.closest('[data-pp-close]')) return close();
+    if (e.target.closest('[data-pp-more]')) { e.preventDefault(); location.reload(); return; }   // partners are fictional: reloads the same page for now
+    if (open && !e.target.closest('.pp')) close();
   };
+  const esc = (e) => { if (e.key === 'Escape') close(); };
+  document.addEventListener('keydown', esc);
   sec.addEventListener('click', click);
 
   // scroll-in: the left and right halves of the grid slide in from the sides and close over "Our partners"
@@ -182,5 +201,5 @@ export function mountPartners(root) {
   let timer = 0;
   const io = new IntersectionObserver(([e]) => { clearInterval(timer); if (e.isIntersecting) timer = setInterval(glitchStep, 160); });
   io.observe(sec);
-  return () => { st?.kill(true); sec._sts?.forEach((t) => t.kill(true)); clearInterval(timer); io.disconnect(); sec.removeEventListener('click', click); };
+  return () => { st?.kill(true); sec._sts?.forEach((t) => t.kill(true)); clearInterval(timer); io.disconnect(); sec.removeEventListener('click', click); document.removeEventListener('keydown', esc); };
 }

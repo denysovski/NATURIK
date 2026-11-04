@@ -26,7 +26,16 @@
           <p class="t-lead" data-reveal>Real people in Prague. Sizing questions answered within one working day — usually within the hour.</p>
           <dl class="contact-hero__facts" data-reveal-stagger>
             <div><dt class="t-mono">Avg. reply</dt><dd>47 min</dd></div>
-            <div><dt class="t-mono">Hours</dt><dd>Mon–Fri · 09–18 CET</dd></div>
+            <div class="hours" data-hours><dt class="t-mono">Hours</dt><dd><button class="hours__btn" type="button" aria-describedby="hours-tip" aria-expanded="false">Mon–Fri · 09–18 CET</button></dd>
+              <div class="hours__tip" id="hours-tip" role="tooltip">
+                <p class="hours__tip-title">When we reply</p>
+                <ul class="hours__days">
+                  <li><span>Monday – Thursday</span><b>09:00 – 18:00</b></li>
+                  <li><span>Friday</span><b>09:00 – 18:00</b></li>
+                  <li><span>Saturday – Sunday</span><b class="is-off">Off · answered Monday</b></li>
+                </ul>
+                <p class="hours__tip-note">Prague time (CET). Write any time — after-hours messages are first in the queue the next morning, usually answered by 10:00. On drop days we stay online until the last piece is sold.</p>
+              </div></div>
           </dl>
         </div>
       </div>
@@ -34,36 +43,49 @@
 
     <section class="contact theme-light" data-header-light aria-label="Contact options">
       <div class="wrap contact__grid">
-        <form class="contact-form" data-contact novalidate aria-labelledby="form-title">
-          <h2 class="t-h3" id="form-title">Send a message</h2>
-          <fieldset class="topic-pick"><legend class="field__label">What is it about?</legend>
-            <label class="chip"><input type="radio" name="topic" value="sizing" checked><span>Sizing</span></label>
-            <label class="chip"><input type="radio" name="topic" value="order"><span>My order</span></label>
-            <label class="chip"><input type="radio" name="topic" value="returns"><span>Returns</span></label>
-            <label class="chip"><input type="radio" name="topic" value="repair"><span>Repair</span></label>
-            <label class="chip"><input type="radio" name="topic" value="press"><span>Press</span></label>
-            <label class="chip"><input type="radio" name="topic" value="wholesale"><span>Wholesale</span></label>
-          </fieldset>
-          <div class="fields fields--2">
-            <div class="field"><label class="field__label" for="c-name">Name</label><input class="field__input" id="c-name" name="name" autocomplete="name" required><span class="field__error"></span></div>
-            <div class="field"><label class="field__label" for="c-email">Email</label><input class="field__input" id="c-email" name="email" type="email" autocomplete="email" required><span class="field__error"></span></div>
+        <div class="contact-ob" data-ob>
+          <div class="ob-step ob-step--pick" data-ob-pick>
+            <p class="ob-kicker">Step 1 of 2</p>
+            <h2 class="ob-title" id="form-title">What do you need?</h2>
+            <p class="t-muted ob-sub">Pick one — we’ll only ask for what that takes.</p>
+            <div class="ob-opts">
+            <button class="ob-opt" type="button" data-pick="sizing"><span class="ob-opt__ico"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 17 17 3l4 4L7 21H3z"/><path d="m8 12 2 2M11 9l2 2M14 6l2 2"/></svg></span><span class="ob-opt__txt"><b>Sizing</b><span>Height, usual size, fit — we pick yours.</span></span><svg class="ob-opt__go"><use href="#i-arrow"/></svg></button>
+            <button class="ob-opt" type="button" data-pick="product"><span class="ob-opt__ico"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3 4 6v4l2 1v10h12V11l2-1V6l-4-3"/><path d="M8 3c0 2 2 3 4 3s4-1 4-3"/></svg></span><span class="ob-opt__txt"><b>About a product</b><span>Fabric, warmth, care, what’s next.</span></span><svg class="ob-opt__go"><use href="#i-arrow"/></svg></button>
+            <button class="ob-opt" type="button" data-pick="order"><span class="ob-opt__ico"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7l9-4 9 4-9 4-9-4z"/><path d="M3 7v10l9 4 9-4V7M12 11v10"/></svg></span><span class="ob-opt__txt"><b>My order</b><span>Delivery, changes, returns.</span></span><svg class="ob-opt__go"><use href="#i-arrow"/></svg></button>
+            <button class="ob-opt" type="button" data-pick="problem"><span class="ob-opt__ico"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v6M12 16.5v.5"/></svg></span><span class="ob-opt__txt"><b>Report a problem</b><span>Something broken on the site.</span></span><svg class="ob-opt__go"><use href="#i-arrow"/></svg></button>
+            <button class="ob-opt" type="button" data-pick="other"><span class="ob-opt__ico"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v11H8l-4 4z"/></svg></span><span class="ob-opt__txt"><b>Something else</b><span>Press, wholesale, a hello.</span></span><svg class="ob-opt__go"><use href="#i-arrow"/></svg></button>
+            </div>
           </div>
-          <div class="field" data-when="order returns repair" hidden><label class="field__label" for="c-order">Order number</label><input class="field__input" id="c-order" name="order" placeholder="NTK-26xxxxx"><span class="field__hint">On your confirmation email.</span></div>
-          <div class="fields fields--2" data-when="sizing">
-            <div class="field"><label class="field__label" for="c-height">Height (cm) <span class="t-muted">optional</span></label><input class="field__input" id="c-height" name="height" type="number" inputmode="numeric"></div>
-            <div class="field"><span class="field__label">Usual jacket size <span class="t-muted">optional</span></span><div data-usual-size class="select--field"></div></div>
-          </div>
-          <div class="field"><label class="field__label" for="c-msg">Message</label><textarea class="field__input" id="c-msg" name="message" required minlength="10" placeholder="Tell us what you need…"></textarea><span class="field__error"></span></div>
-          <label class="check"><input type="checkbox" name="consent" required><span>I agree that NATURIK may use these details to answer me (<button type="button" class="link-btn" data-legal="privacy">privacy</button>).</span></label>
-          <span class="field__error" data-consent-err></span>
-          <button class="btn btn--dark" type="submit" data-magnetic><span class="btn__label">Send message</span><svg class="btn__icon"><use href="#i-arrow"/></svg></button>
-          <div class="contact-form__done" data-contact-done hidden>
-            <div class="co-done__mark"><svg><use href="#i-check"/></svg></div>
-            <h3 class="t-h3">Message received.</h3>
-            <p>Ticket <b data-ticket></b> — we'll reply to <b data-reply-to></b> within one working day.</p>
-            <button class="btn btn--ghost" type="button" data-contact-reset><span class="btn__label">Send another</span></button>
-          </div>
-        </form>
+          <form class="contact-form ob-step" data-contact novalidate aria-labelledby="ob-form-title" hidden>
+            <div class="ob-head">
+              <button class="ob-back" type="button" data-ob-back aria-label="Back to topics"><svg><use href="#i-arrow"/></svg><span>Back</span></button>
+              <p class="ob-kicker">Step 2 of 2</p>
+            </div>
+            <h2 class="t-h3" id="ob-form-title" data-ob-title>Sizing</h2>
+            <p class="t-muted ob-sub" data-ob-sub></p>
+            <input type="hidden" name="topic" value="sizing">
+            <div class="fields fields--2">
+              <div class="field" data-when="sizing product order other"><label class="field__label" for="c-name">Name</label><input class="field__input" id="c-name" name="name" autocomplete="name" required><span class="field__error"></span></div>
+              <div class="field"><label class="field__label" for="c-email">Email</label><input class="field__input" id="c-email" name="email" type="email" autocomplete="email" required><span class="field__error"></span></div>
+            </div>
+            <div class="fields fields--2" data-when="sizing">
+              <div class="field"><label class="field__label" for="c-height">Height (cm)</label><input class="field__input" id="c-height" name="height" type="number" inputmode="numeric" min="120" max="230" required><span class="field__error"></span></div>
+              <div class="field"><span class="field__label">Usual jacket size</span><div data-usual-size class="select--field"></div></div>
+            </div>
+            <div class="field" data-when="product"><span class="field__label">Which piece?</span><div data-piece class="select--field"></div></div>
+            <div class="field" data-when="order"><label class="field__label" for="c-order">Order number</label><input class="field__input" id="c-order" name="order" placeholder="NTK-26xxxxx" required><span class="field__hint">On your confirmation email.</span><span class="field__error"></span></div>
+            <div class="field"><label class="field__label" for="c-msg" data-msg-label>Message</label><textarea class="field__input" id="c-msg" name="message" required minlength="10" placeholder="Tell us what you need…"></textarea><span class="field__error"></span></div>
+            <label class="check"><input type="checkbox" name="consent" required><span>I agree that NATURIK may use these details to answer me (<button type="button" class="link-btn" data-legal="privacy">privacy</button>).</span></label>
+            <span class="field__error" data-consent-err></span>
+            <button class="btn btn--dark" type="submit" data-magnetic><span class="btn__label">Send message</span><svg class="btn__icon"><use href="#i-arrow"/></svg></button>
+            <div class="contact-form__done" data-contact-done hidden>
+              <div class="co-done__mark"><svg><use href="#i-check"/></svg></div>
+              <h3 class="t-h3">Message received.</h3>
+              <p>Ticket <b data-ticket></b> — we'll reply to <b data-reply-to></b> within one working day.</p>
+              <button class="btn btn--ghost" type="button" data-contact-reset><span class="btn__label">Send another</span></button>
+            </div>
+          </form>
+        </div>
 
         <aside class="contact-cards" data-reveal-stagger>
           <a class="c-card" href="mailto:care@naturik.studio"><svg><use href="#i-mail"/></svg><span class="t-mono">Client care</span><b>care@naturik.studio</b><span class="t-muted">Orders, sizing, returns</span></a>
