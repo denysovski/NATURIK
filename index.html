@@ -248,6 +248,38 @@
       </div>
     </section>
 
+    <!-- LIVE CLOCK — real local time + visitors per hour today -->
+    <section class="clock-sec" id="clock" data-header-light aria-labelledby="clock-title">
+      <div class="wrap clock-sec__grid">
+        <div class="clock-sec__copy">
+          <p class="clock-sec__kicker"><span class="clock-sec__live" aria-hidden="true"></span>Live · today</p>
+          <h2 class="clock-sec__title" id="clock-title">Who’s here,<br>hour by hour.</h2>
+          <p class="clock-sec__lead">The clock runs on your time. Every hour on the dial carries a line for how many people opened this page in that hour today.</p>
+          <dl class="clock-stats">
+            <div><dt>On the site now</dt><dd data-clock-now>—</dd></div>
+            <div><dt>Visitors today</dt><dd data-clock-today>—</dd></div>
+            <div><dt>Busiest hour</dt><dd data-clock-peak>—</dd></div>
+          </dl>
+          <p class="clock-sec__note" data-clock-note>Sample figures until site analytics is connected.</p>
+        </div>
+        <div class="clock" data-clock>
+          <div class="clock__sweep" data-clock-sweep aria-hidden="true"></div>
+          <svg class="clock__svg" viewBox="0 0 1000 1000" role="img" aria-labelledby="clock-desc" data-clock-svg>
+            <desc id="clock-desc" data-clock-desc>Clock showing the current time with visitors per hour today.</desc>
+            <g data-clock-stats></g>
+            <g data-clock-ticks></g>
+            <g class="clock__hands" data-clock-hands>
+              <line class="clock__h" data-hand="h" x1="500" y1="535" x2="500" y2="335"/>
+              <line class="clock__m" data-hand="m" x1="500" y1="545" x2="500" y2="245"/>
+              <g data-hand="s"><line class="clock__s" x1="500" y1="575" x2="500" y2="232"/><circle class="clock__s-dot" cx="500" cy="232" r="9"/></g>
+              <circle class="clock__cap" cx="500" cy="500" r="16"/><circle class="clock__cap-in" cx="500" cy="500" r="6"/>
+            </g>
+          </svg>
+          <p class="clock__digital" data-clock-digital aria-live="off">—</p>
+        </div>
+      </div>
+    </section>
+
     <!-- 07 THE DROP GRID -->
     <section class="drop-row theme-light" data-header-light aria-labelledby="row-title">
       <div class="wrap">

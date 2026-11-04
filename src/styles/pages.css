@@ -1271,7 +1271,7 @@ body.is-locked { overflow: visible; }
 /* bag: wider blue free-shipping meter, bold dispatch line */
 .ship-meter .stock__bar { height: 8px !important; border-radius: 999px; overflow: hidden; }
 .ship-meter .stock__fill { background: var(--c-cobalt) !important; border-radius: 999px; }
-.line-item__ship { margin-top: 2px; font-weight: 600; color: var(--c-ink) !important; }
+.line-item__ship { margin-top: 2px; font-weight: 500; color: var(--c-ink) !important; }
 
 /* page transition: header slides up and is not clickable; loader pill on white */
 .site-header { transition: transform 0.55s cubic-bezier(.7,0,.2,1), opacity 0.4s; }
@@ -1537,3 +1537,50 @@ html.is-routing .fab { opacity: 0; pointer-events: none; transition: opacity 0.3
   .hours__tip { right: auto !important; left: calc(16px - var(--hx, 0px)) !important; width: calc(100vw - 32px); }
   .hours__tip::after { right: auto; left: calc(var(--hx, 0px) - 16px + 90px); }
 }
+
+/* =========================== live clock (white) =========================== */
+.clock-sec { position: relative; z-index: var(--z-content); background: #fff; color: var(--c-ink); padding: clamp(90px, 12vw, 180px) 0; overflow: hidden; }
+.clock-sec__grid { display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr); align-items: center; gap: clamp(30px, 5vw, 80px); }
+.clock-sec__kicker { display: inline-flex; align-items: center; gap: 10px; margin: 0 0 18px; font: 400 1rem/1 var(--f-display); color: #5f9c00; }
+.clock-sec__live { width: 9px; height: 9px; border-radius: 50%; background: var(--c-acid); box-shadow: 0 0 0 0 rgba(182,255,46,0.8); animation: clock-live 1.8s infinite; }
+@keyframes clock-live { 70% { box-shadow: 0 0 0 10px rgba(182,255,46,0); } 100% { box-shadow: 0 0 0 0 rgba(182,255,46,0); } }
+.clock-sec__title { margin: 0; font: 500 clamp(2.6rem, 5.4vw, 5.2rem)/0.95 var(--f-display); letter-spacing: -0.05em; }
+.clock-sec__lead { margin: 22px 0 0; max-width: 40ch; font-size: 1.08rem; line-height: 1.5; color: #55555b; }
+.clock-stats { display: grid; grid-template-columns: repeat(3, auto); justify-content: start; gap: 12px 34px; margin: 34px 0 0; }
+.clock-stats dt { font: 400 0.9rem/1 var(--f-display); color: #7a7a80; margin-bottom: 10px; }
+.clock-stats dd { margin: 0; font: 500 clamp(1.5rem, 2.4vw, 2.2rem)/1 var(--f-display); letter-spacing: -0.04em; font-variant-numeric: tabular-nums; }
+.clock-stats div:first-child dd { color: var(--c-ink); display: inline-flex; align-items: center; gap: 10px; }
+.clock-sec__note { margin: 26px 0 0; font-size: 0.82rem; color: #9a9aa0; }
+.clock { position: relative; width: min(100%, 760px, 86vh); aspect-ratio: 1; justify-self: center; will-change: transform; }
+.clock__svg { position: relative; display: block; width: 100%; height: 100%; overflow: visible; }
+.clock__sweep { position: absolute; inset: 21.5%; border-radius: 50%; pointer-events: none; opacity: 0; transition: opacity 1s 0.6s;
+  background: conic-gradient(from -50deg, rgba(22,56,255,0) 0deg, rgba(22,56,255,0.10) 48deg, rgba(22,56,255,0.18) 50deg, rgba(22,56,255,0) 50.5deg); will-change: transform; }
+.clock.is-on .clock__sweep { opacity: 1; }
+.clock__tick { stroke: var(--c-ink); stroke-width: 6; stroke-linecap: round; }
+.clock__tick--q { stroke-width: 16; }
+.clock__bar { stroke: #8fd400; stroke-width: 5; stroke-linecap: round; }
+.clock__dot { fill: #8fd400; }
+.clock__stat.is-future .clock__dot { fill: #d4d4d8; }
+.clock__stat.is-now .clock__bar, .clock__stat.is-now .clock__dot { stroke: var(--c-cobalt); fill: var(--c-cobalt); }
+.clock__stat.is-now .clock__dot { animation: clock-dot 1.6s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+@keyframes clock-dot { 50% { transform: scale(1.8); } }
+.clock__lab { font-family: var(--f-display); fill: var(--c-ink); }
+.clock__lab-n { font-size: 30px; font-weight: 500; letter-spacing: -0.03em; }
+.clock__lab-h { font-size: 19px; font-weight: 400; fill: #8a8a90; }
+.clock__stat.is-now .clock__lab-n { fill: var(--c-cobalt); }
+.clock__hands line { stroke-linecap: round; }
+.clock__hands { opacity: 0; transition: opacity 0.5s; }
+.clock.is-on .clock__hands { opacity: 1; }
+.clock__h { stroke: var(--c-ink); stroke-width: 18; }
+.clock__m { stroke: var(--c-ink); stroke-width: 10; }
+.clock__s { stroke: var(--c-cobalt); stroke-width: 3.5; }
+.clock__s-dot { fill: var(--c-cobalt); }
+.clock__cap { fill: var(--c-ink); } .clock__cap-in { fill: var(--c-acid); }
+.clock__digital { position: absolute; left: 50%; top: 66%; transform: translateX(-50%); margin: 0; font: 400 1.05rem/1 var(--f-display); color: #8a8a90; font-variant-numeric: tabular-nums; letter-spacing: 0.02em; }
+@media (max-width: 900px) {
+  .clock-sec__grid { grid-template-columns: 1fr; }
+  .clock { width: min(100%, 560px); }
+  .clock-stats { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px 16px; }
+  .clock__lab-n { font-size: 46px; } .clock__lab-h { font-size: 28px; }
+}
+@media (max-width: 600px) { .clock-stats { gap: 12px 14px; } .clock-stats dd { font-size: 1.3rem; } .clock-stats dt { font-size: 0.8rem; } }

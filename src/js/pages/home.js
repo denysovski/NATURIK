@@ -7,6 +7,7 @@ import { mountBlob } from '../components/blob.js';
 import { mountLookOrbs } from '../components/lookOrbs.js';
 import { mountWho3d } from '../components/who3d.js';
 import { mountPartners } from '../components/partners.js';
+import { mountClock } from '../components/clock.js';
 
 /* Homepage module — mount() wires everything up, the returned function tears it down
    so the router can swap pages without reloads or leaks. */
@@ -265,7 +266,7 @@ export function mount(root = document) {
       cleanups.push(() => clearTimeout(tid));
     }
   }
-  cleanups.push(mountSignal(root), mountBlob(root), mountLookOrbs(root), mountWho3d(root), mountPartners(root));
+  cleanups.push(mountSignal(root), mountBlob(root), mountLookOrbs(root), mountWho3d(root), mountPartners(root), mountClock(root));
   measure();
   on(window, 'resize', measure);
   intro();
