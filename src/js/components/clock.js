@@ -17,6 +17,38 @@ function sampleDay(d = new Date()) {
   return SHAPE.map((k) => Math.round(k * scale * (0.82 + r() * 0.36)));
 }
 
+
+// slot-machine numbers: every character sits in its own little window; when it changes, the new
+// character rolls up from below and pushes the old one out the top. `spin` runs a few random digits first.
+function roll(el, str, { spin = 0, delay = 0 } = {}) {
+  if (el._v === str && !spin) return;
+  const old = el._v ?? '';
+  el._v = str;
+  if (reduceMotion) { el.textContent = str; return; }
+  const chars = [...str], prev = [...old];
+  if (!el._built || prev.length !== chars.length) {
+    el.setAttribute('aria-label', str);
+    el.innerHTML = chars.map(() => '<span class="roll__c" aria-hidden="true"><span class="roll__col"></span></span>').join('');
+    el._built = true;
+  } else el.setAttribute('aria-label', str);
+  const cells = [...el.children];
+  const isDigit = (c) => c >= '0' && c <= '9';
+  let k = 0;
+  cells.forEach((cell, i) => {
+    const col = cell.firstChild, to = chars[i], from = prev[i] ?? '';
+    gsap.killTweensOf(col);
+    if (from === to && !spin) { col.innerHTML = `<span>${to}</span>`; gsap.set(col, { yPercent: 0 }); return; }
+    const seq = [from || ' '];
+    if (spin && isDigit(to)) for (let n = 0; n < spin + ((chars.length - i) % 3); n++) seq.push(String((Math.random() * 10) | 0));
+    seq.push(to);
+    col.innerHTML = seq.map((c) => `<span>${c === ' ' ? '&nbsp;' : c}</span>`).join('');
+    const order = chars.length - 1 - i;                        // the last digit moves first, like a counter
+    gsap.fromTo(col, { yPercent: 0 }, { yPercent: -100 * (seq.length - 1) / seq.length, duration: spin ? 1.1 + order * 0.12 : 0.55,
+      ease: spin ? 'expo.out' : 'power3.inOut', delay: delay + (spin ? order * 0.04 : order * 0.06 + k++ * 0.02),
+      onComplete: () => { col.innerHTML = `<span>${to}</span>`; gsap.set(col, { yPercent: 0 }); } });
+  });
+}
+
 export function mountClock(root) {
   const el = root.querySelector('[data-clock]');
   if (!el) return () => {};
@@ -57,7 +89,7 @@ export function mountClock(root) {
   };
   const bumpLive = () => { if (real) return; const target = Math.max(3, Math.round(hours[now().getHours()] / 9)); live = live ? Math.round(live + (target - live) * 0.3 + (Math.random() * 4 - 2)) : target; };
   bumpLive();
-  let grow = reduceMotion ? 1 : 0;           // 0 → 1 as the section comes in
+  let grow = reduceMotion ? 1 : 0, spinNext = false;           // 0 → 1 as the section comes in
   const drawStats = () => {
     const d = now(), pm = d.getHours() >= 12, base = pm ? 12 : 0;
     const vals = bars.map((_, i) => valueFor(base + i, d));
@@ -79,9 +111,10 @@ export function mountClock(root) {
     });
     const sofar = hours.slice(0, d.getHours() + 1).map((_, h) => valueFor(h, d) || 0);
     const peakH = sofar.reduce((bi, v, i, arr) => (v > arr[bi] ? i : bi), 0);
-    $('[data-clock-today]').textContent = fmt(today);
-    $('[data-clock-peak]').textContent = `${String(peakH).padStart(2, '0')}:00`;
-    $('[data-clock-now]').textContent = fmt(Math.max(1, live));
+    roll($('[data-clock-today]'), fmt(today), { spin: spinNext ? 4 : 0, delay: spinNext ? 0.1 : 0 });
+    roll($('[data-clock-peak]'), `${String(peakH).padStart(2, '0')}:00`, { spin: spinNext ? 4 : 0, delay: spinNext ? 0.2 : 0 });
+    roll($('[data-clock-now]'), fmt(Math.max(1, live)), { spin: spinNext ? 4 : 0 });
+    spinNext = false;
     svg.querySelector('[data-clock-desc]').textContent = `Clock showing ${d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}. ${fmt(today)} visitors so far today.`;
   };
 
@@ -126,6 +159,7 @@ export function mountClock(root) {
       gsap.to(st, { r: 1, duration: 1.6, ease: 'expo.inOut', onUpdate: () => { reveal = st.r; } });
       gsap.to(st, { g: 1, duration: 1.8, delay: 0.35, ease: 'power3.out', onUpdate: () => { grow = st.g; drawStats(); } });
       el.classList.add('is-on');
+      spinNext = true; drawStats();
     } }));
   } else el.classList.add('is-on');
 

@@ -1549,7 +1549,7 @@ html.is-routing .fab { opacity: 0; pointer-events: none; transition: opacity 0.3
 .clock-stats { display: grid; grid-template-columns: repeat(3, auto); justify-content: start; gap: 12px 34px; margin: 34px 0 0; }
 .clock-stats dt { font: 400 0.9rem/1 var(--f-display); color: #7a7a80; margin-bottom: 10px; }
 .clock-stats dd { margin: 0; font: 500 clamp(1.5rem, 2.4vw, 2.2rem)/1 var(--f-display); letter-spacing: -0.04em; font-variant-numeric: tabular-nums; }
-.clock-stats div:first-child dd { color: var(--c-ink); display: inline-flex; align-items: center; gap: 10px; }
+.clock-stats div:first-child dd { color: var(--c-ink); }
 .clock-sec__note { margin: 26px 0 0; font-size: 0.82rem; color: #9a9aa0; }
 .clock { position: relative; width: min(100%, 760px, 86vh); aspect-ratio: 1; justify-self: center; will-change: transform; }
 .clock__svg { position: relative; display: block; width: 100%; height: 100%; overflow: visible; }
@@ -1597,3 +1597,13 @@ html.is-routing .fab { opacity: 0; pointer-events: none; transition: opacity 0.3
 .clock-stats dd { font-size: clamp(2.6rem, 4.6vw, 4.4rem); letter-spacing: -0.05em; }
 @media (max-width: 600px) { .clock-stats { gap: 14px 18px; } .clock-stats dd { font-size: 2.1rem; } .clock-stats dt { font-size: 0.85rem; } }
 @media (max-width: 600px) { .clock-sec__title { font-size: 11vw; white-space: nowrap; } }
+/* clock section: big brand shape behind everything, faint so the dial stays fully readable */
+.clock-sec__bg { position: absolute; z-index: 0; left: 50%; top: 50%; width: min(1180px, 112vw); aspect-ratio: 960 / 616; translate: -50% -50%; background: center / contain no-repeat; opacity: 0.045; pointer-events: none; }
+.clock-sec__grid { position: relative; z-index: 1; }
+@media (max-width: 900px) { .clock-sec__bg { width: 150vw; top: 58%; opacity: 0.05; } }
+/* slot-machine digits */
+.clock-stats dd { display: flex; align-items: flex-end; }
+.roll__c { display: inline-block; height: 1em; line-height: 1; overflow: hidden; vertical-align: top;
+  -webkit-mask-image: linear-gradient(transparent 0, #000 7%, #000 93%, transparent 100%); mask-image: linear-gradient(transparent 0, #000 7%, #000 93%, transparent 100%); padding: 0 0.005em; }
+.roll__col { display: flex; flex-direction: column; will-change: transform; }
+.roll__col > span { display: block; height: 1em; line-height: 1; text-align: center; }
