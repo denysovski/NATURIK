@@ -1619,3 +1619,11 @@ html.is-routing .fab { opacity: 0; pointer-events: none; transition: opacity 0.3
 /* brand shape in acid green: needs more opacity than the black version to read on white */
 .clock-sec__bg { opacity: 0.32; }
 @media (max-width: 900px) { .clock-sec__bg { opacity: 0.3; } }
+/* rolling digits, final: each window is wider than its glyph (padding), the tight spacing comes from
+   negative margins instead of letter-spacing, so neither the mask nor the clip can cut a digit's side */
+.clock-stats dd { letter-spacing: 0 !important; }
+.roll__c { letter-spacing: 0; padding: 0 0.06em; margin: -0.09em -0.085em -0.09em -0.085em; clip-path: none; overflow: hidden; }
+.clock-stats dd .roll__c:first-child { margin-left: -0.06em; }
+/* header icon buttons: hover is always cobalt with a white icon, on dark and on light sections */
+.site-header .icon-btn:not(.icon-btn--dark):hover, .site-header.on-light .icon-btn:not(.icon-btn--dark):hover,
+.site-header .icon-btn:not(.icon-btn--dark):focus-visible { background: var(--c-cobalt); color: #fff; }
