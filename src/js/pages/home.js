@@ -209,11 +209,14 @@ export function mount(root = document) {
       const HERO = { x: 0, y: d ? 0.07 : 0.12, scale: d ? 0.96 : 0.8, img: 0, zoom: 1.06, pan: 0, opacity: 1, dim: 0 };
       const SPEC = { x: d ? -0.22 : 0, y: d ? 0 : -0.17, scale: d ? 1.1 : 0.72, img: 1, zoom: 1.12, pan: 0, opacity: 1, dim: 0 };
       // after Warmth the card simply leaves with the section (moves up 1:1 with the scroll) — no fade, no travel
-      const OUT = { ...SPEC, y: SPEC.y - 1.05 };
       const range = (trigger, from, to, start, end, scrub = 0.4) => gsap.fromTo(S, { ...from }, { ...to, ease: 'none', immediateRender: false,
-        scrollTrigger: { trigger, start, end, scrub } });
+        scrollTrigger: { trigger, start, end, scrub, invalidateOnRefresh: true } });
       range('#spec', HERO, SPEC, 'top bottom', 'top top');
-      range(root.querySelector('#spec').nextElementSibling, SPEC, OUT, 'top bottom', 'top top');   // gone before the next section settles
+      // once Warmth reaches the top, the photo is glued to the section: it scrolls away 1:1 with the
+      // text instead of staying fixed on screen while the section (and Partners) move past it
+      const specEl = root.querySelector('#spec');
+      const dist = () => Math.max(specEl.offsetHeight, innerHeight * 1.1);
+      range('#spec', SPEC, { ...SPEC, y: () => SPEC.y - dist() / innerHeight }, 'top top', () => `+=${dist()}`);
       // the giant count surfaces as the photo sinks under it
       gsap.fromTo('.drop-last', { opacity: 0, scale: 0.9 }, { opacity: 1, scale: 1, ease: 'none', immediateRender: true,
         scrollTrigger: { trigger: '#drop', start: 'top 70%', end: 'top 15%', scrub: 0.4 } });
@@ -268,5 +271,13 @@ export function mount(root = document) {
   intro();
   requestAnimationFrame(() => ScrollTrigger.refresh());
 
+  // sticky mobile CTA: shows once the hero CTA has scrolled away, steps aside where buying is already on screen
+  const mcta = $('[data-m-cta]');
+  if (mcta && matchMedia('(max-width: 819px)').matches) {
+    const hide = new Set(['hero']);
+    const sync = () => mcta.classList.toggle('is-on', hide.size === 0);
+    const watch = (sel, key) => { const el = $(sel) || document.querySelector(sel); if (!el) return; const io = new IntersectionObserver(([e]) => { e.isIntersecting ? hide.add(key) : hide.delete(key); sync(); }, { rootMargin: '0px 0px -10% 0px' }); io.observe(el); cleanups.push(() => io.disconnect()); };
+    watch('.hero', 'hero'); watch('#drop .drop-buy', 'buy'); watch('.site-footer', 'footer');
+  }
   return () => { ctx.revert(); cleanups.forEach((f) => f()); };
 }

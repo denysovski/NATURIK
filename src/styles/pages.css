@@ -1377,3 +1377,66 @@ html.is-routing .fab { opacity: 0; pointer-events: none; transition: opacity 0.3
 .trk { will-change: transform; box-shadow: 0 0 8px rgba(182,255,46,0.3) !important; }
 .trk--blue { box-shadow: 0 0 8px rgba(22,56,255,0.45) !important; }
 .signal__lines { will-change: contents; }
+
+/* ── round 14 ─────────────────────────────────────────────── */
+/* Partners: a little more air between letters (≈ +2px per letter) */
+.partners .partner__name, .partners .partner__role, .partners .pinfo__big, .partners .pinfo__txt,
+.partners .gl__txt, .partners .pcell__lab, .partners .pp__name, .partners .pp__meta, .partners .pp__text,
+.partners .pp__chip, .partners .partner__more, .partners .pword { letter-spacing: calc(var(--ls, -0.03em) + 2px) !important; }
+.partners .partner__name { --ls: -0.04em; } .partners .pinfo__big { --ls: -0.05em; } .partners .pinfo__txt { --ls: -0.035em; }
+.partners .pp__name { --ls: -0.04em; } .partners .pp__text { --ls: -0.02em; } .partners .pword { --ls: -0.05em; }
+.partners .partner__role, .partners .partner__more, .partners .pp__chip, .partners .pp__meta { --ls: -0.01em; }
+
+/* Signal kicker: capitals, same face and weight as the partner names */
+.signal__kicker { font-family: var(--f-display); font-weight: 500; font-size: 1.15rem; text-transform: uppercase; letter-spacing: 0; color: rgba(255,255,255,0.78); }
+
+/* Who we are glow: further left, softer, and it breathes */
+.manifesto__glow { left: -38vw !important; top: 10% !important; width: 66vw !important; height: 84% !important; }
+.manifesto__glow::before { background: radial-gradient(closest-side at 46% 44%, rgba(22,56,255,0.32), rgba(22,56,255,0.1) 50%, transparent 72%) !important; animation: glow-pulse-a 6s ease-in-out infinite !important; }
+.manifesto__glow::after { background: radial-gradient(closest-side at 60% 62%, rgba(182,255,46,0.24), rgba(182,255,46,0.07) 48%, transparent 70%) !important; animation: glow-pulse-b 8s ease-in-out infinite !important; }
+@keyframes glow-pulse-a { 0%, 100% { transform: translate3d(0, 0, 0) scale(0.9); opacity: 0.45; } 50% { transform: translate3d(2vw, -2vh, 0) scale(1.08); opacity: 1; } }
+@keyframes glow-pulse-b { 0%, 100% { transform: translate3d(1vw, 3vh, 0) scale(1.05); opacity: 0.9; } 50% { transform: translate3d(-2vw, -1vh, 0) scale(0.88); opacity: 0.35; } }
+
+/* Page transition label: green, regular weight */
+.curtain__meta, .curtain__meta [data-curtain-label] { color: #5f9c00 !important; font-weight: 400 !important; }
+
+/* Social button: a "social" glyph that turns into a cross; menu items grow on hover instead of turning white */
+.fab__btn i { display: none; }
+.fab__ico { position: absolute; left: 50%; top: 50%; width: 24px; height: 24px; margin: -12px 0 0 -12px; transition: transform 0.5s var(--ease-out), opacity 0.3s; }
+.fab__ico--close { opacity: 0; transform: rotate(-90deg) scale(0.6); }
+.fab.is-open .fab__ico--social { opacity: 0; transform: rotate(90deg) scale(0.6); }
+.fab.is-open .fab__ico--close { opacity: 1; transform: none; }
+.fab__menu a:hover, .fab__menu a:focus-visible { background: rgba(12,12,14,0.92) !important; color: #fff !important; }
+.fab.is-open .fab__menu a:hover, .fab.is-open .fab__menu a:focus-visible { transform: scale(1.2); transition-delay: 0s !important; }
+
+/* sticky mobile CTA (home) */
+.m-cta { display: none; }
+@media (max-width: 819px) {
+  .m-cta { position: fixed; z-index: 85; left: 76px; right: 12px; bottom: 14px; display: flex; align-items: center; justify-content: space-between; gap: 12px; height: 50px; padding: 0 6px 0 16px;
+    border-radius: 999px; background: rgba(12,12,14,0.94); color: #fff; text-decoration: none; box-shadow: 0 14px 34px -12px rgba(0,0,0,0.6);
+    transform: translateY(140%); opacity: 0; pointer-events: none; transition: transform 0.55s var(--ease-out), opacity 0.35s; }
+  .m-cta.is-on { transform: none; opacity: 1; pointer-events: auto; }
+  .m-cta__txt { display: grid; gap: 2px; font: 500 0.85rem/1.05 var(--f-display); letter-spacing: -0.01em; }
+  .m-cta__txt > span { color: rgba(255,255,255,0.62); font-size: 0.78rem; }
+  .m-cta__btn { display: inline-flex; align-items: center; height: 38px; padding: 0 18px; border-radius: 999px; background: var(--c-acid); color: #000; font: 500 0.95rem/1 var(--f-display); }
+  html.is-routing .m-cta { opacity: 0; pointer-events: none; }
+}
+
+/* legal pages */
+.legal-page { background: var(--c-bone, #f3f3f1); color: var(--c-ink, #0b0b0c); padding: clamp(140px, 16vw, 210px) 0 clamp(80px, 10vw, 140px); }
+.legal-page__wrap { max-width: 860px; }
+.legal-page__kicker { margin: 0 0 18px; font: 500 1rem/1 var(--f-display); color: #55555b; }
+.legal-page__title { margin: 0; font: 500 clamp(3rem, 8vw, 6.4rem)/0.9 var(--f-display); letter-spacing: -0.05em; }
+.legal-page__title em { font-family: var(--f-accent); font-style: normal; color: var(--c-cobalt); }
+.legal-page__updated { margin: 22px 0 56px; font: 400 1rem/1.4 var(--f-display); color: #55555b; }
+.legal-page__updated a { color: inherit; text-decoration: underline; text-underline-offset: 3px; }
+.legal-block { padding: 36px 0; border-top: 1px solid rgba(0,0,0,0.14); font: 400 1.08rem/1.55 var(--f-display); }
+.legal-block h2 { margin: 0 0 16px; font: 500 clamp(1.6rem, 3vw, 2.2rem)/1 var(--f-display); letter-spacing: -0.03em; }
+.legal-block h3 { margin: 26px 0 8px; font: 500 1.15rem/1.2 var(--f-display); }
+.legal-block p { margin: 0 0 12px; max-width: 68ch; }
+.legal-block ul { margin: 0 0 12px; padding-left: 1.1em; }
+.legal-block li { margin: 4px 0; }
+.legal-block .size-table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 0.95rem; }
+.legal-block .size-table th, .legal-block .size-table td { text-align: left; padding: 10px 8px; border-bottom: 1px solid rgba(0,0,0,0.1); }
+.legal-block .cookie__actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+.legal-block ul { list-style: disc; } .legal-block li::marker { color: var(--c-cobalt); }
