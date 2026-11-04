@@ -207,9 +207,9 @@ export function mount(root = document) {
       // Deterministic keyframes: every range is a fromTo between fixed states, so fast scrolling
       // (or jumping) can never leave the card half-way or make it blink in and out.
       const HERO = { x: 0, y: d ? 0.07 : 0.12, scale: d ? 0.96 : 0.8, img: 0, zoom: 1.06, pan: 0, opacity: 1, dim: 0 };
-      const SPEC = { x: d ? -0.22 : 0, y: d ? 0 : -0.17, scale: d ? 1.1 : 0.72, img: 1, zoom: 1.12, pan: 0, opacity: 1, dim: 0 };
+      const SPEC = { x: d ? -0.22 : 0, y: d ? 0.03 : -0.17, scale: d ? 1.0 : 0.72, img: 1, zoom: 1.12, pan: 0, opacity: 1, dim: 0 };
       // after Warmth the card simply leaves with the section (moves up 1:1 with the scroll) — no fade, no travel
-      const range = (trigger, from, to, start, end, scrub = 0.4) => gsap.fromTo(S, { ...from }, { ...to, ease: 'none', immediateRender: false,
+      const range = (trigger, from, to, start, end, scrub = true) => gsap.fromTo(S, { ...from }, { ...to, ease: 'none', immediateRender: false,
         scrollTrigger: { trigger, start, end, scrub, invalidateOnRefresh: true } });
       range('#spec', HERO, SPEC, 'top bottom', 'top top');
       // once Warmth reaches the top, the photo is glued to the section: it scrolls away 1:1 with the

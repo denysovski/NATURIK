@@ -1440,3 +1440,4 @@ html.is-routing .fab { opacity: 0; pointer-events: none; transition: opacity 0.3
 .legal-block .size-table th, .legal-block .size-table td { text-align: left; padding: 10px 8px; border-bottom: 1px solid rgba(0,0,0,0.1); }
 .legal-block .cookie__actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
 .legal-block ul { list-style: disc; } .legal-block li::marker { color: var(--c-cobalt); }
+@media (min-width: 821px) { .stage__frame { width: min(34vw, 470px, 58vh); } }
