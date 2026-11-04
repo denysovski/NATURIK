@@ -13,13 +13,14 @@ Built as a fast, animated single-page experience with a full (simulated) shop an
 
 | | |
 |---|---|
-| **Pages** | Home, Shop (with product detail), Contact — switched without reloads |
+| **Pages** | Home, Shop (with product detail), Contact, Privacy & cookies, Terms of sale, 404 — switched without reloads |
 | **Shop** | Filters, sorting, 2/3-column view, product gallery, size finder, waitlist for sold-out sizes |
 | **Cart & checkout** | Slide-in bag, discount codes, 4-step checkout with card validation (demo only, no payments) |
 | **Motion** | Scroll-driven photo stage, zoom-in sections, page transitions with a tracker/terminal overlay, counters, glitch effects |
 | **Extras** | First-visit 10% popup with newsletter sign-up, live "people looking now" line, floating social button |
 | **3D** | A green blob and three small glossy objects, rendered with three.js only when on screen |
 | **SEO** | Meta + Open Graph, JSON-LD (Product, ItemList, FAQ, Organization), sitemap, robots, 404 |
+| **Analytics** | Consent-gated hook (Plausible) — off until a domain is set in `src/js/core/analytics.js` |
 
 ## Tour of the homepage
 
