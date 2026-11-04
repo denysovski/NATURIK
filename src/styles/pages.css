@@ -1627,3 +1627,10 @@ html.is-routing .fab { opacity: 0; pointer-events: none; transition: opacity 0.3
 /* header icon buttons: hover is always cobalt with a white icon, on dark and on light sections */
 .site-header .icon-btn:not(.icon-btn--dark):hover, .site-header.on-light .icon-btn:not(.icon-btn--dark):hover,
 .site-header .icon-btn:not(.icon-btn--dark):focus-visible { background: var(--c-cobalt); color: #fff; }
+/* onboarding options: no tilt — the card turns green (fill + border) and the icon turns white */
+@media (hover: hover) {
+  .ob-opt:hover { background: var(--c-acid); border-color: var(--c-acid); transform: none; box-shadow: none; }
+  .ob-opt:hover .ob-opt__ico { transform: none; color: #fff; }
+  .ob-opt:hover .ob-opt__txt span { color: rgba(10,10,10,0.7); }
+}
+.ob-opt__ico { transition: color 0.3s; }
