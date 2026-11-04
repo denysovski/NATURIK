@@ -1,4 +1,4 @@
-import { gsap, reduceMotion } from '../core/scroll.js';
+import { gsap, ScrollTrigger, reduceMotion } from '../core/scroll.js';
 // Partners divider: a 7×2 grid filling the whole section (2×7 on phones) with white rules. The four partners land in random
 // partners, info cards and glitching tracker cells are shuffled into the grid. Picking a partner opens
 // a panel styled like the Live count buy box. Glitches animate only while the section is on screen.
@@ -144,34 +144,40 @@ export function mountPartners(root) {
     let frame = sec.querySelector('.partners__frame');
     if (!frame) { frame = document.createElement('div'); frame.className = 'partners__frame'; while (sec.firstChild) frame.appendChild(sec.firstChild); sec.appendChild(frame); }
     const sts = [];
-    // The zoom never stops dead at the pin edges: the card is still growing (and slowing down) for the
-    // first part of the pin, and starts shrinking (speeding up) before the pin lets go, so arriving and
-    // leaving feel like one continuous, eased move instead of a "snap" onto the section.
-    // All frame tweens share one scrub value so jumping around never leaves them fighting each other.
-    const SCRUB = 1.2, o = { overwrite: false };
-    // 1) approach: a rounded, smaller card rises and grows
-    sts.push(gsap.fromTo(frame, { scale: 0.76, borderRadius: 36 }, { scale: mobile ? 1 : 0.9, borderRadius: mobile ? 0 : 22, ease: 'none', immediateRender: true, ...o,
-      scrollTrigger: { trigger: sec, start: 'top bottom', end: 'top top', scrub: SCRUB } }).scrollTrigger);
-    // 2) held on screen: the card settles to full screen, "Our partners" breathes, the halves close,
-    //    the grid rests, then the card starts easing away before the pin releases
-    const tl = gsap.timeline({ scrollTrigger: mobile
-      ? { trigger: sec, start: 'top 80%', end: 'top 5%', scrub: SCRUB }
-      : { trigger: sec, start: 'top top', end: () => `+=${innerHeight * 2.2}`, pin: true, scrub: SCRUB, refreshPriority: 1 } });
-    if (!mobile) tl.fromTo(frame, { scale: 0.9, borderRadius: 22 }, { scale: 1, borderRadius: 0, ease: 'sine.out', duration: 0.45, immediateRender: false, ...o }, 0);
-    const c0 = mobile ? 0.1 : 0.45;
-    tl.fromTo(left, { xPercent: -100 * Math.ceil(half) }, { xPercent: 0, ease: 'power3.inOut', duration: 1 }, c0)
-      .fromTo(right, { xPercent: 100 * Math.ceil(half) }, { xPercent: 0, ease: 'power3.inOut', duration: 1 }, c0)
-      .fromTo(mid, { opacity: 0, scaleY: 0.2 }, { opacity: 1, scaleY: 1, ease: 'power2.out', duration: 0.35 }, c0 + 0.65)
-      .fromTo(intro, { scale: 1, opacity: 1 }, { scale: 0.9, opacity: 0, ease: 'power1.in', duration: 0.35 }, c0 + 0.62)
-      .fromTo(svg, { opacity: 0 }, { opacity: 1, ease: 'none', duration: 0.15 }, c0 + 0.85);
-    if (!mobile) tl.to({}, { duration: 0.55 })                           // hold the finished grid
-      .fromTo(frame, { scale: 1, borderRadius: 0 }, { scale: 0.95, borderRadius: 18, ease: 'sine.in', duration: 0.4, immediateRender: false, ...o });
-    // 3) leaving: the card keeps shrinking at the same pace as Live count slides up
-    const next = (sec.parentElement?.classList.contains('pin-spacer') ? sec.parentElement : sec).nextElementSibling;
-    if (next) sts.push(gsap.fromTo(frame, mobile ? { scale: 1, borderRadius: 0 } : { scale: 0.95, borderRadius: 18 }, { scale: 0.86, borderRadius: 32, ease: 'none', immediateRender: false, ...o,
-      scrollTrigger: { trigger: next, start: 'top bottom', end: 'top 30%', scrub: SCRUB } }).scrollTrigger);
+    // ONE timeline, driven by ONE scroll range, plays the whole thing: approach (card grows) →
+    // pinned (settles to full screen, halves close, rest) → leave (card shrinks while the next section
+    // rises). Nothing else animates the frame, so fast scrolling, jumping or scrolling back always lands
+    // on the exact same state for a given scroll position. Scrub is direct (Lenis already smooths).
+    // Timeline units are screen heights, so positions map 1:1 to scroll distance.
+    const A = 1, P = mobile ? 0 : 2.4, E = 0.8;                       // approach, pinned, exit
+    if (!mobile) sts.push(ScrollTrigger.create({ trigger: sec, start: 'top top', end: () => `+=${innerHeight * P}`, pin: true, refreshPriority: 1 }));
+    gsap.set(frame, { scale: 0.76, borderRadius: 36 });
+    const tl = gsap.timeline({ defaults: { ease: 'none' }, scrollTrigger: mobile
+      ? { trigger: sec, start: 'top bottom', end: 'bottom top', scrub: true, refreshPriority: 1 }
+      : { trigger: sec, start: 'top bottom', end: () => `+=${innerHeight * (A + P + E)}`, scrub: true, refreshPriority: 1, invalidateOnRefresh: true } });
+    if (mobile) {
+      tl.to(frame, { scale: 1, borderRadius: 0, duration: 1 }, 0);
+      const c0 = 0.55;
+      tl.fromTo(left, { xPercent: -100 * Math.ceil(half) }, { xPercent: 0, ease: 'power3.inOut', duration: 0.8 }, c0)
+        .fromTo(right, { xPercent: 100 * Math.ceil(half) }, { xPercent: 0, ease: 'power3.inOut', duration: 0.8 }, c0)
+        .fromTo(intro, { opacity: 1 }, { opacity: 0, duration: 0.3 }, c0 + 0.45)
+        .fromTo(svg, { opacity: 0 }, { opacity: 1, duration: 0.15 }, c0 + 0.7)
+        .to({}, { duration: 1 })
+        .to(frame, { scale: 0.88, borderRadius: 28, duration: 0.6 });
+    } else {
+      const p0 = A;                                                    // pin starts here
+      tl.to(frame, { scale: 0.9, borderRadius: 22, duration: A }, 0)    // rise + grow, linear with the scroll
+        .to(frame, { scale: 1, borderRadius: 0, ease: 'sine.out', duration: 0.45 }, p0)   // settles as the pin catches it
+        .fromTo(left, { xPercent: -100 * Math.ceil(half) }, { xPercent: 0, ease: 'power3.inOut', duration: 1 }, p0 + 0.4)
+        .fromTo(right, { xPercent: 100 * Math.ceil(half) }, { xPercent: 0, ease: 'power3.inOut', duration: 1 }, p0 + 0.4)
+        .fromTo(mid, { opacity: 0, scaleY: 0.2 }, { opacity: 1, scaleY: 1, ease: 'power2.out', duration: 0.35 }, p0 + 1.05)
+        .fromTo(intro, { scale: 1, opacity: 1 }, { scale: 0.9, opacity: 0, ease: 'power1.in', duration: 0.35 }, p0 + 1.0)
+        .fromTo(svg, { opacity: 0 }, { opacity: 1, duration: 0.15 }, p0 + 1.25)
+        .to(frame, { scale: 0.95, borderRadius: 18, ease: 'sine.in', duration: 0.45 }, p0 + P - 0.45)  // starts letting go
+        .to(frame, { scale: 0.86, borderRadius: 32, duration: E }, p0 + P);                         // leaves with the scroll
+    }
+    sts.push(tl.scrollTrigger);
     sec._sts = sts;
-    st = tl.scrollTrigger;
   }
   let timer = 0;
   const io = new IntersectionObserver(([e]) => { clearInterval(timer); if (e.isIntersecting) timer = setInterval(glitchStep, 160); });
