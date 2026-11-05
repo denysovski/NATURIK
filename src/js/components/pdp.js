@@ -1,6 +1,6 @@
 // Product detail panel: gallery (photos + live 3D), sizes with stock, size finder, fit scale, delivery ETA, details.
 import { bySlug, PRODUCTS, SIZES, SIZE_CHART, formatPrice, totalStock, SITE_URL } from '../data/products.js';
-import { gsap, lockScroll, unlockScroll } from '../core/scroll.js';
+import { gsap, lockScroll, unlockScroll, reduceMotion } from '../core/scroll.js';
 import { accordion } from './ui.js';
 import { recommendSize } from './sizeAdvisor.js';
 import { addToBag } from '../core/app.js';
@@ -52,7 +52,7 @@ function template(p) {
     <section class="pdp__info" aria-labelledby="pdp-title">
       <p class="t-mono t-muted pdp__kicker">First drop. Limited edition.</p>
       <h1 class="pdp__title" id="pdp-title">${p.name}</h1>
-      <div class="pdp__row"><p class="pdp__price">${formatPrice(p.price)}</p><p class="t-mono t-muted">VAT incl. · duties paid</p></div>
+      <div class="pdp__row pdp__row--price"><p class="pdp__price">${formatPrice(p.price)}</p><span class="info" tabindex="0" role="button" aria-label="Price information: VAT included, duties paid">i<span class="info__bubble" role="tooltip">VAT incl. · duties paid</span></span></div>
       <p class="pdp__tag">${p.tagline}</p>
 
       <div class="stock pdp__edition">
@@ -81,8 +81,8 @@ function template(p) {
         <summary><svg><use href="#i-ruler"/></svg><span>Find my size <span class="t-muted">— 20 seconds</span></span><span class="acc__icon" aria-hidden="true"></span></summary>
         <form class="pdp__finder-form" novalidate>
           <div class="fields fields--2">
-            <div class="field"><label class="field__label" for="f-h">Height (cm)</label><input class="field__input" id="f-h" name="height" type="number" inputmode="numeric" min="140" max="215" placeholder="182"></div>
-            <div class="field"><label class="field__label" for="f-c">Chest (cm) <span class="t-muted">or weight</span></label><input class="field__input" id="f-c" name="chest" type="number" inputmode="numeric" min="40" max="160" placeholder="100"></div>
+            <div class="field"><label class="field__label" for="f-h">Height (cm)</label><input class="field__input" id="f-h" name="height" type="number" inputmode="numeric" pattern="[0-9]*" min="140" max="215" placeholder="182"></div>
+            <div class="field"><label class="field__label" for="f-c">Chest (cm) <span class="t-muted">or weight</span></label><input class="field__input" id="f-c" name="chest" type="number" inputmode="numeric" pattern="[0-9]*" min="40" max="160" placeholder="100"></div>
           </div>
           <fieldset class="seg pdp__fitpick"><legend class="sr-only">Preferred fit</legend>
             <button type="button" aria-pressed="false" data-fit="slim">Closer</button><button type="button" aria-pressed="true" data-fit="regular">As designed</button><button type="button" aria-pressed="false" data-fit="max">Extra volume</button>
@@ -92,14 +92,10 @@ function template(p) {
         </form>
       </details>
 
-      <div class="pdp__fit">
-        <div class="pdp__label"><span class="t-mono">Fit</span><span class="t-mono t-muted">${p.fit} · ${p.length} length</span></div>
-        <div class="fit-scale" aria-label="Fit: oversized by design, take your usual size"><span class="fit-scale__track"><i style="left:72%"></i></span><span class="fit-scale__labels t-mono"><span>Close</span><span>True</span><span>Oversized</span></span></div>
-      </div>
 
       <div class="pdp__cta">
         <button class="btn btn--block pdp__add" type="button" data-add disabled><span class="btn__label">Select a size</span></button>
-        <p class="t-mono pdp__eta"><svg><use href="#i-truck"/></svg>Order today — arrives by ${eta}</p>
+        <p class="pdp__eta"><svg aria-hidden="true"><use href="#i-truck"/></svg>Order today — arrives by ${eta}</p>
       </div>
 
       <ul class="pdp__trust">
@@ -149,10 +145,35 @@ export function openProduct(slug, { from, push = true } = {}) {
   const p = bySlug(slug); if (!p) return;
   ensurePanel();
   const wasOpen = panel.classList.contains('is-open');
-  current = p; selected = null;
-  panel.innerHTML = template(p);
-  panel.scrollTop = 0;
-  bind(p);
+  // switching colour inside the open page: the current page slides out and the other colourway slides in from the side
+  if (wasOpen && current && current.slug !== p.slug && !reduceMotion) {
+    const dir = PRODUCTS.indexOf(p) > PRODUCTS.indexOf(current) ? 1 : -1;
+    const old = panel.querySelector('.pdp__grid');
+    const keepTop = panel.scrollTop;
+    current = p; selected = null;
+    const tmp = document.createElement('div'); tmp.innerHTML = template(p);
+    const fresh = tmp.querySelector('.pdp__grid');
+    panel.classList.add('is-swapping');
+    const t0 = old.offsetTop;
+    // freeze the sticky gallery where it is on screen, so it slides away as a whole instead of jumping
+    const og = old.querySelector('.pdp__gallery'), ogTop = og?.getBoundingClientRect().top;
+    Object.assign(old.style, { position: 'absolute', left: 0, right: 0, top: `${t0}px`, pointerEvents: 'none' });
+    old.setAttribute('inert', ''); old.removeAttribute('id');
+    old.before(fresh);                                   // the new grid comes first, so bind() finds its elements
+    panel.querySelector('[data-sticky]')?.replaceWith(tmp.querySelector('[data-sticky]'));
+    panel.querySelector('.pdp__crumbs [aria-current]').textContent = p.name;
+    panel.scrollTop = 0;
+    gsap.set(old, { y: -keepTop });                      // the old page stays exactly where it was on screen
+    if (og) { Object.assign(og.style, { position: 'relative', top: '0px' }); og.style.transform = `translateY(${ogTop - og.getBoundingClientRect().top}px)`; }
+    gsap.to(old, { xPercent: -100 * dir, opacity: 0.4, duration: 0.75, ease: 'expo.inOut', onComplete: () => old.remove() });
+    gsap.fromTo(fresh, { xPercent: 100 * dir }, { xPercent: 0, duration: 0.75, ease: 'expo.inOut', clearProps: 'transform', onComplete: () => panel.classList.remove('is-swapping') });
+    bind(p);
+  } else {
+    current = p; selected = null;
+    panel.innerHTML = template(p);
+    panel.scrollTop = 0;
+    bind(p);
+  }
   document.title = `${p.fullName} — ${formatPrice(p.price)} | NATURIK`;
   setJsonLd(p);
   setMeta(p);
@@ -173,11 +194,9 @@ export function openProduct(slug, { from, push = true } = {}) {
           onComplete: () => { gsap.to(panel, { opacity: 1, duration: 0.3 }); setTimeout(() => ghost.remove(), 200); } });
         gsap.to(panel, { opacity: 1, duration: 0.5, delay: 0.55 });
       });
-    } else gsap.fromTo(panel, { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.7, ease: 'expo.out' });
-  } else {
-    gsap.fromTo(panel.querySelector('.pdp__grid'), { opacity: 0, x: 30 }, { opacity: 1, x: 0, duration: 0.6, ease: 'expo.out' });
+    } else gsap.fromTo(panel, { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.7, ease: 'expo.out', clearProps: 'transform' });   // no leftover transform: it would trap the fixed mobile buy bar
   }
-  gsap.from(panel.querySelectorAll('.pdp__info > *'), { y: 30, opacity: 0, stagger: 0.04, duration: 0.9, ease: 'expo.out', delay: wasOpen ? 0 : 0.5 });
+  if (!wasOpen) gsap.from(panel.querySelectorAll('.pdp__info > *'), { y: 30, opacity: 0, stagger: 0.04, duration: 0.9, ease: 'expo.out', delay: 0.5 });
   setTimeout(() => panel.querySelector('[data-pdp-close].icon-btn')?.focus({ preventScroll: true }), 600);
 }
 

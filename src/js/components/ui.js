@@ -251,6 +251,11 @@ function enhanceNumber(input) {
   const btns = document.createElement('span'); btns.className = 'num__btns';
   btns.innerHTML = `<button type="button" class="num__btn" data-d="1" tabindex="-1" aria-label="Increase">${CHEV}</button><button type="button" class="num__btn num__btn--down" data-d="-1" tabindex="-1" aria-label="Decrease">${CHEV}</button>`;
   wrap.appendChild(btns);
+  // digits only: no e, +, −, comma or dot — typed or pasted
+  input.addEventListener('keydown', (e) => { if (e.key.length === 1 && !/[0-9]/.test(e.key) && !e.ctrlKey && !e.metaKey) e.preventDefault(); });
+  input.addEventListener('beforeinput', (e) => { if (e.data && /[^0-9]/.test(e.data)) e.preventDefault(); });
+  input.addEventListener('paste', (e) => { const t = (e.clipboardData || window.clipboardData)?.getData('text') || ''; if (/[^0-9]/.test(t)) { e.preventDefault(); const d = t.replace(/[^0-9]/g, ''); if (d) { input.value = d; input.dispatchEvent(new Event('input', { bubbles: true })); } } });
+  input.setAttribute('inputmode', 'numeric'); if (!input.pattern) input.pattern = '[0-9]*';
   let hold = 0, rep = 0;
   const step = (d) => {
     if (input.disabled || input.readOnly) return;

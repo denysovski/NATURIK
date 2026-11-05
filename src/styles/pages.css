@@ -1697,3 +1697,40 @@ input[type="number"]::-webkit-inner-spin-button, input[type="number"]::-webkit-o
 /* the drop count now has three digits */
 .drop-last__num { font-size: clamp(10rem, 25vw, 27rem) !important; }
 @media (max-width: 819px) { .drop-last__num { font-size: 44vw !important; } }
+
+/* ── PDP round 2 ───────────────────────────────────────────── */
+/* gallery stays put for the whole page; only the right column scrolls */
+.pdp__grid { grid-template-columns: minmax(0, 1fr) minmax(380px, 560px); padding-bottom: 0; align-items: start; }
+.pdp__info { padding-bottom: 80px; }
+.pdp__gallery { position: sticky; top: 76px; justify-items: center; }
+/* photos shown whole: the stage keeps the photos' own portrait ratio and the image is contained, never cropped */
+.pdp__stage { height: calc(100vh - 176px); width: auto; max-width: 100%; max-height: none; aspect-ratio: 912 / 1162; }
+.pdp__slide img { object-fit: contain; }
+.pdp__thumbs { max-width: 100%; justify-self: center; }
+@media (max-width: 900px) {
+  .pdp__grid { grid-template-columns: 1fr; }
+  .pdp__gallery { position: relative; top: 0; }
+  .pdp__stage { height: auto; width: 100%; }
+}
+.pdp.is-swapping { overflow-x: hidden; }
+.pdp__grid { background: var(--c-paper); }
+/* price + info bubble (same as Live count) */
+.pdp__row--price { justify-content: flex-start; align-items: center; gap: 12px; }
+.pdp__row--price .info__bubble { left: 0; transform: translate(0, 6px); }
+.pdp__row--price .info:hover .info__bubble, .pdp__row--price .info:focus-visible .info__bubble { transform: translate(0, 0); }
+.pdp__row--price .info__bubble::after { left: 12px; margin-left: 0; }
+/* chosen size: cobalt */
+.pdp .size-chip[aria-pressed='true'] { background: var(--c-cobalt) !important; color: #fff !important; border-color: var(--c-cobalt) !important; }
+/* delivery line: a green bar, same radius as Add to bag, white centred text */
+.pdp__eta { display: flex; justify-content: center; align-items: center; gap: 10px; margin: 0; min-height: 52px; padding: 12px 18px; border-radius: var(--radius-s);
+  background: var(--c-acid); color: #fff; font: 500 0.98rem/1.2 var(--f-display); text-align: center; }
+.pdp__eta svg { width: 18px; height: 18px; color: #fff; }
+.pdp__cta { display: grid; gap: 10px; }
+/* size finder answer: cobalt */
+.pdp__finder-out { background: var(--c-cobalt) !important; color: #fff; border-radius: var(--radius-s); }
+.pdp__finder-out b { color: #fff; }
+/* one arrow style everywhere: native select arrows match the number fields and custom selects */
+select.field__input { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1.5 1.8 6 6.2l4.5-4.4' fill='none' stroke='%238b8b8f' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); }
+.qty { gap: 3px; padding: 3px; }
+.qty button { width: 28px; border-radius: 8px; background: rgba(127,127,127,0.12); transition: background 0.25s, color 0.25s; }
+@media (hover: hover) { .qty button:hover { background: var(--c-acid); color: #000; } }

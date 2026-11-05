@@ -8,7 +8,7 @@ export function createSelect(host, { label, options, value = options[0][0], onCh
   host.innerHTML = `
     <button type="button" class="select__btn" aria-haspopup="listbox" aria-expanded="false" aria-controls="${id}">
       <span class="select__label t-mono">${label}</span><span class="select__value"></span>
-      <svg class="select__chev" viewBox="0 0 12 8" aria-hidden="true"><path d="M1 1l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+      <svg class="select__chev" viewBox="0 0 12 8" aria-hidden="true"><path d="M1.5 1.8 6 6.2l4.5-4.4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </button>
     <ul class="select__list" role="listbox" id="${id}" tabindex="-1" aria-label="${label}">
       ${options.map(([v, t]) => `<li role="option" data-value="${v}" aria-selected="false"><span>${t}</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2"/></svg></li>`).join('')}
