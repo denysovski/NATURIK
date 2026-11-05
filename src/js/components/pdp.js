@@ -8,6 +8,19 @@ import { openLegal } from './legal.js';
 
 let panel, current, selected, unit = 'cm';
 
+// one small fact per gallery photo; the same facts for both colourways, shuffled differently per jacket
+const FACTS = ['800 FP goose down, RDS certified', '420 g of down in 78 cells', 'Comfort rated to −25 °C', '1.62 kg in size M',
+  'Offset two-way YKK® Aquaguard® zip', 'Shot after dark in Prague', '20D recycled ripstop, satin cire', 'The collar zips to the bridge of your nose',
+  'Piece number stitched inside the collar', 'One night at −40 °C before it got its rating', 'No logo on the jacket. Only M1.', 'Re-loft service, for life',
+  'Patterned in Prague, sewn in Portugal', 'PFC-free water repellent', 'The zip was pulled 10,000 times in a cold room', 'Inner pocket fits a phone and goggles'];
+const SPOTS = ['tl', 'bl', 'tr'];
+function factsFor(p) {
+  let seed = [...p.slug].reduce((a, c) => (a * 31 + c.charCodeAt(0)) >>> 0, 7);
+  const rnd = () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296);
+  const list = [...FACTS]; for (let i = list.length - 1; i > 0; i--) { const j = (rnd() * (i + 1)) | 0; [list[i], list[j]] = [list[j], list[i]]; }
+  return p.images.map((_, i) => ({ text: list[i % list.length], spot: SPOTS[(i + (rnd() * 3 | 0)) % 3] }));
+}
+
 function addBusinessDays(d, n) { const r = new Date(d); while (n > 0) { r.setDate(r.getDate() + 1); if (r.getDay() % 6) n--; } return r; }
 
 function ensurePanel() {
@@ -42,7 +55,7 @@ function template(p) {
     <section class="pdp__gallery" aria-label="Gallery">
       <div class="pdp__stage" data-stage>
         <div class="pdp__slides" data-slides tabindex="0" aria-label="Product images, use arrow keys">
-          ${p.images.map((im, i) => `<figure class="pdp__slide"><img src="${im.src}" alt="${im.alt}" ${i ? 'loading="lazy"' : ''} decoding="async"></figure>`).join('')}
+          ${(() => { const f = factsFor(p); return p.images.map((im, i) => `<figure class="pdp__slide"><img src="${im.src}" alt="${im.alt}" ${i ? 'loading="lazy"' : ''} decoding="async"><figcaption class="pdp__fact pdp__fact--${f[i].spot}">${f[i].text}</figcaption></figure>`).join(''); })()}
         </div>
         <div class="pdp__nav"><button class="icon-btn icon-btn--dark" type="button" data-prev aria-label="Previous image"><svg style="transform:scaleX(-1)"><use href="#i-arrow"/></svg></button><span class="pdp__dots" data-counter aria-hidden="true">${p.images.map((_, i) => `<i class="${i ? '' : 'is-on'}"></i>`).join('')}</span><button class="icon-btn icon-btn--dark" type="button" data-next aria-label="Next image"><svg><use href="#i-arrow"/></svg></button></div>
       </div>
@@ -182,20 +195,18 @@ export function openProduct(slug, { from, push = true } = {}) {
   if (push) history.pushState({ p: slug }, '', `?p=${slug}`);
   if (!wasOpen) {
     panel.classList.add('is-open'); lockScroll();
-    const img = from?.querySelector('img');
+    const media = from?.querySelector('.p-card__media');
     const target = panel.querySelector('.pdp__slide img');
-    if (img && target) {
-      // image travels from the card into the gallery
-      const a = img.getBoundingClientRect();
-      const ghost = img.cloneNode(); Object.assign(ghost.style, { position: 'fixed', zIndex: 120, left: a.left + 'px', top: a.top + 'px', width: a.width + 'px', height: a.height + 'px', objectFit: 'cover', borderRadius: '14px', margin: 0, pointerEvents: 'none' });
-      document.body.appendChild(ghost);
+    if (media && target) {
+      // the card blurs under an "Opening an item" spinner until the page is ready, then the page fades in over it
+      media.querySelector('.p-card__opening')?.remove();
+      media.insertAdjacentHTML('beforeend', '<div class="p-card__opening" aria-hidden="true"><span class="p-card__spin"></span><span>Opening an item</span></div>');
+      const ov = media.lastElementChild;
+      requestAnimationFrame(() => ov.classList.add('is-on'));
       gsap.set(panel, { opacity: 0 });
-      requestAnimationFrame(() => {
-        const b = target.getBoundingClientRect();
-        gsap.to(ghost, { left: b.left, top: b.top, width: b.width, height: b.height, borderRadius: 14, duration: 0.9, ease: 'expo.inOut',
-          onComplete: () => { gsap.to(panel, { opacity: 1, duration: 0.3 }); setTimeout(() => ghost.remove(), 200); } });
-        gsap.to(panel, { opacity: 1, duration: 0.5, delay: 0.55 });
-      });
+      const ready = target.complete ? Promise.resolve() : new Promise((r) => { target.addEventListener('load', r, { once: true }); target.addEventListener('error', r, { once: true }); setTimeout(r, 1500); });
+      Promise.all([ready, new Promise((r) => setTimeout(r, 450))]).then(() =>
+        gsap.to(panel, { opacity: 1, duration: 0.45, ease: 'power2.out', onComplete: () => ov.remove() }));
     } else gsap.fromTo(panel, { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.7, ease: 'expo.out', clearProps: 'transform' });   // no leftover transform: it would trap the fixed mobile buy bar
   }
   if (!wasOpen) gsap.from(panel.querySelectorAll('.pdp__info > *'), { y: 30, opacity: 0, stagger: 0.04, duration: 0.9, ease: 'expo.out', delay: 0.5 });

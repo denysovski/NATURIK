@@ -1,3 +1,4 @@
+import { mountContact3d } from '../components/contact3d.js';
 import { gsap } from '../core/scroll.js';
 import { initReveals } from '../components/ui.js';
 import { createSelect } from '../components/select.js';
@@ -105,5 +106,6 @@ export function mount(root = document) {
   }
 
   const ctx = gsap.context(() => initReveals(root));
+  cleanups.push(mountContact3d(root));
   return () => { ctx.revert(); cleanups.forEach((f) => f()); };
 }

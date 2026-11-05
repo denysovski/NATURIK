@@ -199,7 +199,7 @@ select.field__input option { color: #000; }
 /* ---------- Modal ---------- */
 .modal { position: fixed; inset: 0; z-index: var(--z-modal); display: grid; place-items: center; padding: 12px; pointer-events: none; }
 .modal__backdrop { position: absolute; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); opacity: 0; transition: opacity 0.5s var(--ease-out); }
-.modal__panel { position: relative; width: min(var(--w, 720px), 100%); max-height: calc(100dvh - 24px); overflow: auto; border-radius: var(--radius-m); background: var(--c-paper); color: var(--c-ink); opacity: 0; transform: translateY(40px) scale(0.98); transition: transform 0.7s var(--ease-out), opacity 0.4s; overscroll-behavior: contain; }
+.modal__panel { position: relative; width: min(var(--w, 720px), 100%); max-height: calc(100dvh - 24px); overflow: auto; border-radius: var(--radius-m); background: var(--c-paper); color: var(--c-ink); opacity: 0; transform: translateY(24px); transition: transform 0.55s var(--ease-out), opacity 0.35s; overscroll-behavior: contain; }
 .modal.is-open { pointer-events: auto; }
 .modal.is-open .modal__backdrop { opacity: 1; }
 .modal.is-open .modal__panel { opacity: 1; transform: none; }
