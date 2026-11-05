@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://denysovski.github.io/NATURIK/sitemap.xml
