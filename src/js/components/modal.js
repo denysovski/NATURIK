@@ -25,6 +25,6 @@ export function initModals() {
     const c = e.target.closest('[data-modal-close]');
     if (c) closeModal(c.closest('[data-modal]'));
   });
-  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && stack.length) closeModal(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && stack.length) { e.preventDefault(); closeModal(); } });   // handled: Esc closes only the top layer
 }
 export const modalOpen = () => stack.length > 0;

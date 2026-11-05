@@ -29,7 +29,7 @@ function ensurePanel() {
   panel.className = 'pdp'; panel.setAttribute('data-lenis-prevent', '');   // wheel scrolls the panel, not the page behind it
   panel.setAttribute('role', 'dialog'); panel.setAttribute('aria-modal', 'true'); panel.setAttribute('aria-label', 'Product details');
   document.body.appendChild(panel);
-  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && panel.classList.contains('is-open') && !document.querySelector('.modal.is-open')) closeProduct(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !e.defaultPrevented && panel.classList.contains('is-open') && !document.querySelector('.modal.is-open')) closeProduct(); });
   return panel;
 }
 

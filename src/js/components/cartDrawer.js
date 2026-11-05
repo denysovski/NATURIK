@@ -28,7 +28,7 @@ export function initCart() {
     if (e.target.closest('[data-cart-open]')) { e.preventDefault(); open(); }
     if (e.target.closest('[data-cart-close]') || e.target === overlay) close();
   });
-  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && drawer.classList.contains('is-open')) close(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !e.defaultPrevented && drawer.classList.contains('is-open')) { e.preventDefault(); close(); } });
 
   body.addEventListener('click', (e) => {
     const li = e.target.closest('[data-key]'); if (!li) return;
