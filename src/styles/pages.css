@@ -1069,7 +1069,7 @@ body.is-locked { overflow: visible; }
 .drop-buy__add { transition: background-color 0.25s, border-color 0.25s, opacity 0.25s; }
 
 /* hero remaining: fixed box, digits right-aligned so nothing shifts while counting */
-.hero__stock-num [data-m1-left] { display: inline-block; text-align: right; font-variant-numeric: tabular-nums; }
+.hero__stock-num [data-drop-left] { display: inline-block; text-align: right; font-variant-numeric: tabular-nums; }
 
 /* transition FX: tracker boxes + terminal behind the wordmark */
 .curtain__fx { position: absolute; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
@@ -1266,7 +1266,7 @@ body.is-locked { overflow: visible; }
 .who-star--2 { z-index: 0 !important; }
 /* hero 21/78: clear space between the count and the slash */
 .hero__stock-num { display: inline-flex; align-items: baseline; gap: 0.12em; }
-.hero__stock-num [data-m1-left] { margin-right: 0.04em; }
+.hero__stock-num [data-drop-left] { margin-right: 0.04em; }
 
 /* bag: wider blue free-shipping meter, bold dispatch line */
 .ship-meter .stock__bar { height: 8px !important; border-radius: 999px; overflow: hidden; }
@@ -1634,3 +1634,66 @@ html.is-routing .fab { opacity: 0; pointer-events: none; transition: opacity 0.3
   .ob-opt:hover .ob-opt__txt span { color: rgba(10,10,10,0.7); }
 }
 .ob-opt__ico { transition: color 0.3s; }
+
+/* ── round: stock, partners, PDP ─────────────────────────────── */
+/* Live count: no pulsing dot */
+.live-now__dot { display: none; }
+/* Who we are → Follow the studio: green fill, white icon on hover */
+@media (hover: hover) { .socials--ink a:hover { background: var(--c-acid); border-color: var(--c-acid); color: #fff; } }
+/* "out after dark" and "six pieces" in green */
+.who .t-h2 em, .who .t-h2 em .word { color: var(--c-acid); }
+#row-title em, #row-title em .word { color: #5f9c00; }
+
+/* partners: cheaper layers — the frame is only its own layer while it moves (crisp text when still) */
+.partners__frame { will-change: auto; }
+.partners__frame.is-moving { will-change: transform; }
+.partners__noise { mix-blend-mode: normal !important; will-change: transform; }
+.pstar { will-change: transform, opacity; }
+.gl__box { transition: left 0.14s steps(2), top 0.14s steps(2), width 0.14s steps(2), height 0.14s steps(2); }
+/* the detail card lives outside the zooming frame, so its text is always rendered at full resolution */
+.partners > .partners__panel { position: absolute !important; inset: 0 !important; z-index: 6; }
+.partners__panel .pp { -webkit-font-smoothing: antialiased; backface-visibility: hidden; }
+
+/* PDP */
+.pdp__kicker { margin: 0; }
+.pdp__title { color: #5f9c00; }
+.pdp__tag { font-size: 0.92rem !important; line-height: 1.4; color: #55555b; }
+.pdp__edition .stock__fill { background: var(--c-acid) !important; }
+.pdp__slide { cursor: grab; }
+.pdp__stock-note:empty { display: none; }
+.pdp__trust b { font-weight: 400; color: #5f9c00; }
+.pdp__finder-form { overflow: hidden; }
+.pdp__finder .acc__icon::after { transition: transform 0.45s var(--ease-out); }
+.pdp__finder.is-closing .acc__icon::after { transform: rotate(90deg); }
+
+/* number fields: custom arrows (native spinners hidden everywhere) */
+input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
+input[type="number"]::-webkit-inner-spin-button, input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+.num { position: relative; display: block; }
+.num > .field__input { padding-right: 52px; }
+.num__btns { position: absolute; top: 6px; right: 6px; bottom: 6px; width: 34px; display: grid; grid-template-rows: 1fr 1fr; gap: 3px; }
+.num__btn { display: grid; place-items: center; border-radius: 8px; background: rgba(127,127,127,0.12); color: currentColor; cursor: pointer; transition: background 0.25s, color 0.25s; -webkit-tap-highlight-color: transparent; }
+.num__btn svg { width: 11px; height: 8px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; transition: transform 0.3s var(--ease-out); }
+.num__btn--down svg { transform: rotate(180deg); }
+@media (hover: hover) { .num__btn:hover { background: var(--c-acid); color: #000; } .num__btn:hover svg { transform: translateY(-1px); } .num__btn--down:hover svg { transform: rotate(180deg) translateY(-1px); } }
+.num__btn.is-hit { animation: num-hit 0.28s var(--ease-out); }
+@keyframes num-hit { 40% { transform: scale(0.88); } }
+/* shop hero: "106 pieces left" bottom-left under the title, white, same face as the lead */
+.shop-hero__foot { display: flex; justify-content: space-between; align-items: flex-end; gap: 24px 40px; flex-wrap: wrap; }
+.shop-hero__left { margin: 0; color: #fff; }
+.shop-hero__foot .shop-hero__lead { margin: 0 0 0 auto; }
+@media (max-width: 819px) { .shop-hero__foot .shop-hero__lead { margin: 0; } }
+/* product cards: pieces left in green */
+.p-card__left { color: #5f9c00; }
+.theme-dark .p-card__left { color: var(--c-acid); }
+.product-grid--row { grid-template-columns: repeat(2, 1fr) !important; gap: 40px 24px; }
+@media (max-width: 520px) { .product-grid--row { grid-template-columns: 1fr !important; } }
+.roll__col { align-items: center; } .roll__col > span { white-space: nowrap; }
+.hero__stock-num [data-drop-left] { letter-spacing: 0.02em; }
+/* clock ~30% bigger on desktop; it grows into the free space on the right, still centred vertically on the copy */
+@media (min-width: 901px) {
+  .clock { width: min(910px, 63vw, 100vh); justify-self: end; margin-right: -2vw; }   /* wider than its column: overflows into the gap, not the copy */
+}
+/* the drop count now has three digits */
+.drop-last__num { font-size: clamp(10rem, 25vw, 27rem) !important; }
+@media (max-width: 819px) { .drop-last__num { font-size: 44vw !important; } }

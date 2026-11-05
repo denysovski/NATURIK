@@ -33,7 +33,7 @@ export const bag = {
   },
   setQty(key, qty) {
     const i = state.items.find((x) => x.key === key); if (!i) return;
-    const p = bySlug(i.slug); const max = Math.min(p.stock[i.size] ?? 0, 2);
+    const p = bySlug(i.slug); if (!p) return; const max = Math.min(p.stock[i.size] ?? 0, 2);
     i.qty = Math.max(0, Math.min(max, qty));
     if (!i.qty) state.items = state.items.filter((x) => x !== i);
     save();

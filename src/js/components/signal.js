@@ -14,7 +14,7 @@ const PHRASES = [
   { t: '800 fill. −25 °C.', href: '#spec', c: 'blue' },
   { t: 'Write to the studio.', href: './contact.html', c: 'acid' },
   { t: 'What keeps you warm?', href: '#manifesto', c: 'blue' },
-  { t: 'Six pieces. One drop.', href: '#row-title', c: 'acid' },
+  { t: 'Two pieces. One drop.', href: '#row-title', c: 'acid' },
   { t: 'Repaired for life.', href: './contact.html', c: 'blue' },
 ];
 const WORDS = ['DROP01', 'CELL78', '800 FP', '−25 °C', 'funnel collar', 'satin ripstop', '420 g', 'Prague', 'M1 / 78C', 'no restock', 'cell 41', 'why cold?', 'after dark', '2 am', 'offset zip', 'RDS down'];

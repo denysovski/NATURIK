@@ -45,21 +45,21 @@ export const BODY_CHART = { height: [165, 172, 178, 184, 190, 196], chest: [86, 
 
 const base = {
   m1: {
-    model: 'm1', family: 'M1 Puffer 78C', fit: 'Oversized', length: 'Hip', price: 890, edition: 78,
+    model: 'm1', family: 'M1 Puffer 78C', fit: 'Oversized', length: 'Hip', price: 890, edition: 100,
     tagline: '78 hand-filled down cells. One funnel collar. Built for −25 °C city nights.',
     description: 'The jacket the drop is named after. Seventy-eight individually baffled cells of 800-fill responsible down, sealed in a satin-finish recycled ripstop that throws light like wet asphalt. The two-cell funnel collar zips to the bridge of your nose, the offset zip keeps a clean chest panel for the reflective M1 print, and dropped shoulders give the silhouette its heavy, sculpted volume.',
     specs: [['Fill', '800 FP RDS down, 420 g'], ['Shell', '20D recycled nylon ripstop, satin cire'], ['Finish', 'PFC-free DWR'], ['Rating', 'Comfort to −25 °C'], ['Weight', '1.62 kg (size M)'], ['Cells', '78 sewn-through baffles']],
     features: ['Two-cell funnel collar with chin guard', 'Offset two-way YKK® Aquaguard® zip', 'Reflective M1 chest print', 'Fleece-lined hand-warmer pockets', 'Internal phone + goggle pocket', 'Elastic storm cuffs'],
   },
   c3: {
-    model: 'c3', family: 'C3 Cropped Cell', fit: 'Boxy oversized', length: 'Cropped', price: 690, edition: 120,
+    model: 'c3', family: 'C3 Cropped Cell', fit: 'Boxy oversized', length: 'Cropped', price: 690, edition: 110,
     tagline: 'Fewer cells, more volume. Cropped at the waist, built to layer.',
     description: 'A short, boxy cut with three oversized baffles that sit high on the body — made for wide trousers and long layers underneath. Same down, same shell, same collar engineering as the M1 in a lighter, louder proportion.',
     specs: [['Fill', '800 FP RDS down, 300 g'], ['Shell', '20D recycled nylon ripstop, satin cire'], ['Finish', 'PFC-free DWR'], ['Rating', 'Comfort to −15 °C'], ['Weight', '1.18 kg (size M)'], ['Cells', '54 sewn-through baffles']],
     features: ['Single-cell stand collar', 'Offset two-way zip', 'Cropped elastic hem', 'Hand-warmer pockets', 'Packs into its own inner pocket'],
   },
   l7: {
-    model: 'l7', family: 'L7 Long Cell Coat', fit: 'Relaxed A-line', length: 'Below knee', price: 1150, edition: 48,
+    model: 'l7', family: 'L7 Long Cell Coat', fit: 'Relaxed A-line', length: 'Below knee', price: 1150, edition: 40,
     tagline: 'Full-length warmth. Eight rows of down from collar to calf.',
     description: 'The longest piece in the drop, cut in a slight A-line so it moves when you walk. Two-way zip opens from the hem for stride, and the collar is the same tall two-cell construction as the M1.',
     specs: [['Fill', '800 FP RDS down, 560 g'], ['Shell', '20D recycled nylon ripstop, satin cire'], ['Finish', 'PFC-free DWR'], ['Rating', 'Comfort to −30 °C'], ['Weight', '2.05 kg (size M)'], ['Cells', '112 sewn-through baffles']],
@@ -82,18 +82,18 @@ function make(model, cw, stock, imgs, extra = {}) {
 }
 
 export const PRODUCTS = [
-  // black first, then white — the home row reads three Obsidian, three Arctic.
-  // The first two images of every card (default + hover) are never repeated on another card.
-  make('m1', 'obsidian', { XS: 2, S: 4, M: 6, L: 5, XL: 3, XXL: 1 }, ['m1-editorial-hero', 'm1-back', 'm1-front', 'm1-chest', 'm1-three', 'm1-side', 'm1-editorial-sleeve', 'm1-editorial-back', 'm1-detail-print'], { hero: true }),
-  make('c3', 'obsidian', { XS: 4, S: 7, M: 9, L: 8, XL: 4, XXL: 2 }, ['m1-hand', 'm1-acid-rain', 'm1-chest', 'm1-editorial-sleeve']),
-  make('l7', 'obsidian', { XS: 1, S: 2, M: 3, L: 2, XL: 1, XXL: 1 }, ['m1-goggles', 'm1-zip', 'm1-editorial-back', 'm1-three']),
-  make('m1', 'arctic', { XS: 1, S: 3, M: 5, L: 4, XL: 2, XXL: 0 }, ['arctic-splash-close', 'arctic-front', 'arctic-back', 'arctic-shoulder']),
-  make('c3', 'arctic', { XS: 3, S: 6, M: 0, L: 6, XL: 3, XXL: 2 }, ['arctic-back', 'arctic-splash-front', 'arctic-shoulder', 'arctic-full']),
-  make('l7', 'arctic', { XS: 0, S: 1, M: 2, L: 2, XL: 1, XXL: 0 }, ['arctic-splash-turn', 'arctic-full', 'arctic-front', 'arctic-splash-close']),
+  // Drop 01 is one jacket in two colourways. Each card carries every photo of its colour, rain shots included.
+  make('m1', 'obsidian', { XS: 6, S: 12, M: 16, L: 15, XL: 10, XXL: 6 }, ['m1-editorial-hero', 'm1-back', 'm1-front', 'm1-three', 'm1-side', 'm1-acid-rain', 'm1-hand', 'm1-goggles', 'm1-chest', 'm1-zip', 'm1-editorial-sleeve', 'm1-editorial-back', 'm1-detail-print'], { hero: true, edition: 250 }),
+  make('m1', 'arctic', { XS: 3, S: 8, M: 11, L: 10, XL: 6, XXL: 3 }, ['arctic-splash-turn', 'arctic-full', 'arctic-front', 'arctic-back', 'arctic-shoulder', 'arctic-splash-front', 'arctic-splash-close'], { edition: 250 }),
 ];
 
 export const bySlug = (s) => PRODUCTS.find((p) => p.slug === s);
 export const totalStock = (p) => Object.values(p.stock).reduce((a, b) => a + b, 0);
+// the whole drop: every piece of every silhouette, black and white together (500 made)
+export const DROP_EDITION = PRODUCTS.reduce((a, p) => a + p.edition, 0);
+export const dropLeft = (color) => PRODUCTS.filter((p) => !color || p.color === color).reduce((a, p) => a + totalStock(p), 0);
+export const dropMade = (color) => PRODUCTS.filter((p) => !color || p.color === color).reduce((a, p) => a + p.edition, 0);
+export const sizeLeft = (size) => PRODUCTS.reduce((a, p) => a + (p.stock[size] || 0), 0);
 export const formatPrice = (n) => new Intl.NumberFormat('en-IE', { style: 'currency', currency: 'EUR', maximumFractionDigits: n % 1 ? 2 : 0 }).format(n);
 export const FREE_SHIPPING = 300;
 export const SITE_URL = 'https://denysovski.github.io/NATURIK/';

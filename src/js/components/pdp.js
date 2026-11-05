@@ -13,7 +13,8 @@ function addBusinessDays(d, n) { const r = new Date(d); while (n > 0) { r.setDat
 function ensurePanel() {
   if (panel) return panel;
   panel = document.createElement('div');
-  panel.className = 'pdp'; panel.setAttribute('role', 'dialog'); panel.setAttribute('aria-modal', 'true'); panel.setAttribute('aria-label', 'Product details');
+  panel.className = 'pdp'; panel.setAttribute('data-lenis-prevent', '');   // wheel scrolls the panel, not the page behind it
+  panel.setAttribute('role', 'dialog'); panel.setAttribute('aria-modal', 'true'); panel.setAttribute('aria-label', 'Product details');
   document.body.appendChild(panel);
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && panel.classList.contains('is-open') && !document.querySelector('.modal.is-open')) closeProduct(); });
   return panel;
@@ -39,19 +40,17 @@ function template(p) {
   </div>
   <div class="pdp__grid">
     <section class="pdp__gallery" aria-label="Gallery">
-      <span class="pdp__tabs glass t-mono">Tap to zoom</span>
       <div class="pdp__stage" data-stage>
         <div class="pdp__slides" data-slides tabindex="0" aria-label="Product images, use arrow keys">
-          ${p.images.map((im, i) => `<figure class="pdp__slide hv" data-cursor="Zoom"><img src="${im.src}" alt="${im.alt}" ${i ? 'loading="lazy"' : ''} decoding="async"></figure>`).join('')}
+          ${p.images.map((im, i) => `<figure class="pdp__slide"><img src="${im.src}" alt="${im.alt}" ${i ? 'loading="lazy"' : ''} decoding="async"></figure>`).join('')}
         </div>
         <div class="pdp__nav"><button class="icon-btn icon-btn--dark" type="button" data-prev aria-label="Previous image"><svg style="transform:scaleX(-1)"><use href="#i-arrow"/></svg></button><span class="pdp__dots" data-counter aria-hidden="true">${p.images.map((_, i) => `<i class="${i ? '' : 'is-on'}"></i>`).join('')}</span><button class="icon-btn icon-btn--dark" type="button" data-next aria-label="Next image"><svg><use href="#i-arrow"/></svg></button></div>
-        <div class="pdp__zoom" data-zoom hidden><img alt=""></div>
       </div>
       <div class="pdp__thumbs" data-thumbs>${p.images.map((im, i) => `<button type="button" class="${i ? '' : 'is-active'}" data-thumb="${i}" aria-label="Show image ${i + 1}"><img src="${im.sm}" alt="" loading="lazy"></button>`).join('')}</div>
     </section>
 
     <section class="pdp__info" aria-labelledby="pdp-title">
-      <p class="t-mono t-muted">Drop 01 · Limited to ${p.edition} pieces</p>
+      <p class="t-mono t-muted pdp__kicker">First drop. Limited edition.</p>
       <h1 class="pdp__title" id="pdp-title">${p.name}</h1>
       <div class="pdp__row"><p class="pdp__price">${formatPrice(p.price)}</p><p class="t-mono t-muted">VAT incl. · duties paid</p></div>
       <p class="pdp__tag">${p.tagline}</p>
@@ -70,11 +69,11 @@ function template(p) {
       </div>
 
       <div class="pdp__block">
-        <div class="pdp__label"><span class="t-mono" data-size-label>Size — select</span><button type="button" class="link-btn t-mono" data-size-guide>Size guide</button></div>
+        <div class="pdp__label"><span class="t-mono" data-size-label>Size</span><button type="button" class="link-btn t-mono" data-size-guide>Size guide</button></div>
         <div class="size-grid" role="radiogroup" aria-label="Size">
           ${SIZES.map((s) => `<button type="button" class="size-chip ${p.stock[s] && p.stock[s] <= 2 ? 'is-low' : ''}" ${p.stock[s] ? '' : 'is-soldout'}" data-size="${s}" aria-pressed="false" aria-label="${s}${p.stock[s] ? (p.stock[s] <= 2 ? `, only ${p.stock[s]} left` : '') : ', sold out — join the waitlist'}">${s}</button>`).join('')}
         </div>
-        <p class="t-mono t-muted pdp__stock-note" data-stock-note aria-live="polite">Dot = 2 or fewer left. Sold out? Tap the size to join the waitlist.</p>
+        <p class="t-mono t-muted pdp__stock-note" data-stock-note aria-live="polite"></p>
         <div class="waitlist" data-waitlist hidden></div>
       </div>
 
@@ -96,7 +95,6 @@ function template(p) {
       <div class="pdp__fit">
         <div class="pdp__label"><span class="t-mono">Fit</span><span class="t-mono t-muted">${p.fit} · ${p.length} length</span></div>
         <div class="fit-scale" aria-label="Fit: oversized by design, take your usual size"><span class="fit-scale__track"><i style="left:72%"></i></span><span class="fit-scale__labels t-mono"><span>Close</span><span>True</span><span>Oversized</span></span></div>
-        <p class="t-muted pdp__fit-note">Cut to wear over a hoodie and knit. Take your usual size; size down for a cleaner line.</p>
       </div>
 
       <div class="pdp__cta">
@@ -221,25 +219,13 @@ function bind(p) {
   slides.addEventListener('pointerdown', (e) => { if (e.pointerType !== 'mouse') return; down = true; moved = false; sx = e.clientX; sl = slides.scrollLeft; slides.style.scrollSnapType = 'none'; });
   window.addEventListener('pointermove', (e) => { if (!down) return; const dx = e.clientX - sx; if (Math.abs(dx) > 4) moved = true; slides.scrollLeft = sl - dx; });
   window.addEventListener('pointerup', (e) => { if (!down) return; down = false; slides.style.scrollSnapType = ''; const dx = e.clientX - sx; go(Math.abs(dx) > 60 ? idx + (dx < 0 ? 1 : -1) : idx); });
-  // zoom: click to open, pointer pans
-  const zoom = $('[data-zoom]'), zimg = zoom.querySelector('img');
-  slides.addEventListener('click', (e) => {
-    if (moved) return;
-    const img = e.target.closest('.pdp__slide img'); if (!img) return;
-    zimg.src = img.src; zimg.alt = img.alt; zoom.hidden = false;
-    gsap.fromTo(zoom, { opacity: 0 }, { opacity: 1, duration: 0.3 });
-  });
-  zoom.addEventListener('pointermove', (e) => { const r = zoom.getBoundingClientRect(); zimg.style.transformOrigin = `${((e.clientX - r.left) / r.width) * 100}% ${((e.clientY - r.top) / r.height) * 100}%`; });
-  zoom.addEventListener('click', () => (zoom.hidden = true));
 
   /* sizes */
   const add = $('[data-add]'), stickyAdd = $('[data-sticky-add]');
   const select = (s) => {
     selected = s;
     $$('.size-chip[data-size]').forEach((c) => c.setAttribute('aria-pressed', String(c.dataset.size === s)));
-    $('[data-size-label]').textContent = `Size — ${s}`;
-    const n = p.stock[s];
-    $('[data-stock-note]').innerHTML = n <= 2 ? `<span style="color:var(--c-acid)">Only ${n} left in ${s}</span> — reserved for 15 min at checkout` : `${s} in stock · ships within 24 h`;
+    $('[data-stock-note]').innerHTML = '';
     add.disabled = false; add.querySelector('.btn__label').textContent = `Add to bag — ${formatPrice(p.price)}`;
     $('[data-sticky-size]').textContent = `Size ${s}`;
   };
@@ -271,6 +257,24 @@ function bind(p) {
   };
   add.onclick = doAdd; stickyAdd.onclick = doAdd;
   $('[data-size-guide]').onclick = () => openLegal('sizing');
+
+  /* size finder: the panel slides open and closed instead of jumping */
+  const finder = $('[data-finder]'), fsum = finder.querySelector('summary'), fbody = finder.querySelector('.pdp__finder-form');
+  let fAnim = null;
+  fsum.addEventListener('click', (e) => {
+    e.preventDefault();
+    fAnim?.kill();
+    const opening = !finder.open || finder.classList.contains('is-closing');
+    if (opening) {
+      const h0 = finder.classList.contains('is-closing') ? fbody.offsetHeight : 0;
+      finder.classList.remove('is-closing'); finder.open = true;
+      fAnim = gsap.fromTo(fbody, { height: h0, opacity: h0 ? 1 : 0 }, { height: 'auto', opacity: 1, duration: 0.6, ease: 'expo.out', clearProps: 'height,opacity' });
+      gsap.fromTo(fbody.children, { y: 12, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5, ease: 'expo.out', stagger: 0.04, delay: 0.05, clearProps: 'all' });
+    } else {
+      finder.classList.add('is-closing');
+      fAnim = gsap.to(fbody, { height: 0, opacity: 0, duration: 0.42, ease: 'power3.inOut', onComplete: () => { finder.open = false; finder.classList.remove('is-closing'); gsap.set(fbody, { clearProps: 'height,opacity' }); } });
+    }
+  });
 
   /* size finder */
   let fit = 'regular';

@@ -38,6 +38,11 @@ function roll(el, str, { spin = 0, delay = 0 } = {}) {
     const col = cell.firstChild, to = chars[i], from = prev[i] ?? '';
     gsap.killTweensOf(col);
     if (from === to && !spin) { col.innerHTML = `<span>${to}</span>`; gsap.set(col, { yPercent: 0 }); return; }
+    // lock the window to the final glyph's width so the spinning digits (not all equally wide in this face)
+    // never push the number sideways
+    col.innerHTML = `<span>${to === ' ' ? '&nbsp;' : to}</span>`; cell.style.width = '';
+    const fs = parseFloat(getComputedStyle(el).fontSize) || 16;
+    cell.style.width = `${(cell.getBoundingClientRect().width / fs).toFixed(3)}em`;
     const seq = [from || ' '];
     if (spin && isDigit(to)) for (let n = 0; n < spin + ((chars.length - i) % 3); n++) seq.push(String((Math.random() * 10) | 0));
     seq.push(to);
@@ -45,7 +50,7 @@ function roll(el, str, { spin = 0, delay = 0 } = {}) {
     const order = chars.length - 1 - i;                        // the last digit moves first, like a counter
     gsap.fromTo(col, { yPercent: 0 }, { yPercent: -100 * (seq.length - 1) / seq.length, duration: spin ? 1.1 + order * 0.12 : 0.8,
       ease: spin ? 'expo.out' : 'power3.inOut', delay: delay + (spin ? order * 0.04 : order * 0.06 + k++ * 0.02),
-      onComplete: () => { col.innerHTML = `<span>${to}</span>`; gsap.set(col, { yPercent: 0 }); } });
+      onComplete: () => { col.innerHTML = `<span>${to}</span>`; gsap.set(col, { yPercent: 0 }); cell.style.width = ''; } });
   });
 }
 

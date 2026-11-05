@@ -1,7 +1,7 @@
 import { addToBag } from '../core/app.js';
 import { gsap, ScrollTrigger, reduceMotion } from '../core/scroll.js';
 import { initReveals, initCounters, split } from '../components/ui.js';
-import { SIZES, bySlug, totalStock } from '../data/products.js';
+import { SIZES, bySlug, totalStock, dropLeft, sizeLeft, DROP_EDITION } from '../data/products.js';
 import { mountSignal } from '../components/signal.js';
 import { mountBlob } from '../components/blob.js';
 import { mountLookOrbs } from '../components/lookOrbs.js';
@@ -28,10 +28,14 @@ export function mount(root = document) {
   };
 
   /* ---------- live data ---------- */
-  $$('[data-m1-left], [data-m1-left-count]').forEach((n) => (n.textContent = totalStock(m1)));
-  const heroLeft = $('.hero__stock-num [data-m1-left]');
+  // one source of truth: the same total as the "pieces left" chip in the nav (both colourways, black + white)
+  $$('[data-drop-left], [data-drop-left-count]').forEach((n) => (n.textContent = dropLeft()));
+  $$('[data-m1-left]').forEach((n) => (n.textContent = totalStock(m1)));   // M1 Obsidian only (stage tag, mobile CTA)
+  $$('[data-drop-made]').forEach((n) => (n.textContent = DROP_EDITION));
+  $$('[data-drop-split]').forEach((n) => (n.textContent = `${dropLeft('black')} black, ${dropLeft('white')} white`));
+  const heroLeft = $('.hero__stock-num [data-drop-left]');
   if (heroLeft && !reduceMotion) {
-    const end = totalStock(m1);
+    const end = dropLeft();
     // lock the width at the final value — measured only after the display font has loaded
     const run = () => {
       heroLeft.style.width = ''; heroLeft.textContent = end;
@@ -43,8 +47,8 @@ export function mount(root = document) {
     (document.fonts?.ready || Promise.resolve()).then(() => requestAnimationFrame(run));
   }
   $('[data-size-stock]').innerHTML = SIZES.map((s) => {
-    const n = m1.stock[s];
-    return `<div class="size-stock__row"><span class="t-mono">${s}</span><span class="stock__bar"><span class="stock__fill" style="--p:${(n / 8) * 100}%"></span></span><span class="t-mono ${n <= 2 ? 'is-low' : ''}">${n ? `${n} left` : 'Sold out'}</span></div>`;
+    const n = sizeLeft(s), top = Math.max(...SIZES.map(sizeLeft));
+    return `<div class="size-stock__row"><span class="t-mono">${s}</span><span class="stock__bar"><span class="stock__fill" style="--p:${(n / top) * 100}%"></span></span><span class="t-mono ${n <= 2 ? 'is-low' : ''}">${n ? `${n} left` : 'Sold out'}</span></div>`;
   }).join('');
   const drop = $('[data-drop-sizes]'), dropAdd = $('[data-drop-add]');
   let dropSize = null;
@@ -102,7 +106,7 @@ export function mount(root = document) {
      DETAILS — pinned full-bleed zoom with glass cards
      ========================================================= */
   const STEPS = [
-    { img: 'hero', fx: 0.5, fy: 0.5, s: 1, title: 'M1 Puffer 78C', text: 'Seventy-eight hand-filled cells, one funnel collar and a satin shell that throws light like wet asphalt.', spec: 'Obsidian · 78 numbered pieces' },
+    { img: 'hero', fx: 0.5, fy: 0.5, s: 1, title: 'M1 Puffer 78C', text: 'Seventy-eight hand-filled cells, one funnel collar and a satin shell that throws light like wet asphalt.', spec: 'Obsidian · 100 numbered pieces' },
     { img: 'hero', fx: 0.5, fy: 0.3, s: 2.2, title: 'Funnel collar', text: 'Two stacked cells rise to the bridge of your nose. A brushed chin guard sits inside, so the zip never touches skin.', spec: 'Height 27 cm · two cells' },
     { img: 'hero', fx: 0.41, fy: 0.62, s: 2.6, title: 'M1 print', text: 'Matte grey by day, bright under headlights. Printed across one full chest cell so it moves with the down.', spec: 'Reflective · wash-fast' },
     { img: 'hero', fx: 0.25, fy: 0.66, s: 2.3, title: 'Shoulder cell', text: 'One continuous cell over a dropped shoulder — no seam where a bag strap sits. The wordmark rides on the cap.', spec: 'Single-cell yoke' },

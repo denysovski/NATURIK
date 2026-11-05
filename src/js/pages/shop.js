@@ -15,7 +15,7 @@ export function mount(root = document) {
 
   const grid = $('[data-grid]');
   const params = new URLSearchParams(location.search);
-  let filter = ['black', 'white', 'm1', 'c3', 'l7'].includes(params.get('c')) ? params.get('c') : 'all', sort = 'featured';
+  let filter = ['black', 'white'].includes(params.get('c')) ? params.get('c') : 'all', sort = 'featured';
 
   if (!grid.children.length) grid.innerHTML = PRODUCTS.map((p, i) => productCard(p, { eager: i < 3, index: i })).join('');
   $('[data-shop-total]').textContent = PRODUCTS.reduce((a, p) => a + totalStock(p), 0);

@@ -83,9 +83,15 @@ export function mountPartners(root) {
   const pick = (a) => a[(Math.random() * a.length) | 0];
   const allBoxes = () => glitch.flatMap((g) => g.boxes.filter((b) => b.style.display !== 'none'));
   let order = [];
+  // cell geometry is cached (read once, and again only when the grid resizes): the glitch loop never forces a layout
+  let geo = null;
+  const measureGeo = () => { geo = { w: grid.offsetWidth, h: grid.offsetHeight, cells: glitch.map((g) => ({ x: g.c.offsetLeft, y: g.c.offsetTop, w: g.c.offsetWidth, h: g.c.offsetHeight })) }; };
   const drawLines = () => {
-    const gr = grid.getBoundingClientRect();
-    const pts = allBoxes().map((b) => { const r = b.getBoundingClientRect(); return [r.left - gr.left + r.width / 2, r.top - gr.top + r.height / 2]; });
+    if (!geo) measureGeo();
+    const pts = [];
+    glitch.forEach((g, gi) => { const c = geo.cells[gi]; g.boxes.forEach((b) => { if (b.style.display === 'none') return;
+      pts.push([c.x + (parseFloat(b.style.left) / 100) * c.w + parseFloat(b.style.width) / 2, c.y + (parseFloat(b.style.top) / 100) * c.h + parseFloat(b.style.height) / 2]); }); });
+    const gr = { width: geo.w, height: geo.h };
     if (order.length !== pts.length || Math.random() < 0.2) order = pts.map((_, i) => i).sort(() => Math.random() - 0.5);
     svg.setAttribute('viewBox', `0 0 ${gr.width | 0} ${gr.height | 0}`);
     let d = '', d2 = '';
@@ -112,14 +118,14 @@ export function mountPartners(root) {
   glitchStep();
 
   let open = null;
-  const inner = panel.parentElement;
+  const ro = new ResizeObserver(() => { geo = null; }); ro.observe(grid);
   const close = () => {
     if (!open) return;
     open = null;
     grid.querySelectorAll('[data-partner]').forEach((b) => b.setAttribute('aria-expanded', 'false'));
     const card = panel.querySelector('.pp');
     const done = () => { if (!open) { panel.hidden = true; panel.innerHTML = ''; } };
-    card?.animate ? card.animate([{ opacity: 1, transform: 'none' }, { opacity: 0, transform: 'translateY(8px) scale(0.97)' }], { duration: 220, easing: 'cubic-bezier(.4,0,1,1)', fill: 'forwards' }).finished.then(done) : done();
+    card?.animate ? card.animate([{ opacity: 1, transform: 'none' }, { opacity: 0, transform: 'translateY(10px)' }], { duration: 200, easing: 'cubic-bezier(.4,0,1,1)', fill: 'forwards' }).finished.then(done) : done();
     panel.classList.remove('is-on');
   };
   const show = (id) => {
@@ -135,12 +141,13 @@ export function mountPartners(root) {
       <div class="pp__foot"><span class="pp__since">Since ${p.since}</span><a class="pp__more" href="./" data-pp-more>Learn more about this company</a></div>
     </div>`;
     // centre of what you can actually see of the section (on desktop the section is pinned, so that's the screen centre)
-    const r = inner.getBoundingClientRect(), k = r.height / inner.offsetHeight || 1;
+    // the panel sits on the section itself (outside the zooming frame), so no scale correction is needed
+    const r = sec.getBoundingClientRect();
     const vis = (Math.max(r.top, 0) + Math.min(r.bottom, innerHeight)) / 2;
-    panel.style.setProperty('--pp-y', `${((vis - r.top) / k).toFixed(0)}px`);
+    panel.style.setProperty('--pp-y', `${(vis - r.top).toFixed(0)}px`);
     panel.hidden = false; panel.classList.add('is-on');
-    // the card animates on its own element, so the panel's centring transform is never overridden
-    panel.querySelector('.pp').animate?.([{ opacity: 0, transform: 'translateY(14px) scale(0.96)' }, { opacity: 1, transform: 'none' }], { duration: 460, easing: 'cubic-bezier(.16,1,.3,1)' });
+    // fade + slide only, no scale: a scaled layer is rasterised blurry until the animation ends
+    panel.querySelector('.pp').animate?.([{ opacity: 0, transform: 'translateY(16px)' }, { opacity: 1, transform: 'none' }], { duration: 380, easing: 'cubic-bezier(.16,1,.3,1)' });
     panel.querySelector('.pp').focus({ preventScroll: true });
   };
   const click = (e) => {
@@ -168,7 +175,7 @@ export function mountPartners(root) {
     // rises). Nothing else animates the frame, so fast scrolling, jumping or scrolling back always lands
     // on the exact same state for a given scroll position. Scrub is direct (Lenis already smooths).
     // Timeline units are screen heights, so positions map 1:1 to scroll distance.
-    const A = 1, P = mobile ? 0 : 2.4, E = 0.8;                       // approach, pinned, exit
+    const A = 1, P = mobile ? 0 : 1.7, E = 0.8;                       // approach, pinned, exit
     if (!mobile) sts.push(ScrollTrigger.create({ trigger: sec, start: 'top top', end: () => `+=${innerHeight * P}`, pin: true, refreshPriority: 1 }));
     gsap.set(frame, { scale: 0.76, borderRadius: 36 });
     const tl = gsap.timeline({ defaults: { ease: 'none' }, scrollTrigger: mobile
@@ -187,19 +194,23 @@ export function mountPartners(root) {
       const p0 = A;                                                    // pin starts here
       tl.to(frame, { scale: 0.9, borderRadius: 22, duration: A }, 0)    // rise + grow, linear with the scroll
         .to(frame, { scale: 1, borderRadius: 0, ease: 'sine.out', duration: 0.45 }, p0)   // settles as the pin catches it
-        .fromTo(left, { xPercent: -100 * Math.ceil(half) }, { xPercent: 0, ease: 'power3.inOut', duration: 1 }, p0 + 0.4)
-        .fromTo(right, { xPercent: 100 * Math.ceil(half) }, { xPercent: 0, ease: 'power3.inOut', duration: 1 }, p0 + 0.4)
-        .fromTo(mid, { opacity: 0, scaleY: 0.2 }, { opacity: 1, scaleY: 1, ease: 'power2.out', duration: 0.35 }, p0 + 1.05)
-        .fromTo(intro, { scale: 1, opacity: 1 }, { scale: 0.9, opacity: 0, ease: 'power1.in', duration: 0.35 }, p0 + 1.0)
-        .fromTo(svg, { opacity: 0 }, { opacity: 1, duration: 0.15 }, p0 + 1.25)
+        .fromTo(left, { xPercent: -100 * Math.ceil(half) }, { xPercent: 0, ease: 'power2.inOut', duration: 0.75 }, p0 + 0.1)
+        .fromTo(right, { xPercent: 100 * Math.ceil(half) }, { xPercent: 0, ease: 'power2.inOut', duration: 0.75 }, p0 + 0.1)
+        .fromTo(mid, { opacity: 0, scaleY: 0.2 }, { opacity: 1, scaleY: 1, ease: 'power2.out', duration: 0.3 }, p0 + 0.6)
+        .fromTo(intro, { scale: 1, opacity: 1 }, { scale: 0.92, opacity: 0, ease: 'power1.in', duration: 0.3 }, p0 + 0.55)
+        .fromTo(svg, { opacity: 0 }, { opacity: 1, duration: 0.15 }, p0 + 0.8)
         .to(frame, { scale: 0.95, borderRadius: 18, ease: 'sine.in', duration: 0.45 }, p0 + P - 0.45)  // starts letting go
         .to(frame, { scale: 0.86, borderRadius: 32, duration: E }, p0 + P);                         // leaves with the scroll
     }
+    // the frame is promoted to its own layer only while it zooms; at rest it is repainted once at full sharpness
+    let moving = null;
+    tl.eventCallback('onUpdate', () => { const m = Math.abs(gsap.getProperty(frame, 'scale') - 1) > 0.002; if (m !== moving) { moving = m; frame.classList.toggle('is-moving', m); } });
     sts.push(tl.scrollTrigger);
     sec._sts = sts;
   }
+  sec.appendChild(panel);              // detail card: outside the frame, never scaled
   let timer = 0;
-  const io = new IntersectionObserver(([e]) => { clearInterval(timer); if (e.isIntersecting) timer = setInterval(glitchStep, 160); });
+  const io = new IntersectionObserver(([e]) => { clearInterval(timer); if (e.isIntersecting) timer = setInterval(glitchStep, 200); });
   io.observe(sec);
-  return () => { st?.kill(true); sec._sts?.forEach((t) => t.kill(true)); clearInterval(timer); io.disconnect(); sec.removeEventListener('click', click); document.removeEventListener('keydown', esc); };
+  return () => { st?.kill(true); sec._sts?.forEach((t) => t.kill(true)); clearInterval(timer); io.disconnect(); ro.disconnect(); sec.removeEventListener('click', click); document.removeEventListener('keydown', esc); };
 }

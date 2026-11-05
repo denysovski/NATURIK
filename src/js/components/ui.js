@@ -241,6 +241,39 @@ function initFocusTrap() {
   });
 }
 
+/* ---------- number fields: our own up/down arrows instead of the browser's spinners ---------- */
+const CHEV = '<svg viewBox="0 0 12 8" aria-hidden="true"><path d="M1.5 6.2 6 1.8l4.5 4.4"/></svg>';
+function enhanceNumber(input) {
+  if (input.dataset.num) return;
+  input.dataset.num = '1';
+  const wrap = document.createElement('span'); wrap.className = 'num';
+  input.parentNode.insertBefore(wrap, input); wrap.appendChild(input);
+  const btns = document.createElement('span'); btns.className = 'num__btns';
+  btns.innerHTML = `<button type="button" class="num__btn" data-d="1" tabindex="-1" aria-label="Increase">${CHEV}</button><button type="button" class="num__btn num__btn--down" data-d="-1" tabindex="-1" aria-label="Decrease">${CHEV}</button>`;
+  wrap.appendChild(btns);
+  let hold = 0, rep = 0;
+  const step = (d) => {
+    if (input.disabled || input.readOnly) return;
+    if (input.value === '') input.value = input.placeholder || input.min || 0;
+    else d > 0 ? input.stepUp() : input.stepDown();
+    input.dispatchEvent(new Event('input', { bubbles: true })); input.dispatchEvent(new Event('change', { bubbles: true }));
+  };
+  const stop = () => { clearTimeout(hold); clearInterval(rep); };
+  btns.addEventListener('pointerdown', (e) => {
+    const b = e.target.closest('[data-d]'); if (!b) return;
+    e.preventDefault(); input.focus({ preventScroll: true });
+    const d = +b.dataset.d; step(d);
+    b.classList.remove('is-hit'); void b.offsetWidth; b.classList.add('is-hit');
+    hold = setTimeout(() => (rep = setInterval(() => step(d), 70)), 380);     // hold to keep counting
+  });
+  ['pointerup', 'pointerleave', 'pointercancel'].forEach((ev) => btns.addEventListener(ev, stop));
+}
+function initNumbers() {
+  const scan = (root) => root.querySelectorAll?.('input[type="number"]').forEach(enhanceNumber);
+  scan(document);
+  new MutationObserver((ms) => ms.forEach((m) => m.addedNodes.forEach((n) => n.nodeType === 1 && (n.matches('input[type="number"]') ? enhanceNumber(n) : scan(n))))).observe(document.body, { childList: true, subtree: true });
+}
+
 export function initUI() {
   const refit = () => fitHeadlines(document);
   document.fonts?.ready.then(refit); refit();
@@ -248,5 +281,5 @@ export function initUI() {
   document.addEventListener('naturik:page', () => requestAnimationFrame(refit));
   initImageLoading(); initScrollProgress(); initFocusTrap();
   initHeader(); initMenu(); initCursor(); initMagnetic(); initNewsletter(); initCookies(); initCurtainFallback(); initFooter();
-  initAccordions(document);
+  initAccordions(document); initNumbers();
 }

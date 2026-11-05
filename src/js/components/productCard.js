@@ -17,7 +17,7 @@ export function productCard(p, { eager = false, index = 0 } = {}) {
     <a class="p-card__link" data-cursor="View" href="./shop.html?p=${p.slug}" data-open-product="${p.slug}"><span class="sr-only">View ${p.fullName}</span></a>
     <div class="p-card__info">
       <h3 class="p-card__name">${p.name}</h3><span class="p-card__price">${formatPrice(p.price)}</span>
-      <p class="p-card__meta t-mono">${p.colorName} · ${p.fit} · ${p.edition} pcs</p>
+      <p class="p-card__meta t-mono">${p.colorName} · ${p.fit} · <span class="p-card__left">${left ? `${left} pieces left` : 'Sold out'}</span></p>
     </div>
   </article>`;
 }

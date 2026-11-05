@@ -59,7 +59,7 @@ export function mount(root = document) {
   form.addEventListener('submit', (e) => {
     e.preventDefault();
     let ok = true;
-    const set = (input, msg) => { input.setAttribute('aria-invalid', String(!!msg)); const err = input.parentElement.querySelector('.field__error'); if (err) err.textContent = msg || ''; if (msg) ok = false; };
+    const set = (input, msg) => { input.setAttribute('aria-invalid', String(!!msg)); const err = (input.closest('.field') || input.parentElement).querySelector('.field__error'); if (err) err.textContent = msg || ''; if (msg) ok = false; };
     if (!form.name.disabled) set(form.name, form.name.value.trim().length < 2 ? 'Tell us your name' : '');
     set(form.email, /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(form.email.value.trim()) ? '' : 'Enter a valid email address');
     if (!form.height.disabled) { const h = +form.height.value; set(form.height, h >= 120 && h <= 230 ? '' : 'Your height in cm, e.g. 182'); }
