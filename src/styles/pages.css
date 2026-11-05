@@ -1776,3 +1776,9 @@ html.is-routing .fab { opacity: 0; transform: translateY(14px) scale(0.7); }
 /* question mark ~70% bigger */
 .faq__3d { width: clamp(306px, 37vw, 544px); margin-top: 8px; margin-left: -4%; }
 @media (max-width: 900px) { .faq__3d { width: 290px; margin: 0 0 0 auto; } }
+/* megaphone +40% and 100px further left; it sits behind the headline so the words stay readable where they meet */
+@media (min-width: 901px) {
+  .contact-hero__3d { width: min(64vw, 980px); top: -70px; right: calc(-3vw + 100px); z-index: 0; }
+  .contact-hero__title, .contact-hero__meta { position: relative; z-index: 1; }
+}
+@media (min-width: 901px) { .contact-hero__facts dt, .contact-hero__facts dd { text-shadow: 0 1px 14px rgba(0,0,0,0.75); } }
