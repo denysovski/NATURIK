@@ -1782,3 +1782,4 @@ html.is-routing .fab { opacity: 0; transform: translateY(14px) scale(0.7); }
   .contact-hero__title, .contact-hero__meta { position: relative; z-index: 1; }
 }
 @media (min-width: 901px) { .contact-hero__facts dt, .contact-hero__facts dd { text-shadow: 0 1px 14px rgba(0,0,0,0.75); } }
+.contact-hero__3d { pointer-events: none !important; cursor: default; }

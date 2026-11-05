@@ -78,7 +78,8 @@ export function mountContact3d(root) {
       io.observe(host);
       const enter = () => (st.hov = 1), leave = () => { st.hov = 0; st.tx = st.ty = 0; };
       const move = (e) => { const r = host.getBoundingClientRect(); st.tx = ((e.clientX - r.left) / r.width - 0.5) * 0.7; st.ty = ((e.clientY - r.top) / r.height - 0.5) * 0.4; };
-      host.addEventListener('pointerenter', enter); host.addEventListener('pointerleave', leave); host.addEventListener('pointermove', move);
+      const interactive = host.dataset.c3d !== 'megaphone';      // the megaphone is decoration only: no hover
+      if (interactive) { host.addEventListener('pointerenter', enter); host.addEventListener('pointerleave', leave); host.addEventListener('pointermove', move); }
       requestAnimationFrame(() => host.classList.add('is-ready'));
       offs.push(() => { pause(); io.disconnect(); ro.disconnect(); host.removeEventListener('pointerenter', enter); host.removeEventListener('pointerleave', leave); host.removeEventListener('pointermove', move);
         scene.traverse((o) => { o.geometry?.dispose(); o.material?.dispose?.(); }); env.dispose(); renderer.dispose(); canvas.remove(); });
