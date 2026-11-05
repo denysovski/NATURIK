@@ -1794,3 +1794,31 @@ html.is-routing .fab { opacity: 0; transform: translateY(14px) scale(0.7); }
   body:has(.mobile-menu.is-open) .site-header { background: transparent; color: var(--c-bone); box-shadow: none; transform: none; }
   body:has(.mobile-menu.is-open) .site-header .icon-btn:not(.icon-btn--dark) { background: var(--c-bone); color: var(--c-ink); }
 }
+
+/* ── mobile pass: nothing that carries text may sit under something else ───────── */
+/* manifesto copy is drawn above the 3D blob (readable black on green where they meet) */
+.manifesto .index-num, .manifesto__text, .manifesto__cols, .manifesto__social { position: relative; z-index: 1; }
+@media (max-width: 819px) {
+  /* floating social button and the sticky buy bar sit side by side, never on top of each other */
+  .m-cta { left: 86px; }
+  /* the last lines of every page clear the floating social button */
+  .footer-bottom { padding-bottom: 96px; }
+  /* lookbook notes get a column wide enough for their lines (they ran under the next photo) */
+  .look-col--above, .look-col--below { min-width: 196px; }
+  .look-col .look-note { max-width: none !important; }
+  /* partner cells grow with their content instead of spilling into the next cell */
+  .partners__grid { grid-auto-rows: minmax(150px, auto) !important; }
+  /* contact facts: values stay on one line */
+  .contact-hero__facts { gap: 24px; flex-wrap: wrap; }
+  .contact-hero__facts dd { white-space: nowrap; }
+}
+@media (max-width: 380px) {
+  .contact-hero__facts dd { font-size: 1.25rem; }
+  /* bag: the price column never gets pushed out of the drawer */
+  .line-item { grid-template-columns: 64px minmax(0, 1fr) auto; gap: 10px; }
+  .line-item__img { width: 64px; }
+  /* size tables fit narrow phones */
+  .legal-block .size-table, .legal .size-table { font-size: 0.78rem; }
+  .legal-block .size-table th, .legal-block .size-table td { padding: 8px 4px; }
+}
+.line-item > div { min-width: 0; }

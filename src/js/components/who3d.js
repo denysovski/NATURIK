@@ -4,6 +4,7 @@
 // viewports; the environment map is built once, ahead of time, while the browser is idle; the canvas
 // renders only while the section is on screen.
 import { reduceMotion } from '../core/scroll.js';
+import { PHONE, softGL, gate } from './gltier.js';
 
 function starShape(T, points = 5, outer = 1, inner = 0.46) {
   const sh = new T.Shape();
@@ -95,6 +96,7 @@ export function mountWho3d(root) {
     renderer.setPixelRatio(Math.min(devicePixelRatio, innerWidth < 820 ? 1 : 1.25));
     renderer.toneMapping = T.ACESFilmicToneMapping; renderer.outputColorSpace = T.SRGBColorSpace;
     renderer.autoClear = false; renderer.setScissorTest(true);
+    if (softGL(renderer)) { renderer.dispose(); canvas.remove(); return; }   // no GPU: skip the 3D objects
     // environment map: built once, in an idle slot, shared by all three scenes
     await new Promise((r) => idle(r));
     if (dead) { renderer.dispose(); canvas.remove(); return; }
@@ -129,8 +131,10 @@ export function mountWho3d(root) {
     const ro = new ResizeObserver(layout); ro.observe(grid);
 
     let raf = 0, last = 0;
+    const still = softGL(renderer), g = gate(PHONE ? 30 : 60);
     const frame = (now) => {
       raf = requestAnimationFrame(frame);
+      if (!g(now)) return;
       const dt = Math.min(0.05, (now - (last || now)) / 1000); last = now;
       renderer.setScissorTest(false); renderer.clear(); renderer.setScissorTest(true);
       items.forEach((it) => {
@@ -147,7 +151,7 @@ export function mountWho3d(root) {
         renderer.render(it.scene, it.cam);
       });
     };
-    const play = () => { if (!raf && !reduceMotion) { last = 0; raf = requestAnimationFrame(frame); } };
+    const play = () => { if (still) { frame(performance.now()); cancelAnimationFrame(raf); raf = 0; return; } if (!raf && !reduceMotion) { last = 0; raf = requestAnimationFrame(frame); } };
     const pause = () => { cancelAnimationFrame(raf); raf = 0; };
     if (reduceMotion) frame(performance.now()), pause();
     const io = new IntersectionObserver(([e]) => (e.isIntersecting ? play() : pause()), { rootMargin: '100px 0px' });
@@ -168,7 +172,7 @@ export function mountWho3d(root) {
   let started = false;
   const go = () => { if (started || dead) return; started = true; boot(); };
   const idleStart = () => (window.requestIdleCallback ? requestIdleCallback(go, { timeout: 5000 }) : setTimeout(go, 1500));
-  const kick = setTimeout(idleStart, 3400);
+  const kick = PHONE ? 0 : setTimeout(idleStart, 3400);     // phones: boot only when the section is near
   const near = new IntersectionObserver(([e]) => { if (e.isIntersecting) { near.disconnect(); go(); } }, { rootMargin: '600px 0px' });
   near.observe(grid);
   return () => { dead = true; clearTimeout(kick); near.disconnect(); cleanup(); };

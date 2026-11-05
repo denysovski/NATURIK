@@ -204,7 +204,9 @@ export function mount(root = document) {
     window.naturikScrollTo ? window.naturikScrollTo(y, 0) : window.scrollTo({ top: y, behavior: 'smooth' });
   });
 
-  const ctx = gsap.context(() => {
+  // the scroll choreography is built one frame after the hero has painted, so the first screen shows up sooner
+  let ctx = null, dead = false;
+  const buildScroll = () => { ctx = gsap.context(() => {
     if (reduceMotion) { S.opacity = 0; return; }
     const mm = gsap.matchMedia();
     mm.add({ desk: '(min-width: 820px)', mob: '(max-width: 819px)' }, (c) => {
@@ -248,7 +250,7 @@ export function mount(root = document) {
     gsap.fromTo(root.querySelectorAll('.size-stock .stock__fill'), { scaleX: 0 }, { scaleX: 1, duration: 1.2, ease: 'expo.out', stagger: 0.08,
       scrollTrigger: { trigger: '[data-size-stock]', start: 'top 85%', once: true } });
     initReveals(root);
-  }, root === document ? undefined : root);
+  }, root === document ? undefined : root); };
 
   /* ---------- live-now line under "Live count" (demo: simulated numbers that drift up and down) ---------- */
   {
@@ -270,11 +272,18 @@ export function mount(root = document) {
       cleanups.push(() => clearTimeout(tid));
     }
   }
-  cleanups.push(mountSignal(root), mountBlob(root), mountLookOrbs(root), mountWho3d(root), mountPartners(root), mountClock(root));
   measure();
   on(window, 'resize', measure);
   intro();
-  requestAnimationFrame(() => ScrollTrigger.refresh());
+  requestAnimationFrame(() => setTimeout(() => {
+    if (dead) return;
+    buildScroll();
+    cleanups.push(mountSignal(root), mountBlob(root), mountLookOrbs(root), mountWho3d(root), mountPartners(root));
+    // the clock sits near the bottom: build it only when it gets close
+    const clk = root.querySelector('#clock');
+    if (clk) { const io = new IntersectionObserver(([e]) => { if (!e.isIntersecting) return; io.disconnect(); cleanups.push(mountClock(root)); }, { rootMargin: '150% 0px' }); io.observe(clk); cleanups.push(() => io.disconnect()); }
+    ScrollTrigger.refresh();
+  }, 0));
 
   // sticky mobile CTA: shows once the hero CTA has scrolled away, steps aside where buying is already on screen
   const mcta = $('[data-m-cta]');
@@ -284,5 +293,5 @@ export function mount(root = document) {
     const watch = (sel, key) => { const el = $(sel) || document.querySelector(sel); if (!el) return; const io = new IntersectionObserver(([e]) => { e.isIntersecting ? hide.add(key) : hide.delete(key); sync(); }, { rootMargin: '0px 0px -10% 0px' }); io.observe(el); cleanups.push(() => io.disconnect()); };
     watch('.hero', 'hero'); watch('#drop .drop-buy', 'buy'); watch('.site-footer', 'footer');
   }
-  return () => { ctx.revert(); cleanups.forEach((f) => f()); };
+  return () => { dead = true; ctx?.revert(); cleanups.forEach((f) => f()); };
 }

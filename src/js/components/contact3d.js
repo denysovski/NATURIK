@@ -2,6 +2,7 @@
 // a tilted question mark next to "Before you ask." and a green/blue megaphone top-right of "Talk to us."
 // Each host gets a small renderer that only draws while it is on screen; setup waits for an idle slot.
 import { reduceMotion } from '../core/scroll.js';
+import { PHONE, softGL, gate } from './gltier.js';
 
 function build(T, kind) {
   const g = new T.Group();
@@ -48,6 +49,8 @@ export function mountContact3d(root) {
       const renderer = new T.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'high-performance' });
       renderer.setPixelRatio(Math.min(devicePixelRatio, innerWidth < 820 ? 1.5 : 1.75));
       renderer.toneMapping = T.ACESFilmicToneMapping; renderer.outputColorSpace = T.SRGBColorSpace;
+      // no GPU (software WebGL): skip the object entirely, building it would freeze the page for seconds
+      if (softGL(renderer)) { renderer.dispose(); canvas.remove(); return; }
       const pm = new T.PMREMGenerator(renderer);
       const env = pm.fromScene(new T.RoomEnvironment(), 0.04).texture; pm.dispose();
       const scene = new T.Scene(); scene.environment = env;
@@ -60,8 +63,10 @@ export function mountContact3d(root) {
       size(); const ro = new ResizeObserver(size); ro.observe(host);
       renderer.compile(scene, cam);
       let raf = 0, last = 0;
+      const still = softGL(renderer), g = gate(PHONE ? 30 : 60);
       const frame = (now) => {
         raf = requestAnimationFrame(frame);
+        if (!g(now)) return;
         const dt = Math.min(0.05, (now - (last || now)) / 1000); last = now; st.t += dt;
         st.hv += (st.hov - st.hv) * 0.12; st.x += (st.tx - st.x) * 0.08; st.y += (st.ty - st.y) * 0.08;
         const b = obj.userData.base, k = obj.userData.sway;
@@ -71,7 +76,7 @@ export function mountContact3d(root) {
         if (host.dataset.c3d === 'megaphone') obj.rotation.z = b.z + st.hv * Math.sin(st.t * 18) * 0.04;  // a little "shout" buzz
         renderer.render(scene, cam);
       };
-      const play = () => { if (!raf) { last = 0; raf = requestAnimationFrame(frame); } };
+      const play = () => { if (still) { frame(performance.now()); cancelAnimationFrame(raf); raf = 0; return; } if (!raf) { last = 0; raf = requestAnimationFrame(frame); } };
       const pause = () => { cancelAnimationFrame(raf); raf = 0; };
       if (reduceMotion) { frame(performance.now()); pause(); }
       const io = new IntersectionObserver(([e]) => (e.isIntersecting && !reduceMotion ? play() : pause()), { rootMargin: '80px 0px' });

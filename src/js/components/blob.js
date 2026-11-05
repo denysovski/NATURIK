@@ -1,5 +1,6 @@
 // Green 3D blob for "Who we are". three.js is loaded only when the section gets close, the canvas
 // renders only while visible, and the hover "expand" is a damped spring (it overshoots and settles).
+import { PHONE, softGL, gate } from './gltier.js';
 import { reduceMotion } from '../core/scroll.js';
 
 const VERT = /* glsl */`
@@ -83,6 +84,7 @@ export function mountBlob(root) {
     let pr = Math.min(devicePixelRatio, small ? 1 : 1.25);
     renderer.setPixelRatio(pr);
     renderer.setClearColor(0x000000, 0);
+    if (softGL(renderer)) { renderer.dispose(); return; }   // no GPU: skip the blob
     host.appendChild(renderer.domElement);
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(32, 1, 0.1, 50);
@@ -97,6 +99,7 @@ export function mountBlob(root) {
     resize();
     // compile the shader and draw one frame now (idle time), so the first visible frame isn't a hitch
     renderer.compile(scene, camera); renderer.render(scene, camera);
+    const still = softGL(renderer), g = gate(PHONE ? 30 : 60);
 
     // springs: scale (hover expand) and tilt (follows the pointer with inertia)
     const sp = { s: 1, v: 0, target: 1 }, tilt = { x: 0, y: 0, tx: 0, ty: 0 };
@@ -105,9 +108,10 @@ export function mountBlob(root) {
     let shS = '', shO = '';
     const frame = (now) => {
       raf = requestAnimationFrame(frame);
+      if (!g(now)) return;
       const raw = now - last;
       const dt = Math.min(0.05, raw / 1000); last = now; t += dt;
-      if (++seen > 20) { slow = raw > 22 ? slow + 1 : Math.max(0, slow - 1);
+      if (++seen > 20) { slow = raw > (PHONE ? 45 : 22) ? slow + 1 : Math.max(0, slow - 1);
         if (slow > 24 && pr > 0.6) { pr = Math.max(0.6, pr - 0.2); renderer.setPixelRatio(pr); resize(); slow = 0; } }
       const k = 140, c = 11;                       // stiffness / damping → a little overshoot
       sp.v += (-(sp.s - sp.target) * k - sp.v * c) * dt; sp.s += sp.v * dt;
@@ -125,7 +129,7 @@ export function mountBlob(root) {
         if (os !== shO) shadow.style.opacity = shO = os;
       }
     };
-    const play = () => { if (!raf && !reduceMotion) { last = performance.now(); seen = 0; raf = requestAnimationFrame(frame); } };
+    const play = () => { if (still) { renderer.render(scene, camera); return; } if (!raf && !reduceMotion) { last = performance.now(); seen = 0; raf = requestAnimationFrame(frame); } };
     const pause = () => { cancelAnimationFrame(raf); raf = 0; };
     if (reduceMotion) renderer.render(scene, camera);
 
@@ -154,7 +158,7 @@ export function mountBlob(root) {
   let started = false;
   const go = () => { if (started || dead) return; started = true; boot(); };
   const idleStart = () => (window.requestIdleCallback ? requestIdleCallback(go, { timeout: 5000 }) : setTimeout(go, 1500));
-  const kick = setTimeout(idleStart, 2600);
+  const kick = PHONE ? 0 : setTimeout(idleStart, 2600);    // phones: boot only when the section is near
   const near = new IntersectionObserver(([e]) => { if (e.isIntersecting) { near.disconnect(); go(); } }, { rootMargin: '600px 0px' });
   near.observe(host);
   return () => { dead = true; clearTimeout(kick); near.disconnect(); live?.disconnect(); cleanup(); };

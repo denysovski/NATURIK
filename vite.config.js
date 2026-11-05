@@ -16,7 +16,7 @@ const PRERENDER = {
   'legal-terms': () => legalPage('terms', 'withdrawal', 'shipping', 'returns', 'care'),
   faq: () => accordionHTML(FAQ),
   'ld-faq': () => `<script type="application/ld+json">${JSON.stringify({ '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: FAQ.map(([q, a]) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a } })) })}</script>`,
-  products: () => PRODUCTS.map((p, i) => productCard(p, { eager: i < 3, index: i })).join(''),
+  products: () => PRODUCTS.map((p, i) => productCard(p, { eager: false, index: i })).join(''),
   'ld-products': () => `<script type="application/ld+json">${JSON.stringify({
     '@context': 'https://schema.org',
     '@graph': PRODUCTS.map((p) => ({
