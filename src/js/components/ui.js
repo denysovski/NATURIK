@@ -97,9 +97,17 @@ export const accordion = (items, { single = false, openFirst = false } = {}) => 
 /* ---------- header: hide on scroll down, colour on light sections ---------- */
 function initHeader() {
   const h = document.querySelector('[data-header]'); if (!h) return;
-  let last = 0;
+  let last = 0, acc = 0;
+  // phones: the (white) bar slides away while you scroll down and comes straight back on any scroll up
+  const mq = matchMedia('(max-width: 819px)');
   const update = (y) => {
     const menuOpen = document.querySelector('[data-mobile-menu].is-open');
+    const d = y - last;
+    // smooth scrolling moves a pixel or two per frame, so add up the movement in one direction
+    acc = Math.sign(d) === Math.sign(acc) ? acc + d : d;
+    if (!mq.matches || menuOpen || y < 70) h.classList.remove('m-hide');
+    else if (acc > 14) h.classList.add('m-hide');
+    else if (acc < -6) h.classList.remove('m-hide');
     last = y;
     const probe = 36;
     h.classList.toggle('on-light', !menuOpen && $$('[data-header-light]').some((s) => { const r = s.getBoundingClientRect(); return r.top <= probe && r.bottom >= probe; }));

@@ -6,13 +6,13 @@
 
 A drop store for the M1 Puffer: scroll-driven storytelling, live 3D objects and a complete (simulated) shop with checkout. No framework, no page reloads.
 
-[**▶ Open the live site**](https://denysovski.github.io/NATURIK/) &nbsp;·&nbsp; [Shop](https://denysovski.github.io/NATURIK/shop.html) &nbsp;·&nbsp; [Product](https://denysovski.github.io/NATURIK/shop.html?p=m1-obsidian) &nbsp;·&nbsp; [Contact](https://denysovski.github.io/NATURIK/contact.html)
+[**Open the live site**](https://denysovski.github.io/NATURIK/) &nbsp;·&nbsp; [Shop](https://denysovski.github.io/NATURIK/shop.html) &nbsp;·&nbsp; [Product](https://denysovski.github.io/NATURIK/shop.html?p=m1-obsidian) &nbsp;·&nbsp; [Contact](https://denysovski.github.io/NATURIK/contact.html)
 
-![Vite](https://img.shields.io/badge/Vite-646CFF?logo=vite&logoColor=white)
-![GSAP](https://img.shields.io/badge/GSAP%20%2B%20ScrollTrigger-0AE448?logo=greensock&logoColor=black)
-![three.js](https://img.shields.io/badge/three.js-000000?logo=threedotjs&logoColor=white)
-![Lenis](https://img.shields.io/badge/Lenis-smooth%20scroll-b6ff2e)
-![No framework](https://img.shields.io/badge/framework-none-1638ff)
+![Vite](https://img.shields.io/badge/Vite-000000?style=flat-square&labelColor=000000&logo=vite&logoColor=white)
+![GSAP](https://img.shields.io/badge/GSAP%20%2B%20ScrollTrigger-000000?style=flat-square&labelColor=000000&logo=greensock&logoColor=white)
+![three.js](https://img.shields.io/badge/three.js-000000?style=flat-square&labelColor=000000&logo=threedotjs&logoColor=white)
+![Lenis](https://img.shields.io/badge/Lenis-smooth%20scroll-000000?style=flat-square&labelColor=000000)
+![No framework](https://img.shields.io/badge/framework-none-000000?style=flat-square&labelColor=000000)
 
 <br>
 
@@ -26,13 +26,13 @@ A drop store for the M1 Puffer: scroll-driven storytelling, live 3D objects and 
 
 | | |
 |---|---|
-| 🧥 **The drop** | M1 Puffer **77C** (Obsidian) and **78C** (Arctic), 250 of each. One stock source drives every counter: the nav chip, the hero, Live count, the shop and each product (**106 left: 65 black, 41 white**). |
-| 🗺️ **Pages** | Home, Shop with product pages, Contact, Privacy, Terms and 404. Pages switch without reloads, with a tracker/terminal transition. |
-| 🛍️ **Shop** | Colour filter, sorting, full-photo gallery with a fact on every photo, a 20-second size finder, a size guide, a waitlist for sold-out sizes and a sliding Obsidian ↔ Arctic switch. |
-| 💳 **Bag & checkout** | Slide-in bag, free-shipping meter, discount codes, 4-step checkout with card validation (demo only, nothing is charged). |
-| ✨ **Motion** | Pinned zoom sections, a scroll-scrubbed photo stage, slot-machine counters, a live clock, glitch partners grid and smooth Lenis scrolling. |
-| 🧊 **3D** | A WebGL blob, glossy objects (bike wheel + thermometer, camera, star), a megaphone and a tilted question mark. All three.js, loaded lazily and drawn only while on screen. |
-| 🔎 **SEO** | Meta and Open Graph, JSON-LD (Product, ItemList, FAQ, Organization), sitemap, robots, 404. |
+| **The drop** | M1 Puffer **77C** (Obsidian) and **78C** (Arctic), 250 of each. One stock source drives every counter: the nav chip, the hero, Live count, the shop and each product (**106 left: 65 black, 41 white**). |
+| **Pages** | Home, Shop with product pages, Contact, Privacy, Terms and 404. Pages switch without reloads, with a tracker/terminal transition. |
+| **Shop** | Colour filter, sorting, full-photo gallery with a fact on every photo, a 20-second size finder, a size guide, a waitlist for sold-out sizes and a sliding Obsidian ↔ Arctic switch. |
+| **Bag & checkout** | Slide-in bag, free-shipping meter, discount codes, 4-step checkout with card validation (demo only, nothing is charged). |
+| **Motion** | Pinned zoom sections, a scroll-scrubbed photo stage, slot-machine counters, a live clock, glitch partners grid and smooth Lenis scrolling. |
+| **3D** | A WebGL blob, glossy objects (bike wheel + thermometer, camera, star), a megaphone and a tilted question mark. All three.js, loaded lazily and drawn only while on screen. |
+| **SEO** | Meta and Open Graph, JSON-LD (Product, ItemList, FAQ, Organization), sitemap, robots, 404. |
 
 ---
 
@@ -81,38 +81,10 @@ The homepage tells the story of the jacket from top to bottom. Each section has 
 
 ## Mobile
 
-<p align="center">
-  <img src="docs/screens/m-hero.jpg" width="190" alt="Mobile hero">
-  <img src="docs/screens/m-live-count.jpg" width="190" alt="Mobile live count">
-  <img src="docs/screens/m-who.jpg" width="190" alt="Mobile 3D cards">
-  <img src="docs/screens/m-clock.jpg" width="190" alt="Mobile clock">
-  <img src="docs/screens/m-product.jpg" width="190" alt="Mobile product">
-  <img src="docs/screens/m-contact.jpg" width="190" alt="Mobile contact">
-</p>
-
----
-
-## Full pages
-
-Scroll-throughs of each page at full height, captured screen by screen as the animations play.
-
-<details>
-<summary><b>Home</b>: the whole story, top to bottom</summary>
-<br>
-<img src="docs/screens/full-home.jpg" width="720" alt="Full homepage">
-</details>
-
-<details>
-<summary><b>Shop</b></summary>
-<br>
-<img src="docs/screens/full-shop.jpg" width="720" alt="Full shop page">
-</details>
-
-<details>
-<summary><b>Contact</b></summary>
-<br>
-<img src="docs/screens/full-contact.jpg" width="720" alt="Full contact page">
-</details>
+| | | |
+|:---:|:---:|:---:|
+| <img src="docs/screens/m-hero.jpg" width="230" alt="Mobile hero"><br><sub>Hero</sub> | <img src="docs/screens/m-live-count.jpg" width="230" alt="Mobile live count"><br><sub>Live count</sub> | <img src="docs/screens/m-who.jpg" width="230" alt="Mobile 3D cards"><br><sub>Who it's for, 3D</sub> |
+| <img src="docs/screens/m-clock.jpg" width="230" alt="Mobile clock"><br><sub>Who showed up</sub> | <img src="docs/screens/m-product.jpg" width="230" alt="Mobile product"><br><sub>Product</sub> | <img src="docs/screens/m-contact.jpg" width="230" alt="Mobile contact"><br><sub>Contact</sub> |
 
 ---
 

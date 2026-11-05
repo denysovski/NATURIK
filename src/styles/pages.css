@@ -1783,3 +1783,14 @@ html.is-routing .fab { opacity: 0; transform: translateY(14px) scale(0.7); }
 }
 @media (min-width: 901px) { .contact-hero__facts dt, .contact-hero__facts dd { text-shadow: 0 1px 14px rgba(0,0,0,0.75); } }
 .contact-hero__3d { pointer-events: none !important; cursor: default; }
+
+/* phones: solid white navigation bar, hides on scroll down, returns on scroll up */
+@media (max-width: 819px) {
+  .site-header, .site-header.on-light { background: #fff; color: var(--c-ink); box-shadow: 0 1px 0 rgba(0,0,0,0.08); }
+  .site-header::before, .site-header.on-light::before { display: none; }
+  .site-header .icon-btn:not(.icon-btn--dark), .site-header.on-light .icon-btn:not(.icon-btn--dark) { background: var(--c-ink); color: var(--c-bone); }
+  .site-header .brand__mark { --mark-ink: #fff; }
+  .site-header.m-hide { transform: translateY(-110%); }
+  body:has(.mobile-menu.is-open) .site-header { background: transparent; color: var(--c-bone); box-shadow: none; transform: none; }
+  body:has(.mobile-menu.is-open) .site-header .icon-btn:not(.icon-btn--dark) { background: var(--c-bone); color: var(--c-ink); }
+}
