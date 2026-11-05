@@ -1734,3 +1734,8 @@ select.field__input { background-image: url("data:image/svg+xml,%3Csvg xmlns='ht
 .qty { gap: 3px; padding: 3px; }
 .qty button { width: 28px; border-radius: 8px; background: rgba(127,127,127,0.12); transition: background 0.25s, color 0.25s; }
 @media (hover: hover) { .qty button:hover { background: var(--c-acid); color: #000; } }
+/* PDP round 3: the gallery's sticky offset equals its resting position, so it never shifts when scrolling starts */
+@media (min-width: 901px) { .pdp__gallery { top: 80px; } }
+.pdp__grid { position: relative; z-index: 1; }
+.pdp__edition .stock__fill { background: var(--c-cobalt) !important; }
+.pdp__eta, .pdp__eta svg { color: #000; }

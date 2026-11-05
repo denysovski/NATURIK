@@ -157,7 +157,8 @@ export function openProduct(slug, { from, push = true } = {}) {
     const t0 = old.offsetTop;
     // freeze the sticky gallery where it is on screen, so it slides away as a whole instead of jumping
     const og = old.querySelector('.pdp__gallery'), ogTop = og?.getBoundingClientRect().top;
-    Object.assign(old.style, { position: 'absolute', left: 0, right: 0, top: `${t0}px`, pointerEvents: 'none' });
+    Object.assign(old.style, { position: 'absolute', left: 0, right: 0, top: `${t0}px`, pointerEvents: 'none', zIndex: 0 });
+    fresh.style.zIndex = 2;   // the new page is drawn on top of the one fading out
     old.setAttribute('inert', ''); old.removeAttribute('id');
     old.before(fresh);                                   // the new grid comes first, so bind() finds its elements
     panel.querySelector('[data-sticky]')?.replaceWith(tmp.querySelector('[data-sticky]'));
@@ -165,8 +166,9 @@ export function openProduct(slug, { from, push = true } = {}) {
     panel.scrollTop = 0;
     gsap.set(old, { y: -keepTop });                      // the old page stays exactly where it was on screen
     if (og) { Object.assign(og.style, { position: 'relative', top: '0px' }); og.style.transform = `translateY(${ogTop - og.getBoundingClientRect().top}px)`; }
-    gsap.to(old, { xPercent: -100 * dir, opacity: 0.4, duration: 0.75, ease: 'expo.inOut', onComplete: () => old.remove() });
-    gsap.fromTo(fresh, { xPercent: 100 * dir }, { xPercent: 0, duration: 0.75, ease: 'expo.inOut', clearProps: 'transform', onComplete: () => panel.classList.remove('is-swapping') });
+    // the old colourway fades out fully (and drifts a little) while the new one slides in over it
+    gsap.to(old, { xPercent: -14 * dir, opacity: 0, duration: 0.5, ease: 'power2.out', onComplete: () => old.remove() });
+    gsap.fromTo(fresh, { xPercent: 100 * dir, opacity: 1 }, { xPercent: 0, duration: 0.8, ease: 'expo.out', clearProps: 'transform', onComplete: () => panel.classList.remove('is-swapping') });
     bind(p);
   } else {
     current = p; selected = null;

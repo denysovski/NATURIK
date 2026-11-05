@@ -73,18 +73,18 @@ const colorways = {
 };
 
 function make(model, cw, stock, imgs, extra = {}) {
-  const b = base[model], c = colorways[cw];
+  const b = base[model], c = colorways[cw], family = extra.family || b.family;
   return {
     id: `${model}-${cw}`, slug: `${model}-${cw}`,
-    name: `${b.family}`, fullName: `${b.family} — ${c.colorName}`,
     ...b, ...c, stock, images: imgs.map(IMG), ...extra,
+    family, name: family, fullName: `${family} — ${c.colorName}`,
   };
 }
 
 export const PRODUCTS = [
   // Drop 01 is one jacket in two colourways. Each card carries every photo of its colour, rain shots included.
-  make('m1', 'obsidian', { XS: 6, S: 12, M: 16, L: 15, XL: 10, XXL: 6 }, ['m1-editorial-hero', 'm1-back', 'm1-front', 'm1-three', 'm1-side', 'm1-acid-rain', 'm1-hand', 'm1-goggles', 'm1-chest', 'm1-zip', 'm1-editorial-sleeve', 'm1-editorial-back', 'm1-detail-print'], { hero: true, edition: 250 }),
-  make('m1', 'arctic', { XS: 3, S: 8, M: 11, L: 10, XL: 6, XXL: 3 }, ['arctic-splash-turn', 'arctic-full', 'arctic-front', 'arctic-back', 'arctic-shoulder', 'arctic-splash-front', 'arctic-splash-close'], { edition: 250 }),
+  make('m1', 'obsidian', { XS: 6, S: 12, M: 16, L: 15, XL: 10, XXL: 6 }, ['m1-editorial-hero', 'm1-back', 'm1-front', 'm1-three', 'm1-side', 'm1-acid-rain', 'm1-hand', 'm1-goggles', 'm1-chest', 'm1-zip', 'm1-editorial-sleeve', 'm1-editorial-back', 'm1-detail-print'], { hero: true, edition: 250, family: 'M1 Puffer 77C' }),
+  make('m1', 'arctic', { XS: 3, S: 8, M: 11, L: 10, XL: 6, XXL: 3 }, ['arctic-splash-turn', 'arctic-full', 'arctic-front', 'arctic-back', 'arctic-shoulder', 'arctic-splash-front', 'arctic-splash-close'], { edition: 250, family: 'M1 Puffer 78C' }),
 ];
 
 export const bySlug = (s) => PRODUCTS.find((p) => p.slug === s);
