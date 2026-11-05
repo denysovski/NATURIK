@@ -17,8 +17,8 @@ function build(T, kind) {
     const capB = new T.Mesh(new T.SphereGeometry(0.2, 24, 16), green); capB.position.copy(pts[pts.length - 1]); g.add(capB);
     const dot = new T.Mesh(new T.SphereGeometry(0.25, 32, 24), blue); dot.position.set(0, -0.98, 0); g.add(dot);
     g.position.y = -0.05;
-    g.rotation.z = -0.32;                     // lean: top to the right, bottom to the left
-    g.userData = { base: { x: 0.1, y: -0.45, z: -0.32 }, sway: 0.35 };
+    g.rotation.z = -0.67;                     // lean (~38°): top to the right, bottom to the left
+    g.userData = { base: { x: 0.1, y: -0.45, z: -0.67 }, sway: 0.35 };
   } else {
     // megaphone: green horn, blue body, mouth ring, handle and trigger
     const horn = new T.Mesh(new T.CylinderGeometry(0.95, 0.28, 1.5, 48, 1, true), green); horn.rotation.z = -Math.PI / 2; horn.position.x = 0.45; g.add(horn);

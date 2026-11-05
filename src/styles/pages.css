@@ -1768,3 +1768,11 @@ html.is-routing .fab { opacity: 0; transform: translateY(14px) scale(0.7); }
 .contact-hero__3d { position: absolute; z-index: 2; right: 0; top: 10px; width: clamp(150px, 24vw, 360px); aspect-ratio: 1; cursor: pointer; }
 .faq__3d { width: clamp(180px, 22vw, 320px); aspect-ratio: 1; margin-top: 24px; }
 @media (max-width: 900px) { .contact-hero__3d { width: 124px; top: 4px; right: 10px; } .faq__3d { width: 170px; margin: 10px 0 0 auto; } }
+/* megaphone: big, filling the right half next to "Talk to us." (facts row stays on top and clickable) */
+@media (min-width: 901px) {
+  .contact-hero__3d { width: min(46vw, 700px); top: 20px; right: -3vw; }
+  .contact-hero__row { position: relative; z-index: 3; }
+}
+/* question mark ~70% bigger */
+.faq__3d { width: clamp(306px, 37vw, 544px); margin-top: 8px; margin-left: -4%; }
+@media (max-width: 900px) { .faq__3d { width: 290px; margin: 0 0 0 auto; } }
