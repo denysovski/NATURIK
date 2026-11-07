@@ -5,7 +5,7 @@ import { openModal, closeModal } from './modal.js';
 import { gsap } from '../core/scroll.js';
 
 const STEPS = ['Contact', 'Delivery', 'Payment', 'Review'];
-const COUNTRIES = ['Czech Republic', 'Austria', 'Belgium', 'Denmark', 'Finland', 'France', 'Germany', 'Ireland', 'Italy', 'Netherlands', 'Norway', 'Poland', 'Portugal', 'Slovakia', 'Spain', 'Sweden', 'Switzerland', 'United Kingdom'];
+const COUNTRIES = [['Czech Republic', 'CZ'], ['Austria', 'AT'], ['Belgium', 'BE'], ['Denmark', 'DK'], ['Finland', 'FI'], ['France', 'FR'], ['Germany', 'DE'], ['Ireland', 'IE'], ['Italy', 'IT'], ['Netherlands', 'NL'], ['Norway', 'NO'], ['Poland', 'PL'], ['Portugal', 'PT'], ['Slovakia', 'SK'], ['Spain', 'ES'], ['Sweden', 'SE'], ['Switzerland', 'CH'], ['United Kingdom', 'GB']];
 
 let state, root, timer;
 
@@ -70,6 +70,63 @@ function field(name, label, { type = 'text', auto = '', placeholder = '', hint =
     <span class="field__error" id="co-${name}-e">${err || ''}</span>${hint ? `<span class="field__hint">${hint}</span>` : ''}</div>`;
 }
 
+function countryField(cur) {
+  const code = (COUNTRIES.find(([n]) => n === cur) || COUNTRIES[0])[1];
+  return `<div class="field combo" data-combo>
+    <span class="field__label" id="co-country-l">Country</span>
+    <input type="hidden" name="country" value="${esc(cur)}">
+    <button class="field__input combo__btn" type="button" id="co-country" aria-haspopup="listbox" aria-expanded="false" aria-controls="co-country-list" aria-labelledby="co-country-l co-country-v">
+      <span class="combo__value" id="co-country-v">${esc(cur)}</span><span class="combo__code">${code}</span><svg class="combo__chev" viewBox="0 0 12 8" aria-hidden="true"><path d="M1 1l5 5 5-5"/></svg>
+    </button>
+    <ul class="combo__list" id="co-country-list" role="listbox" tabindex="-1" aria-labelledby="co-country-l" data-lenis-prevent hidden>
+      ${COUNTRIES.map(([n, c], i) => `<li class="combo__opt" role="option" id="co-country-o${i}" data-value="${esc(n)}" aria-selected="${n === cur}"><span>${esc(n)}</span><span class="combo__code">${c}</span></li>`).join('')}
+    </ul>
+  </div>`;
+}
+
+function bindCombo(box) {
+  const btn = box.querySelector('.combo__btn'), list = box.querySelector('.combo__list'), input = box.querySelector('input[type="hidden"]');
+  const opts = [...list.querySelectorAll('[role="option"]')];
+  let active = Math.max(0, opts.findIndex((o) => o.getAttribute('aria-selected') === 'true'));
+  const mark = (i) => { active = (i + opts.length) % opts.length; opts.forEach((o, k) => o.classList.toggle('is-active', k === active)); list.setAttribute('aria-activedescendant', opts[active].id); opts[active].scrollIntoView({ block: 'nearest' }); };
+  const open = () => {
+    if (!list.hidden) return;
+    list.hidden = false; btn.setAttribute('aria-expanded', 'true');
+    const r = btn.getBoundingClientRect(), pr = root.getBoundingClientRect();
+    box.classList.toggle('is-up', pr.bottom - r.bottom < 240 && r.top - pr.top > pr.bottom - r.bottom);
+    mark(active); list.focus({ preventScroll: true });
+    requestAnimationFrame(() => box.classList.add('is-open'));
+    document.addEventListener('pointerdown', outside, true);
+  };
+  const close = (focus = true) => {
+    if (list.hidden) return;
+    box.classList.remove('is-open'); btn.setAttribute('aria-expanded', 'false'); list.hidden = true;
+    document.removeEventListener('pointerdown', outside, true);
+    if (focus) btn.focus({ preventScroll: true });
+  };
+  const pick = (i) => {
+    const o = opts[i]; opts.forEach((x) => x.setAttribute('aria-selected', String(x === o)));
+    input.value = o.dataset.value; state.data.country = o.dataset.value;
+    box.querySelector('.combo__value').textContent = o.dataset.value;
+    btn.querySelector('.combo__code').textContent = o.querySelector('.combo__code').textContent;
+    close();
+  };
+  const outside = (e) => { if (!box.contains(e.target)) close(false); };
+  btn.addEventListener('click', () => (list.hidden ? open() : close()));
+  btn.addEventListener('keydown', (e) => { if (['ArrowDown', 'ArrowUp', 'Enter', ' '].includes(e.key)) { e.preventDefault(); open(); } });
+  list.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowDown') { e.preventDefault(); mark(active + 1); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); mark(active - 1); }
+    else if (e.key === 'Home') { e.preventDefault(); mark(0); }
+    else if (e.key === 'End') { e.preventDefault(); mark(opts.length - 1); }
+    else if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick(active); }
+    else if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); close(); }
+    else if (e.key === 'Tab') close(false);
+    else if (/^[a-z]$/i.test(e.key)) { const k = e.key.toLowerCase(); const from = opts.findIndex((o, i) => i > active && o.dataset.value.toLowerCase().startsWith(k)); const i = from >= 0 ? from : opts.findIndex((o) => o.dataset.value.toLowerCase().startsWith(k)); if (i >= 0) mark(i); }
+  });
+  opts.forEach((o, i) => { o.addEventListener('pointermove', () => { if (active !== i) mark(i); }); o.addEventListener('click', () => pick(i)); });
+}
+
 function stepView() {
   const d = state.data;
   if (state.step === 0) return `
@@ -87,7 +144,7 @@ function stepView() {
       <div class="fields fields--2">${field('first', 'First name', { auto: 'given-name' })}${field('last', 'Last name', { auto: 'family-name' })}</div>
       ${field('address', 'Address', { auto: 'address-line1', placeholder: 'Street and number' })}
       <div class="fields fields--3">${field('city', 'City', { auto: 'address-level2' })}${field('zip', 'Postcode', { auto: 'postal-code' })}
-        <div class="field"><label class="field__label" for="co-country">Country</label><select class="field__input" id="co-country" name="country" autocomplete="country-name">${COUNTRIES.map((c) => `<option ${c === d.country ? 'selected' : ''}>${c}</option>`).join('')}</select><span class="field__error"></span></div></div>
+        ${countryField(d.country)}</div>
       <fieldset class="co-choices"><legend class="field__label">Shipping method</legend>
         ${Object.entries(SHIPPING).map(([k, m]) => {
           const t = bag.totals(k);
@@ -100,16 +157,16 @@ function stepView() {
   if (state.step === 2) return `
     <h3 class="co-h">Payment</h3>
     <p class="co-note t-mono">Demo store — use test card 4242 4242 4242 4242. Nothing is charged.</p>
-    <fieldset class="co-choices"><legend class="sr-only">Payment method</legend>
+    <fieldset class="co-choices co-choices--row"><legend class="sr-only">Payment method</legend>
       <label class="choice"><input type="radio" name="pay" value="card" ${d.pay === 'card' ? 'checked' : ''}><span>Card<span class="choice__sub">Visa, Mastercard, Amex</span></span><b class="t-mono">${brand((d.card || '').replace(/\s/g, '')) || 'CARD'}</b></label>
       <label class="choice"><input type="radio" name="pay" value="wallet" ${d.pay === 'wallet' ? 'checked' : ''}><span>Apple Pay / Google Pay<span class="choice__sub">Confirm on your device</span></span><b class="t-mono">WALLET</b></label>
       <label class="choice"><input type="radio" name="pay" value="klarna" ${d.pay === 'klarna' ? 'checked' : ''}><span>Klarna — pay in 30 days<span class="choice__sub">No interest, no fees</span></span><b class="t-mono">LATER</b></label>
     </fieldset>
-    ${d.pay === 'card' ? `<div class="fields" style="margin-top:16px">
+    ${d.pay === 'card' ? `<div class="fields co-card">
       ${field('cardName', 'Name on card', { auto: 'cc-name' })}
       ${field('card', 'Card number', { auto: 'cc-number', placeholder: '1234 1234 1234 1234', attrs: 'inputmode="numeric" maxlength="23" data-mask="card"' })}
-      <div class="fields fields--2">${field('exp', 'Expiry', { auto: 'cc-exp', placeholder: 'MM / YY', attrs: 'inputmode="numeric" maxlength="7" data-mask="exp"' })}${field('cvc', 'CVC', { auto: 'cc-csc', placeholder: '123', attrs: 'inputmode="numeric" maxlength="4"' })}</div>
-    </div>` : `<p class="co-note" style="margin-top:16px">You'll confirm the payment in a secure window after placing the order.</p>`}`;
+      <div class="fields fields--2 co-card__row">${field('exp', 'Expiry', { auto: 'cc-exp', placeholder: 'MM / YY', attrs: 'inputmode="numeric" maxlength="7" data-mask="exp"' })}${field('cvc', 'CVC', { auto: 'cc-csc', placeholder: '123', attrs: 'inputmode="numeric" maxlength="4"' })}</div>
+    </div>` : `<p class="co-note co-card">You'll confirm the payment in a secure window after placing the order.</p>`}`;
   const t = bag.totals(d.ship), m = SHIPPING[d.ship];
   return `
     <h3 class="co-h">Review</h3>
@@ -124,8 +181,9 @@ function stepView() {
     <p class="co-total-line">Total to pay <b>${formatPrice(t.total)}</b></p>`;
 }
 
-function render() {
+function render(animate = true) {
   const s = state.step;
+  const keep = root.scrollTop;
   root.innerHTML = `
     <button class="icon-btn modal__close" type="button" data-modal-close aria-label="Close checkout"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
     <div class="co">
@@ -144,7 +202,8 @@ function render() {
       ${summary()}
     </div>`;
   tick();
-  gsap.fromTo(root.querySelector('[data-step]'), { y: 24, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6, ease: 'expo.out' });
+  if (animate) gsap.fromTo(root.querySelector('[data-step]'), { y: 24, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6, ease: 'expo.out' });
+  else root.scrollTop = keep;
   bind();
 }
 
@@ -195,7 +254,8 @@ function bind() {
   });
   form.querySelector('[data-back]')?.addEventListener('click', () => { collect(); state.errors = {}; state.step--; render(); });
   root.querySelectorAll('[data-goto]').forEach((b) => b.addEventListener('click', () => { collect(); state.step = +b.dataset.goto; render(); }));
-  form.querySelectorAll('input[name="ship"], input[name="pay"]').forEach((r) => r.addEventListener('change', () => { collect(); render(); }));
+  form.querySelectorAll('input[name="ship"], input[name="pay"]').forEach((r) => r.addEventListener('change', () => { collect(); render(false); root.querySelector(`input[name="${r.name}"][value="${r.value}"]`)?.focus({ preventScroll: true }); }));
+  root.querySelectorAll('[data-combo]').forEach(bindCombo);
   form.querySelectorAll('[data-mask="card"]').forEach((i) => i.addEventListener('input', () => {
     i.value = i.value.replace(/\D/g, '').slice(0, 19).replace(/(\d{4})(?=\d)/g, '$1 ');
     const b = root.querySelector('input[name="pay"][value="card"]')?.closest('.choice')?.querySelector('b'); if (b) b.textContent = brand(i.value.replace(/\s/g, '')) || 'CARD';
@@ -207,9 +267,9 @@ function bind() {
   code?.addEventListener('submit', (ev) => {
     ev.preventDefault(); collect();
     const ok = bag.applyCode(code.code?.value);
-    if (ok) render(); else root.querySelector('[data-code-msg]').textContent = 'That code isn\'t valid for this drop.';
+    if (ok) render(false); else root.querySelector('[data-code-msg]').textContent = 'That code isn\'t valid for this drop.';
   });
-  root.querySelector('[data-code-remove]')?.addEventListener('click', () => { collect(); bag.removeCode(); render(); });
+  root.querySelector('[data-code-remove]')?.addEventListener('click', () => { collect(); bag.removeCode(); render(false); });
 }
 
 function place() {
