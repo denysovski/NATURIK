@@ -33,6 +33,7 @@ A drop store for the M1 Puffer: scroll-driven storytelling, live 3D objects and 
 | **Motion** | Pinned zoom sections, a scroll-scrubbed photo stage, slot-machine counters, a live clock, glitch partners grid and smooth Lenis scrolling. |
 | **3D** | A WebGL blob, glossy objects (bike wheel + thermometer, camera, star), a megaphone and a tilted question mark. All three.js, loaded lazily and drawn only while on screen. |
 | **SEO** | Meta and Open Graph, JSON-LD (Product, ItemList, FAQ, Organization), sitemap, robots, 404. |
+| **Figma** | Design system, wireframes and final desktop and mobile screens with a clickable prototype. See [Figma project](#figma-project) and the [PDF](figma/NATURIK-figma.pdf). |
 
 ---
 
@@ -88,6 +89,44 @@ The homepage tells the story of the jacket from top to bottom. Each section has 
 
 ---
 
+## Figma project
+
+The whole store also exists as a Figma file: a small design system, grey-box wireframes and the final desktop and mobile screens, linked into a clickable prototype.
+
+[**Download the PDF export**](figma/NATURIK-figma.pdf) (19 pages) &nbsp;·&nbsp; [Open in Figma](https://www.figma.com/design/QJSaUPJHjrsI6FjJMpKxOJ)
+
+![Figma cover](figma/previews/01-cover.jpg)
+
+### The idea
+
+Design and code usually drift apart. Here the order was turned around: the site was built first, and the Figma file was then made to match it 1:1, so it can serve as the reference for the next drop. It is meant to be read top to bottom, from the building blocks to the finished screens.
+
+| Page | What is on it |
+|---|---|
+| **Foundations** | Colour variables (ink, paper, cobalt, acid…), spacing and radius tokens, the brand words in Dirtyline and Canobis, and the product photos. |
+| **Components** | Icons, buttons, pills, size chips, stock bar, accordion, contact options, navigation, product card and footer. Each one has variants and properties, e.g. Button: Acid, Dark, Ghost, Light, Cobalt. |
+| **Wireframes** | Grey blocks only: section order, hierarchy and what each area does, for desktop (1440) and mobile (390). |
+| **Desktop — Final** | Home, Shop, both product pages and Contact, plus the states you can open: Find my size, Size guide, Bag and the sizing form. |
+| **Mobile — Final** | Home, Shop, Contact, the product page and the open menu. |
+
+| | |
+|---|---|
+| ![Foundations](figma/previews/02-foundations.jpg) **Foundations.** Colours, tokens and outlined brand words. | ![Components](figma/previews/03-components.jpg) **Components.** Reusable parts with variants. |
+| ![Wireframe](figma/previews/04-wireframe-home.jpg) **Wireframes.** Layout and flow before any visuals. | ![Product](figma/previews/05-product.jpg) **Final screens.** The product page, identical to the site. |
+| ![Contact](figma/previews/06-contact.jpg) **Contact.** The megaphone and question mark are still renders of the real 3D objects. | ![Mobile](figma/previews/07-mobile.jpg) **Mobile.** Product, its states and the menu. |
+
+### How it was made
+
+- **Built through the Figma Plugin API.** Variables, components, the wireframes and the prototype links were all created with scripts instead of by hand, so names and tokens stay consistent.
+- **Final screens are taken from the live site.** A small script walks the rendered page and writes every visible element as SVG: backgrounds and gradients, borders and radii, shadows and blur, clipping, inline icons and text with its real size, weight and colour. Figma imports that SVG as editable shapes and text layers, not a flat screenshot.
+- **Real assets.** Photos are uploaded in full resolution from the site. Headlines set in Dirtyline, Canobis or a metallic gradient are placed as sharp images, because those fonts are not available in Figma. Body text uses Hanken Grotesk as the closest match to Neue Montreal, with letter spacing adjusted so every line keeps its original width.
+- **3D as stills.** The WebGL objects (blob, bike wheel, camera, star, megaphone, question mark) are captured as images of the actual render.
+- **Pinned sections, one frame each.** Scroll-driven parts such as Closer and the Lookbook are shown as a single state instead of every scroll step.
+- **Clickable prototype.** Navigation, product cards, the Obsidian / Arctic switch, Size guide, Find my size, the bag, the contact topics and the mobile menu all link to their screens. Flows start at Desktop — Home and Mobile — Home.
+- **PDF.** Exported page by page from the Figma frames into `figma/NATURIK-figma.pdf`.
+
+---
+
 ## Try the demo checkout
 
 - Card **4242 4242 4242 4242**, any future date, any CVC
@@ -111,6 +150,7 @@ src/js/components/                      product page, bag, checkout, clock, part
 src/js/data/products.js                 the two colourways, stock and editions
 src/styles/                             tokens, components, pages
 public/                                 images, fonts, icons, SEO files
+figma/                                  Figma export (PDF) and preview images
 ```
 
 ## Run it locally
