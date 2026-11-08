@@ -38,7 +38,7 @@ export function addToBag(slug, size) {
   const p = bySlug(slug); if (!p) return false;
   const r = bag.add(slug, size);
   if (r === 'limit') { toast(`Limited drop — max 2 per size. You already have ${size} in your bag.`); return false; }
-  toast(`<b>${p.name}</b><br>${p.colorName} · ${size} — added to bag`, { image: p.images[0].sm, action: 'View bag', onAction: () => window.naturikCart?.open() });
+  toast(`<b>${p.name}</b><br>${p.colorName} · ${size} — added to bag<br><span class="toast__sub">Reserved for you for 15 min</span>`, { image: p.images[0].sm, action: 'View bag', onAction: () => window.naturikCart?.open() });
   const btn = document.querySelector('.cart-btn');
   if (btn) btn.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.25)' }, { transform: 'scale(1)' }], { duration: 500, easing: 'cubic-bezier(.16,1,.3,1)' });
   return true;

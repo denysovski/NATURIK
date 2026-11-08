@@ -1,7 +1,9 @@
 import { bag } from './store.js';
-import { formatPrice, FREE_SHIPPING, PRODUCTS, totalStock } from '../data/products.js';
+import { formatPrice, FREE_SHIPPING, PRODUCTS, totalStock, bySlug } from '../data/products.js';
+import { HOLD_MS } from './store.js';
 import { lockScroll, unlockScroll, gsap } from '../core/scroll.js';
 import { openCheckout } from './checkout.js';
+import { closeModal } from './modal.js';
 import { toast } from './toast.js';
 
 const $ = (s, r = document) => r.querySelector(s);
@@ -47,20 +49,67 @@ export function initCart() {
     window.naturikOpenProduct?.(add.dataset.upsell);
     if (!window.naturikOpenProduct) location.href = `./shop.html?p=${add.dataset.upsell}`;
   });
+  body.addEventListener('click', (e) => {
+    if (e.target.closest('[data-restore]')) {
+      const n = bag.restore();
+      toast(n ? `${n === 1 ? 'Piece' : `${n} pieces`} back in your bag — held for another 15 min.` : 'Sorry — those pieces have been taken by someone else.');
+    }
+    if (e.target.closest('[data-released-dismiss]')) bag.dismissReleased();
+  });
   foot.addEventListener('click', (e) => {
     if (e.target.closest('[data-checkout-start]')) { close(); setTimeout(openCheckout, 250); }
   });
 
+  /* ---------- 15-minute hold: live countdown, a 2-minute warning, and the release notice ---------- */
+  const fmt = (ms) => { const t = Math.ceil(ms / 1000); return `${Math.floor(t / 60)}:${String(t % 60).padStart(2, '0')}`; };
+  let warned = 0, closeWarn = null;
+  const tick = () => {
+    bag.check();                                     // releases the bag once the hold is over (fires onExpire)
+    const left = bag.left(); if (!left) return;
+    document.querySelectorAll('[data-hold]').forEach((n) => { n.textContent = fmt(left); });
+    document.querySelectorAll('[data-hold-bar]').forEach((n) => { n.style.transform = `scaleX(${(left / HOLD_MS).toFixed(4)})`; });
+    document.querySelectorAll('[data-hold-box]').forEach((n) => n.classList.toggle('is-low', left <= 120000));
+    if (left <= 120000 && left > 15000 && warned !== bag.until && !document.hidden) {
+      warned = bag.until;
+      closeWarn = toast(`Your bag is held for <b>${fmt(left)}</b> more. After that the pieces go back to the drop.`, { action: 'Checkout', onAction: () => { close(); openCheckout(); }, duration: 6000 });
+    }
+  };
+  // tell the visitor once: right away if they're here, otherwise as soon as they come back to the tab / site
+  const announce = () => {
+    const r = bag.released; if (!r || r.seen || document.hidden) return;
+    bag.markReleasedSeen();
+    const n = r.items.reduce((a, i) => a + i.qty, 0);
+    toast(`<b>Your reservation ran out.</b><br>You were inactive for 15 minutes, so we released ${n === 1 ? 'the piece' : `${n} pieces`} in your bag.`,
+      { action: 'View bag', onAction: open, duration: 8000 });
+  };
+  bag.onExpire(() => {
+    closeWarn?.(); closeWarn = null;
+    const inCheckout = document.querySelector('.modal.is-open[data-modal="checkout"]');
+    if (inCheckout) { closeModal(inCheckout); setTimeout(open, 300); }   // the bag explains what happened
+    announce();
+  });
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) { tick(); announce(); } });
+  addEventListener('pageshow', () => { tick(); announce(); });
   bag.subscribe(() => render());
+  setInterval(tick, 1000); tick(); setTimeout(announce, 1200);
 
   function render() {
     const items = bag.items, count = bag.count();
     document.querySelectorAll('[data-cart-count]').forEach((n) => { n.textContent = count; n.classList.toggle('has-items', count > 0); });
     const lbl = $('[data-cart-count-label]'); if (lbl) lbl.textContent = `(${count})`;
     const t = bag.totals();
+    const rel = bag.released;
+    const relNote = rel ? (() => {
+      const list = rel.items.map((i) => { const p = bySlug(i.slug); return p ? `${p.name} · ${i.size}${i.qty > 1 ? ` ×${i.qty}` : ''}` : ''; }).filter(Boolean);
+      const when = new Date(rel.at).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+      return `<div class="released" role="status">
+        <p class="released__title">You've been inactive, so we released your reservation.</p>
+        <p class="released__text">Pieces are held for 15 minutes. At ${when} these went back to the drop: <b>${list.join(', ')}</b>.</p>
+        <div class="released__row"><button class="btn btn--dark btn--sm" type="button" data-restore><span class="btn__label">Add them back</span></button><button class="link-btn t-mono" type="button" data-released-dismiss>Dismiss</button></div>
+      </div>`; })() : '';
     if (!items.length) {
       const pick = PRODUCTS.filter((p) => totalStock(p) > 0).slice(0, 2);
-      body.innerHTML = `<div class="empty-state">
+      body.innerHTML = `${relNote}<div class="empty-state">
           <svg aria-hidden="true"><use href="#i-bag"/></svg>
           <p class="t-h3">Your bag is empty.</p>
           <p class="t-muted">Drop 01 is live while pieces last.</p>
@@ -74,7 +123,13 @@ export function initCart() {
     }
     const left = Math.max(0, FREE_SHIPPING - (t.subtotal - t.discount));
     const pct = Math.min(100, ((t.subtotal - t.discount) / FREE_SHIPPING) * 100);
+    const left0 = bag.left();
     body.innerHTML = `
+      <div class="hold${left0 <= 120000 ? ' is-low' : ''}" data-hold-box>
+        <div class="hold__row"><span class="hold__label"><svg aria-hidden="true"><use href="#i-lock"/></svg>Reserved for you</span><b class="hold__time" data-hold>${fmt(left0)}</b></div>
+        <div class="hold__bar"><span data-hold-bar style="transform:scaleX(${(left0 / HOLD_MS).toFixed(4)})"></span></div>
+        <p class="hold__note">Limited drop: pieces are held for 15 min, then released to the next person in line.</p>
+      </div>
       <div class="ship-meter">
         <div class="stock__row t-mono"><span>${left > 0 ? `${formatPrice(left)} away from free shipping` : 'Free express-tracked EU shipping unlocked'}</span><span>${Math.round(pct)}%</span></div>
         <div class="stock__bar"><span class="stock__fill" style="--p:${pct}%"></span></div>
@@ -102,6 +157,6 @@ export function initCart() {
         <div class="totals__row totals__row--grand"><span>Total <span class="t-mono t-muted">incl. VAT</span></span><span>${formatPrice(t.total)}</span></div>
       </div>
       <button class="btn btn--dark btn--block" type="button" data-checkout-start><svg class="btn__icon" style="width:16px"><use href="#i-lock"/></svg><span class="btn__label">Secure checkout</span></button>
-      <p class="t-mono t-muted" style="text-align:center">Pieces are reserved for 15 min once checkout starts</p>`;
+      <p class="t-mono t-muted" style="text-align:center">Held for <span data-hold>${fmt(left0)}</span> · then released to the drop</p>`;
   }
 }

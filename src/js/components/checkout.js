@@ -19,7 +19,7 @@ export function openCheckout() {
   root = document.querySelector('[data-checkout]');
   if (!root) return;
   if (!bag.count()) { window.naturikCart?.open(); return; }
-  state = { step: 0, data: { country: 'Czech Republic', ship: 'standard', pay: 'card', news: true }, errors: {}, reserved: Date.now() + 15 * 60 * 1000 };
+  state = { step: 0, data: { country: 'Czech Republic', ship: 'standard', pay: 'card', news: true }, errors: {} };
   openModal('checkout');
   render();
   clearInterval(timer);
@@ -29,8 +29,10 @@ export function openCheckout() {
 
 function tick() {
   const el = root.querySelector('[data-reserve]'); if (!el) return;
-  const left = Math.max(0, state.reserved - Date.now());
-  const m = Math.floor(left / 60000), s = Math.floor((left % 60000) / 1000);
+  if (!bag.until) return;                         // order placed: nothing is held any more
+  const left = bag.left(), t = Math.ceil(left / 1000);
+  const m = Math.floor(t / 60), s = t % 60;
+  el.closest('p')?.classList.toggle('is-low', left <= 120000);
   el.textContent = `${m}:${String(s).padStart(2, '0')}`;
 }
 
@@ -38,7 +40,7 @@ function summary() {
   const t = bag.totals(state.data.ship);
   return `
   <aside class="co-summary">
-    <div class="co-summary__head"><p class="t-mono">Order summary</p><p class="t-mono t-muted">Reserved <b data-reserve>15:00</b></p></div>
+    <div class="co-summary__head"><p class="t-mono">Order summary</p><p class="t-mono t-muted">Reserved <b data-reserve>${(() => { const t = Math.ceil(bag.left() / 1000); return `${Math.floor(t / 60)}:${String(t % 60).padStart(2, '0')}`; })()}</b></p></div>
     <ul class="co-items">${bag.items.map((i) => `
       <li><span class="co-items__img"><img src="${i.product.images[0].sm}" alt=""><b>${i.qty}</b></span>
         <span><span class="co-items__name">${esc(i.product.name)}</span><span class="t-muted co-items__meta">${i.product.colorName} · ${i.size}</span></span>

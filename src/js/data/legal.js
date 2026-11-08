@@ -29,7 +29,7 @@ export const LEGAL = {
   terms: { t: 'Terms of sale', b: `
     <p><b>Demo store notice:</b> this website is a design prototype. No contract of sale is formed and no payment is taken.</p>
     <h3>1. Seller</h3><p>NATURIK (placeholder company details — to be completed before launch).</p>
-    <h3>2. Orders</h3><p>An order is accepted when we send the shipping confirmation. Limited pieces are reserved for 15 minutes during checkout. Max. 2 pieces per size per customer.</p>
+    <h3>2. Orders</h3><p>An order is accepted when we send the shipping confirmation. Pieces in your bag are reserved for 15 minutes from the last one you added; after that they are released back to the drop. Max. 2 pieces per size per customer.</p>
     <h3>3. Prices</h3><p>All prices in EUR including VAT. Shipping costs are shown before you pay.</p>
     <h3>4. Warranty</h3><p>Statutory 24-month warranty plus our lifetime repair programme.</p>
     <h3>5. Disputes</h3><p>EU consumers may use the European Online Dispute Resolution platform.</p>` },
