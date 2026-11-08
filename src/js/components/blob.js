@@ -81,7 +81,8 @@ export function mountBlob(root) {
     const small = innerWidth < 820 || (navigator.hardwareConcurrency || 8) <= 4;
     const renderer = new THREE.WebGLRenderer({ antialias: !small, alpha: true, powerPreference: 'high-performance' });
     // the blob is soft and blurry-edged, so it doesn't need retina pixels: this alone cuts fill cost ~2-3×
-    let pr = Math.min(devicePixelRatio, small ? 1 : 1.25);
+    // 1× is plenty for a soft shape (≈36% fewer pixels than 1.25×); adaptive quality can still drop it further
+    let pr = Math.min(devicePixelRatio, small ? 0.85 : 1);
     renderer.setPixelRatio(pr);
     renderer.setClearColor(0x000000, 0);
     if (softGL(renderer)) { renderer.dispose(); return; }   // no GPU: skip the blob
@@ -91,14 +92,22 @@ export function mountBlob(root) {
     camera.position.set(0, 0, 6.2);
     const uni = { uTime: { value: 0 }, uAmp: { value: 0.13 }, uFreq: { value: 0.95 },
       uBase: { value: new THREE.Color('#b6ff2e') }, uDeep: { value: new THREE.Color('#1d3a00') } };
-    const mesh = new THREE.Mesh(new THREE.IcosahedronGeometry(1, small ? 20 : 32),
-      new THREE.ShaderMaterial({ vertexShader: VERT, fragmentShader: FRAG, uniforms: uni }));
+    // IcosahedronGeometry is non-indexed: every vertex is stored ~6× (once per touching triangle), so the
+    // noise-heavy vertex shader ran ~6× more often than needed. Welding the vertices into an indexed mesh
+    // lets the GPU reuse each transformed vertex: same shape, a fraction of the vertex work.
+    const ico = new THREE.IcosahedronGeometry(1, small ? 16 : 26);
+    ico.deleteAttribute('uv');
+    const geo = THREE.mergeVertices(ico, 1e-4); ico.dispose();
+    const mesh = new THREE.Mesh(geo, new THREE.ShaderMaterial({ vertexShader: VERT, fragmentShader: FRAG, uniforms: uni }));
     scene.add(mesh);
 
     const resize = () => { const w = host.clientWidth, h = host.clientHeight; renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); };
     resize();
-    // compile the shader and draw one frame now (idle time), so the first visible frame isn't a hitch
-    renderer.compile(scene, camera); renderer.render(scene, camera);
+    // compile off the main thread where the browser supports it (KHR_parallel_shader_compile), then draw one
+    // frame, so neither the compile nor the first visible frame lands while someone is scrolling
+    try { await renderer.compileAsync(scene, camera); } catch { renderer.compile(scene, camera); }
+    if (dead) { geo.dispose(); mesh.material.dispose(); renderer.dispose(); renderer.domElement.remove(); return; }
+    renderer.render(scene, camera);
     const still = softGL(renderer), g = gate(PHONE ? 30 : 60);
 
     // springs: scale (hover expand) and tilt (follows the pointer with inertia)
@@ -136,18 +145,23 @@ export function mountBlob(root) {
     const io = new IntersectionObserver(([e]) => { visible = e.isIntersecting; visible ? play() : pause(); }, { rootMargin: '45% 0px' }); // start a beat before it's on screen
     io.observe(host);
     const sec = host.parentElement;
+    // the blob's box is cached (page coordinates) and refreshed on resize, so pointermove never forces a layout
+    let box = null;
+    const measure = () => { const r = host.getBoundingClientRect(); box = { left: r.left + scrollX, top: r.top + scrollY, width: r.width, height: r.height }; };
     const move = (e) => {
-      const r = host.getBoundingClientRect();
+      if (!box) measure();
+      const r = { left: box.left - scrollX, top: box.top - scrollY, width: box.width, height: box.height };
       const nx = (e.clientX - (r.left + r.width / 2)) / r.width, ny = (e.clientY - (r.top + r.height / 2)) / r.height;
       tilt.ty = nx * 0.8; tilt.tx = ny * 0.6;
       const over = Math.hypot(nx, ny) < 0.32;
       if (over !== host.classList.contains('is-over')) { host.classList.toggle('is-over', over); sp.target = over ? 1.28 : 1; ampT = over ? 0.22 : 0.13; sp.v += over ? 2.2 : -1.2; }
     };
     const leave = () => { tilt.tx = tilt.ty = 0; host.classList.remove('is-over'); sp.target = 1; ampT = 0.13; };
-    sec.addEventListener('pointermove', move); sec.addEventListener('pointerleave', leave);
-    const onResize = () => resize(); addEventListener('resize', onResize);
-    cleanup = () => { pause(); io.disconnect(); sec.removeEventListener('pointermove', move); sec.removeEventListener('pointerleave', leave); removeEventListener('resize', onResize);
-      mesh.geometry.dispose(); mesh.material.dispose(); renderer.dispose(); renderer.domElement.remove(); };
+    const enter = () => { box = null; };            // re-measure once per visit (layout above may have shifted)
+    sec.addEventListener('pointerenter', enter); sec.addEventListener('pointermove', move); sec.addEventListener('pointerleave', leave);
+    const onResize = () => { resize(); box = null; }; addEventListener('resize', onResize);
+    cleanup = () => { pause(); io.disconnect(); sec.removeEventListener('pointermove', move); sec.removeEventListener('pointerleave', leave); sec.removeEventListener('pointerenter', enter); removeEventListener('resize', onResize);
+      geo.dispose(); mesh.material.dispose(); renderer.dispose(); renderer.domElement.remove(); };
   };
 
   // heavy setup (module load, environment, shader compile) runs in idle time soon after the page loads,
@@ -158,8 +172,8 @@ export function mountBlob(root) {
   let started = false;
   const go = () => { if (started || dead) return; started = true; boot(); };
   const idleStart = () => (window.requestIdleCallback ? requestIdleCallback(go, { timeout: 5000 }) : setTimeout(go, 1500));
-  const kick = PHONE ? 0 : setTimeout(idleStart, 2600);    // phones: boot only when the section is near
-  const near = new IntersectionObserver(([e]) => { if (e.isIntersecting) { near.disconnect(); go(); } }, { rootMargin: '600px 0px' });
+  const kick = setTimeout(idleStart, PHONE ? 4000 : 2600);  // phones a little later; the near-observer below is the fallback
+  const near = new IntersectionObserver(([e]) => { if (e.isIntersecting) { near.disconnect(); go(); } }, { rootMargin: '1400px 0px' });
   near.observe(host);
   return () => { dead = true; clearTimeout(kick); near.disconnect(); live?.disconnect(); cleanup(); };
 }
