@@ -1875,3 +1875,7 @@ html.is-routing .fab { opacity: 0; transform: translateY(14px) scale(0.7); }
 .combo__opt[aria-selected="true"] .combo__code { color: var(--c-acid); }
 .combo__opt .combo__code { color: var(--c-fog); }
 @media (max-width: 560px) { .combo__list { width: 100%; max-height: 220px; } }
+
+/* blob shadow: static now (no per-frame updates); swells a touch with the hover via CSS */
+.blob__shadow { will-change: auto !important; transition: transform 0.6s var(--ease-out, ease); }
+.blob.is-over .blob__shadow { transform: translateX(-50%) scale(1.12); }

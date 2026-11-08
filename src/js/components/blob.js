@@ -1,49 +1,25 @@
 // Green 3D blob for "Who we are". three.js is loaded only when the section gets close, the canvas
-// renders only while visible, and the hover "expand" is a damped spring (it overshoots and settles).
+// renders only while visible. Kept deliberately light: sine-wave wobble (no noise), a low-poly mesh, 30 fps,
+// and simple eased hover/tilt instead of spring physics.
 import { PHONE, softGL, gate } from './gltier.js';
 import { reduceMotion } from '../core/scroll.js';
 
 const VERT = /* glsl */`
-uniform float uTime, uAmp, uFreq;
+uniform float uTime, uAmp;
 varying vec3 vN, vP;
-// simplex noise (Ashima / Stefan Gustavson)
-vec3 mod289(vec3 x){return x-floor(x*(1./289.))*289.;}
-vec4 mod289(vec4 x){return x-floor(x*(1./289.))*289.;}
-vec4 permute(vec4 x){return mod289(((x*34.)+1.)*x);}
-vec4 taylorInvSqrt(vec4 r){return 1.79284291400159-0.85373472095314*r;}
-float snoise(vec3 v){
-  const vec2 C=vec2(1./6.,1./3.);const vec4 D=vec4(0.,.5,1.,2.);
-  vec3 i=floor(v+dot(v,C.yyy));vec3 x0=v-i+dot(i,C.xxx);
-  vec3 g=step(x0.yzx,x0.xyz);vec3 l=1.-g;vec3 i1=min(g.xyz,l.zxy);vec3 i2=max(g.xyz,l.zxy);
-  vec3 x1=x0-i1+C.xxx;vec3 x2=x0-i2+C.yyy;vec3 x3=x0-D.yyy;
-  i=mod289(i);
-  vec4 p=permute(permute(permute(i.z+vec4(0.,i1.z,i2.z,1.))+i.y+vec4(0.,i1.y,i2.y,1.))+i.x+vec4(0.,i1.x,i2.x,1.));
-  float n_=.142857142857;vec3 ns=n_*D.wyz-D.xzx;
-  vec4 j=p-49.*floor(p*ns.z*ns.z);vec4 x_=floor(j*ns.z);vec4 y_=floor(j-7.*x_);
-  vec4 x=x_*ns.x+ns.yyyy;vec4 y=y_*ns.x+ns.yyyy;vec4 h=1.-abs(x)-abs(y);
-  vec4 b0=vec4(x.xy,y.xy);vec4 b1=vec4(x.zw,y.zw);
-  vec4 s0=floor(b0)*2.+1.;vec4 s1=floor(b1)*2.+1.;vec4 sh=-step(h,vec4(0.));
-  vec4 a0=b0.xzyw+s0.xzyw*sh.xxyy;vec4 a1=b1.xzyw+s1.xzyw*sh.zzww;
-  vec3 p0=vec3(a0.xy,h.x);vec3 p1=vec3(a0.zw,h.y);vec3 p2=vec3(a1.xy,h.z);vec3 p3=vec3(a1.zw,h.w);
-  vec4 norm=taylorInvSqrt(vec4(dot(p0,p0),dot(p1,p1),dot(p2,p2),dot(p3,p3)));
-  p0*=norm.x;p1*=norm.y;p2*=norm.z;p3*=norm.w;
-  vec4 m=max(.6-vec4(dot(x0,x0),dot(x1,x1),dot(x2,x2),dot(x3,x3)),0.);m=m*m;
-  return 42.*dot(m*m,vec4(dot(p0,x0),dot(p1,x1),dot(p2,x2),dot(p3,x3)));
+// cheap wobble: a few overlapping sine waves instead of 3D noise (a handful of sin() per vertex, no noise lookups)
+float wave(vec3 p){
+  return sin(p.x * 2.6 + p.y * .8 + uTime) * .42 + sin(p.y * 3.1 - p.z * .9 + uTime * .8 + 1.3) * .34
+       + sin(p.z * 2.8 + p.x * 1.1 + uTime * .9 + 2.1) * .3 + sin((p.x + p.y - p.z) * 1.6 + uTime * .6) * .3;
 }
-vec3 displace(vec3 p){
-  float n = snoise(p * uFreq + vec3(uTime * .22, uTime * .17, -uTime * .12));
-  return p * (1. + uAmp * n);
-}
+vec3 displace(vec3 p){ return p * (1. + uAmp * wave(p)); }
 void main(){
   vec3 p = displace(position);
-  // normal by finite differences along the sphere tangents
   vec3 t = normalize(cross(normal, abs(normal.y) < .99 ? vec3(0.,1.,0.) : vec3(1.,0.,0.)));
   vec3 bt = cross(normal, t);
-  float e = .012;
-  vec3 pa = displace(normalize(position + t * e));
-  vec3 pb = displace(normalize(position + bt * e));
-  vec3 n = normalize(cross(pa - p, pb - p));
-  vN = normalize(normalMatrix * n);
+  vec3 pa = displace(normalize(position + t * .02));
+  vec3 pb = displace(normalize(position + bt * .02));
+  vN = normalize(normalMatrix * normalize(cross(pa - p, pb - p)));
   vec4 mv = modelViewMatrix * vec4(p, 1.);
   vP = mv.xyz;
   gl_Position = projectionMatrix * mv;
@@ -59,7 +35,7 @@ void main(){
   float d1 = max(dot(n, L1), 0.), d2 = max(dot(n, L2), 0.);
   float wrap = max((dot(n, L1) + .45) / 1.45, 0.);           // soft subsurface-ish wrap
   vec3 h1 = normalize(L1 + v);
-  float spec = pow(max(dot(n, h1), 0.), 70.) * 1.1 + pow(max(dot(n, h1), 0.), 12.) * .12;
+  float spec = pow(max(dot(n, h1), 0.), 60.) * 1.1;
   float fres = pow(1. - max(dot(n, v), 0.), 3.);
   float ao = smoothstep(-.9, .4, n.y);                        // darker underside = grounded
   vec3 col = mix(uDeep, uBase, wrap) * (.35 + .65 * ao);
@@ -72,7 +48,6 @@ void main(){
 export function mountBlob(root) {
   const host = root.querySelector('[data-blob]');
   if (!host) return () => {};
-  const shadow = host.querySelector('[data-blob-shadow]');
   let dead = false, cleanup = () => {};
 
   const boot = async () => {
@@ -81,8 +56,7 @@ export function mountBlob(root) {
     const small = innerWidth < 820 || (navigator.hardwareConcurrency || 8) <= 4;
     const renderer = new THREE.WebGLRenderer({ antialias: !small, alpha: true, powerPreference: 'high-performance' });
     // the blob is soft and blurry-edged, so it doesn't need retina pixels: this alone cuts fill cost ~2-3×
-    // 1× is plenty for a soft shape (≈36% fewer pixels than 1.25×); adaptive quality can still drop it further
-    let pr = Math.min(devicePixelRatio, small ? 0.85 : 1);
+    const pr = Math.min(devicePixelRatio, small ? 0.85 : 1);
     renderer.setPixelRatio(pr);
     renderer.setClearColor(0x000000, 0);
     if (softGL(renderer)) { renderer.dispose(); return; }   // no GPU: skip the blob
@@ -90,12 +64,12 @@ export function mountBlob(root) {
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(32, 1, 0.1, 50);
     camera.position.set(0, 0, 6.2);
-    const uni = { uTime: { value: 0 }, uAmp: { value: 0.13 }, uFreq: { value: 0.95 },
+    const uni = { uTime: { value: 0 }, uAmp: { value: 0.15 },
       uBase: { value: new THREE.Color('#b6ff2e') }, uDeep: { value: new THREE.Color('#1d3a00') } };
     // IcosahedronGeometry is non-indexed: every vertex is stored ~6× (once per touching triangle), so the
     // noise-heavy vertex shader ran ~6× more often than needed. Welding the vertices into an indexed mesh
     // lets the GPU reuse each transformed vertex: same shape, a fraction of the vertex work.
-    const ico = new THREE.IcosahedronGeometry(1, small ? 14 : 22);
+    const ico = new THREE.IcosahedronGeometry(1, small ? 10 : 16);
     ico.deleteAttribute('uv');
     const geo = THREE.mergeVertices(ico, 1e-4); ico.dispose();
     const mesh = new THREE.Mesh(geo, new THREE.ShaderMaterial({ vertexShader: VERT, fragmentShader: FRAG, uniforms: uni }));
@@ -108,41 +82,28 @@ export function mountBlob(root) {
     try { await renderer.compileAsync(scene, camera); } catch { renderer.compile(scene, camera); }
     if (dead) { geo.dispose(); mesh.material.dispose(); renderer.dispose(); renderer.domElement.remove(); return; }
     renderer.render(scene, camera);
-    const still = softGL(renderer), g = gate(PHONE ? 30 : 60);
+    const still = softGL(renderer), g = gate(30);   // the motion is slow, 30 fps looks the same and halves the work
 
-    // springs: scale (hover expand) and tilt (follows the pointer with inertia)
-    const sp = { s: 1, v: 0, target: 1 }, tilt = { x: 0, y: 0, tx: 0, ty: 0 };
-    let amp = 0.13, ampT = 0.13, visible = false, raf = 0, last = performance.now(), t = 0;
-    let slow = 0, seen = 0;                          // adaptive quality: drop resolution if frames run long
-    let shS = '', shO = '';
+    // simple eased values (no spring physics): scale for the hover swell, tilt towards the pointer
+    const ease = { s: 1, ts: 1, x: 0, y: 0, tx: 0, ty: 0, a: 0.15, ta: 0.15 };
+    let raf = 0, last = performance.now(), t = 0;
     const frame = (now) => {
       raf = requestAnimationFrame(frame);
       if (!g(now)) return;
-      const raw = now - last;
-      const dt = Math.min(0.05, raw / 1000); last = now; t += dt;
-      if (++seen > 20) { slow = raw > (PHONE ? 45 : 22) ? slow + 1 : Math.max(0, slow - 1);
-        if (slow > 24 && pr > 0.6) { pr = Math.max(0.6, pr - 0.2); renderer.setPixelRatio(pr); resize(); slow = 0; } }
-      const k = 140, c = 11;                       // stiffness / damping → a little overshoot
-      sp.v += (-(sp.s - sp.target) * k - sp.v * c) * dt; sp.s += sp.v * dt;
-      tilt.x += (tilt.tx - tilt.x) * Math.min(1, dt * 2.5); tilt.y += (tilt.ty - tilt.y) * Math.min(1, dt * 2.5);
-      amp += (ampT - amp) * Math.min(1, dt * 5);
-      uni.uTime.value = t * 0.55; uni.uAmp.value = amp;   // calmer, slower surface motion
-      const bob = Math.sin(t * 0.6) * 0.05;
-      mesh.position.y = bob;
-      mesh.scale.setScalar(sp.s);
-      mesh.rotation.set(tilt.x + t * 0.03, tilt.y + t * 0.05, 0);
+      const dt = Math.min(0.1, (now - last) / 1000); last = now; t += dt;
+      const k = Math.min(1, dt * 3);
+      ease.s += (ease.ts - ease.s) * k; ease.x += (ease.tx - ease.x) * k; ease.y += (ease.ty - ease.y) * k; ease.a += (ease.ta - ease.a) * k;
+      uni.uTime.value = t * 0.5; uni.uAmp.value = ease.a;
+      mesh.position.y = Math.sin(t * 0.6) * 0.05;
+      mesh.scale.setScalar(ease.s);
+      mesh.rotation.set(ease.x + t * 0.03, ease.y + t * 0.05, 0);
       renderer.render(scene, camera);
-      if (shadow) {                                  // only touch the DOM when the value actually changes
-        const ts = `translateX(-50%) scale(${(sp.s * (1 - bob * 1.4)).toFixed(2)})`, os = (0.55 - bob * 1.2).toFixed(2);
-        if (ts !== shS) shadow.style.transform = shS = ts;
-        if (os !== shO) shadow.style.opacity = shO = os;
-      }
     };
-    const play = () => { if (still) { renderer.render(scene, camera); return; } if (!raf && !reduceMotion) { last = performance.now(); seen = 0; raf = requestAnimationFrame(frame); } };
+    const play = () => { if (still) { renderer.render(scene, camera); return; } if (!raf && !reduceMotion) { last = performance.now(); raf = requestAnimationFrame(frame); } };
     const pause = () => { cancelAnimationFrame(raf); raf = 0; };
     if (reduceMotion) renderer.render(scene, camera);
 
-    const io = new IntersectionObserver(([e]) => { visible = e.isIntersecting; visible ? play() : pause(); }, { rootMargin: '45% 0px' }); // start a beat before it's on screen
+    const io = new IntersectionObserver(([e]) => (e.isIntersecting ? play() : pause()), { rootMargin: '10% 0px' });
     io.observe(host);
     const sec = host.parentElement;
     // the blob's box is cached (page coordinates) and refreshed on resize, so pointermove never forces a layout
@@ -152,11 +113,11 @@ export function mountBlob(root) {
       if (!box) measure();
       const r = { left: box.left - scrollX, top: box.top - scrollY, width: box.width, height: box.height };
       const nx = (e.clientX - (r.left + r.width / 2)) / r.width, ny = (e.clientY - (r.top + r.height / 2)) / r.height;
-      tilt.ty = nx * 0.8; tilt.tx = ny * 0.6;
+      ease.ty = nx * 0.6; ease.tx = ny * 0.45;
       const over = Math.hypot(nx, ny) < 0.32;
-      if (over !== host.classList.contains('is-over')) { host.classList.toggle('is-over', over); sp.target = over ? 1.28 : 1; ampT = over ? 0.22 : 0.13; sp.v += over ? 2.2 : -1.2; }
+      if (over !== host.classList.contains('is-over')) { host.classList.toggle('is-over', over); ease.ts = over ? 1.16 : 1; ease.ta = over ? 0.21 : 0.15; }
     };
-    const leave = () => { tilt.tx = tilt.ty = 0; host.classList.remove('is-over'); sp.target = 1; ampT = 0.13; };
+    const leave = () => { ease.tx = ease.ty = 0; host.classList.remove('is-over'); ease.ts = 1; ease.ta = 0.15; };
     const enter = () => { box = null; };            // re-measure once per visit (layout above may have shifted)
     sec.addEventListener('pointerenter', enter); sec.addEventListener('pointermove', move); sec.addEventListener('pointerleave', leave);
     const onResize = () => { resize(); box = null; }; addEventListener('resize', onResize);
