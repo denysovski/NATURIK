@@ -31,7 +31,7 @@ export function mountSignal(root) {
   const field = sec.querySelector('[data-signal-field]'), svg = sec.querySelector('[data-signal-lines]');
   const link = sec.querySelector('[data-signal-link]'), text = sec.querySelector('[data-signal-text]'), idxEl = sec.querySelector('[data-signal-idx]');
   const mobile = innerWidth < 820;
-  const N = mobile ? 9 : 16;
+  const N = mobile ? 6 : 11;                 // ~30% fewer boxes (and so fewer dashed lines) than before
   const base = new URL('./images/', location.href).href;
 
   // build tracker boxes once; they are moved, never re-created
@@ -56,7 +56,7 @@ export function mountSignal(root) {
     let x = rnd(0.02, 0.98) * W - w / 2, y = rnd(0.05, 0.95) * H - h / 2;
     if (Math.abs(y + h / 2 - H / 2) < H * 0.14 && Math.abs(x + w / 2 - W / 2) < W * 0.3) y += (y < H / 2 ? -1 : 1) * H * 0.22;
     x = Math.max(4, Math.min(W - w - 4, x)); y = Math.max(4, Math.min(H - h - 4, y));
-    const showImg = Math.random() < 0.55;
+    const showImg = Math.random() < 0.4;
     b.img.style.backgroundImage = showImg ? `url(${base}${pick(IMAGES)})` : 'none';
     b.img.style.backgroundPosition = `${rnd(0, 100)}% ${rnd(0, 100)}%`;
     b.el.classList.toggle('has-img', showImg);
@@ -71,7 +71,7 @@ export function mountSignal(root) {
     if (!moving.size) return;
     const list = [...moving]; moving.clear();
     const o = { t: 0 };
-    gsap.to(o, { t: 1, duration: 0.32, ease: 'expo.out', onUpdate: () => {
+    gsap.to(o, { t: 1, duration: 0.6, ease: 'power3.out', onUpdate: () => {
       list.forEach((b) => { b.x = b.fx + (b.tx - b.fx) * o.t; b.y = b.fy + (b.ty - b.fy) * o.t; b.el.style.transform = `translate3d(${b.x.toFixed(1)}px, ${b.y.toFixed(1)}px, 0)`; });
       draw();                                   // lines are redrawn only while something moves
     } });
@@ -102,7 +102,7 @@ export function mountSignal(root) {
     // restart the flash without forcing a layout: alternate between two identical animations
     flip = !flip; sec.classList.toggle('is-flash', flip); sec.classList.toggle('is-flash-b', !flip);
     const o = { k: 0 };
-    gsap.to(o, { k: 1, duration: 0.28, ease: 'none', onUpdate: () => {
+    gsap.to(o, { k: 1, duration: 0.42, ease: 'none', onUpdate: () => {
       const n = Math.floor(o.k * final.length);
       text.textContent = final.slice(0, n) + [...final.slice(n)].map((ch) => (ch === ' ' ? ' ' : pick(GLYPHS))).join('');
     }, onComplete: () => (text.textContent = final) });
@@ -112,11 +112,11 @@ export function mountSignal(root) {
   const step = () => {
     if (!hold) { pi = (pi + 1) % PHRASES.length; setPhrase(pi); }
     // move a handful of boxes each beat, reshuffle the links now and then
-    for (let k = 0; k < (mobile ? 2 : 4); k++) place(pick(boxes));
+    for (let k = 0; k < (mobile ? 1 : 2); k++) place(pick(boxes));
     if (++beat % 3 === 0) order = order.sort(() => Math.random() - 0.5);
     glide();
   };
-  const start = () => { if (running || reduceMotion) return; running = true; timer = setInterval(step, 820); };
+  const start = () => { if (running || reduceMotion) return; running = true; timer = setInterval(step, 1400); };
   const stop = () => { running = false; clearInterval(timer); };
 
   size(); boxes.forEach((b) => place(b, true)); draw(); setPhrase(0);

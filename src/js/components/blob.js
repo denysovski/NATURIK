@@ -95,7 +95,7 @@ export function mountBlob(root) {
     // IcosahedronGeometry is non-indexed: every vertex is stored ~6× (once per touching triangle), so the
     // noise-heavy vertex shader ran ~6× more often than needed. Welding the vertices into an indexed mesh
     // lets the GPU reuse each transformed vertex: same shape, a fraction of the vertex work.
-    const ico = new THREE.IcosahedronGeometry(1, small ? 16 : 26);
+    const ico = new THREE.IcosahedronGeometry(1, small ? 14 : 22);
     ico.deleteAttribute('uv');
     const geo = THREE.mergeVertices(ico, 1e-4); ico.dispose();
     const mesh = new THREE.Mesh(geo, new THREE.ShaderMaterial({ vertexShader: VERT, fragmentShader: FRAG, uniforms: uni }));
@@ -124,13 +124,13 @@ export function mountBlob(root) {
         if (slow > 24 && pr > 0.6) { pr = Math.max(0.6, pr - 0.2); renderer.setPixelRatio(pr); resize(); slow = 0; } }
       const k = 140, c = 11;                       // stiffness / damping → a little overshoot
       sp.v += (-(sp.s - sp.target) * k - sp.v * c) * dt; sp.s += sp.v * dt;
-      tilt.x += (tilt.tx - tilt.x) * Math.min(1, dt * 4); tilt.y += (tilt.ty - tilt.y) * Math.min(1, dt * 4);
+      tilt.x += (tilt.tx - tilt.x) * Math.min(1, dt * 2.5); tilt.y += (tilt.ty - tilt.y) * Math.min(1, dt * 2.5);
       amp += (ampT - amp) * Math.min(1, dt * 5);
-      uni.uTime.value = t; uni.uAmp.value = amp;
-      const bob = Math.sin(t * 0.9) * 0.06;
+      uni.uTime.value = t * 0.55; uni.uAmp.value = amp;   // calmer, slower surface motion
+      const bob = Math.sin(t * 0.6) * 0.05;
       mesh.position.y = bob;
       mesh.scale.setScalar(sp.s);
-      mesh.rotation.set(tilt.x + t * 0.05, tilt.y + t * 0.08, 0);
+      mesh.rotation.set(tilt.x + t * 0.03, tilt.y + t * 0.05, 0);
       renderer.render(scene, camera);
       if (shadow) {                                  // only touch the DOM when the value actually changes
         const ts = `translateX(-50%) scale(${(sp.s * (1 - bob * 1.4)).toFixed(2)})`, os = (0.55 - bob * 1.2).toFixed(2);

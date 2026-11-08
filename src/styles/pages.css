@@ -1376,7 +1376,7 @@ html.is-routing .fab { opacity: 0; pointer-events: none; transition: opacity 0.3
 @keyframes sig-flash-b { 0% { background: var(--c-acid); color: #000; } 50% { background: var(--c-cobalt); color: var(--c-acid); } 100% { background: transparent; } }
 .trk { will-change: transform; box-shadow: 0 0 8px rgba(182,255,46,0.3) !important; }
 .trk--blue { box-shadow: 0 0 8px rgba(22,56,255,0.45) !important; }
-.signal__lines { will-change: contents; }
+.signal__lines { will-change: auto; }
 
 /* ── round 14 ─────────────────────────────────────────────── */
 /* Partners: a little more air between letters (≈ +2px per letter) */
@@ -1392,8 +1392,8 @@ html.is-routing .fab { opacity: 0; pointer-events: none; transition: opacity 0.3
 
 /* Who we are glow: further left, softer, and it breathes */
 .manifesto__glow { left: -38vw !important; top: 10% !important; width: 66vw !important; height: 84% !important; }
-.manifesto__glow::before { background: radial-gradient(closest-side at 46% 44%, rgba(22,56,255,0.32), rgba(22,56,255,0.1) 50%, transparent 72%) !important; animation: glow-pulse-a 6s ease-in-out infinite !important; }
-.manifesto__glow::after { background: radial-gradient(closest-side at 60% 62%, rgba(182,255,46,0.24), rgba(182,255,46,0.07) 48%, transparent 70%) !important; animation: glow-pulse-b 8s ease-in-out infinite !important; }
+.manifesto__glow::before { background: radial-gradient(closest-side at 46% 44%, rgba(22,56,255,0.32), rgba(22,56,255,0.1) 50%, transparent 72%) !important; animation: glow-pulse-a 12s ease-in-out infinite !important; }
+.manifesto__glow::after { background: radial-gradient(closest-side at 60% 62%, rgba(182,255,46,0.24), rgba(182,255,46,0.07) 48%, transparent 70%) !important; animation: glow-pulse-b 16s ease-in-out infinite !important; }
 @keyframes glow-pulse-a { 0%, 100% { transform: translate3d(0, 0, 0) scale(0.9); opacity: 0.45; } 50% { transform: translate3d(2vw, -2vh, 0) scale(1.08); opacity: 1; } }
 @keyframes glow-pulse-b { 0%, 100% { transform: translate3d(1vw, 3vh, 0) scale(1.05); opacity: 0.9; } 50% { transform: translate3d(-2vw, -1vh, 0) scale(0.88); opacity: 0.35; } }
 
